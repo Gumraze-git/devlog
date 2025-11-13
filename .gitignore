@@ -43,3 +43,6 @@ next-env.d.ts
 /.idea/modules.xml
 /.idea/devlog.iml
 /.idea/aws.xml
+
+# docs
+/docs/
