@@ -3,25 +3,56 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
 // 네비게이션 항목 정의
 const navItems = [
-  { name: "Home", href: "/" },          // Home
-  { name: "About", href: "/about" },    // 소개 페이지
-  { name: "Devlog", href: "/devlog" },  // 개발 블로그
-  { name: "Projects", href: "/projects" }, // 프로젝트
-  { name: "Contact", href: "/contact" },   // 연락 페이지
+  { name: "Home", href: "#home" },          // Home
+  { name: "About", href: "#about" },        // 소개 섹션
+  { name: "Devlog", href: "#devlog" },      // 개발 블로그
+  { name: "Projects", href: "#projects" },  // 프로젝트
+  { name: "Contact", href: "#contact" },    // 연락 섹션
 ];
 
 export default function NavBar() {
-  // 현재 URL의 경로 가져옴
-  const pathname = usePathname();
-
   // 모바일 메뉴 열림 여부 (true, false)
   const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
+
+  useEffect(() => {
+    const sectionIds = navItems.map((item) => item.href.replace("#", ""));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visibleEntry?.target?.id) {
+          setActiveSection(visibleEntry.target.id);
+        }
+      },
+      {
+        threshold: 0.35,
+      }
+    );
+
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      elements.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
+    };
+  }, []);
+
+  const handleNavClick = (target: string) => {
+    setActiveSection(target);
+    setIsOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-40 border-b border-slate-200 bg-slate-50/80 backdrop-blur-md">
@@ -35,14 +66,14 @@ export default function NavBar() {
         <div className="hidden gap-6 md:flex">
           {navItems.map((item) => {
             // 현재 페이지와 nav 항목이 같으면 활성 상태로 표시함.
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname?.startsWith(item.href));
+            const targetId = item.href.replace("#", "");
+            const isActive = activeSection === targetId;
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => handleNavClick(targetId)}
                 className={`text-base font-semibold transition hover:text-emerald-500 ${
                   isActive ? "text-emerald-600" : "text-slate-700"
                 }`}
@@ -67,15 +98,14 @@ export default function NavBar() {
       {isOpen && (
         <div className="border-t border-slate-200 bg-white/90 px-4 py-3 md:hidden">
           {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname?.startsWith(item.href));
+            const targetId = item.href.replace("#", "");
+            const isActive = activeSection === targetId;
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setIsOpen(false)}  // 항목 클릭하면 메뉴 닫기
+                onClick={() => handleNavClick(targetId)}  // 항목 클릭하면 메뉴 닫기
                 className={`block px-2 py-2 text-base font-semibold rounded-md transition hover:text-emerald-500 ${
                   isActive ? "text-emerald-600" : "text-slate-700"
                 }`}
