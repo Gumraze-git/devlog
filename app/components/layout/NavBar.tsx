@@ -1,0 +1,91 @@
+// Next.js App Router 환경에서 NavBar는 클라이언트 컴포넌트이어야함.
+// (상태 사용, usePathname 훅 사용 등 때문에 필요함.
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+
+// 네비게이션 항목 정의
+const navItems = [
+  { name: "Home", href: "/" },          // Home
+  { name: "About", href: "/about" },    // 소개 페이지
+  { name: "Devlog", href: "/devlog" },  // 개발 블로그
+  { name: "Projects", href: "/projects" }, // 프로젝트
+  { name: "Contact", href: "/contact" },   // 연락 페이지
+];
+
+export default function NavBar() {
+  // 현재 URL의 경로 가져옴
+  const pathname = usePathname();
+
+  // 모바일 메뉴 열림 여부 (true, false)
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="sticky top-0 z-40 border-b border-slate-200 bg-slate-50/80 backdrop-blur-md">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        {/* 홈으로 이동, 로고 역할 */}
+        <Link href="/" className="text-lg font-semibold">
+          DKim Devlog
+        </Link>
+
+        {/* 데스크톱 메뉴 영역 */}
+        <div className="hidden gap-6 md:flex">
+          {navItems.map((item) => {
+            // 현재 페이지와 nav 항목이 같으면 활성 상태로 표시함.
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/" && pathname?.startsWith(item.href));
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-base font-semibold transition hover:text-emerald-500 ${
+                  isActive ? "text-emerald-600" : "text-slate-700"
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* 모바일 메뉴 버튼(햄버거 버튼) */}
+        <button
+          className="md:hidden text-slate-700"
+          onClick={() => setIsOpen((prev) => !prev)}   //  토글
+        >
+          {isOpen ? <X size={22} /> : <Menu size={22} />}
+          {/* isOpen=true면 X 아이콘, 아니면 Menu 아이콘 */}
+        </button>
+      </div>
+
+      {/* 모바일 메뉴 드롭다운 */}
+      {isOpen && (
+        <div className="border-t border-slate-200 bg-white/90 px-4 py-3 md:hidden">
+          {navItems.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/" && pathname?.startsWith(item.href));
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsOpen(false)}  // 항목 클릭하면 메뉴 닫기
+                className={`block px-2 py-2 text-base font-semibold rounded-md transition hover:text-emerald-500 ${
+                  isActive ? "text-emerald-600" : "text-slate-700"
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </nav>
+  );
+}
