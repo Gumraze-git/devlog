@@ -5,7 +5,6 @@ import { createContext, useContext, useMemo, useState } from "react";
 type SectionWatchContextValue = {
   activeId: string;
   activate: (id: string) => void;
-  deactivate: (id: string) => void;
   sections: string[];
 };
 
@@ -24,11 +23,7 @@ export function SectionWatchProvider({ sections, children }: SectionWatchProvide
     setActiveId(id);
   };
 
-  const deactivate = (_id: string) => {
-    // no-op: active 섹션은 다음 섹션의 onViewportEnter에서 갱신
-  };
-
-  const value = useMemo(() => ({ activeId, sections, activate, deactivate }), [activeId, sectionsKey]);
+  const value = useMemo(() => ({ activeId, sections, activate }), [activeId, sectionsKey]);
 
   return <SectionWatchContext.Provider value={value}>{children}</SectionWatchContext.Provider>;
 }
