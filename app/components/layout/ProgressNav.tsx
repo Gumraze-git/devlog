@@ -8,6 +8,7 @@ import { useSectionWatch } from "./SectionWatchProvider";
 type NavItem = {
   id: string;
   label: string;
+  abbr: string;
 };
 
 type ProgressNavProps = {
@@ -30,7 +31,7 @@ export default function ProgressNav({ items }: ProgressNavProps) {
           />
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold uppercase text-slate-500">
-          {items.map(({ id, label }) => {
+          {items.map(({ id, label, abbr }) => {
             const isActive = id === activeId;
             return (
               <Link
@@ -41,8 +42,15 @@ export default function ProgressNav({ items }: ProgressNavProps) {
                   isActive ? "text-emerald-600" : "text-slate-500"
                 }`}
               >
-                <span className="text-[10px] font-bold opacity-70">{label.slice(0, 3).toUpperCase()}</span>
-                <span className="text-sm">{label}</span>
+                {/*NavItem의 abbr*/}
+                <span className="text-[10px] font-bold opacity-70">
+                  {abbr}
+                </span>
+
+                {/*NavItem의 label*/}
+                <span className="text-sm">
+                  {label}
+                </span>
               </Link>
             );
           })}

@@ -10,12 +10,13 @@ import { SectionWatchProvider } from "./components/layout/SectionWatchProvider";
 
 const sections = ["home", "about", "devlog", "skill", "projects", "education", "contact"];
 const navItems = [
-  { id: "about", label: "About" },
-  { id: "devlog", label: "Devlog" },
-  { id: "skill", label: "Skill" },
-  { id: "projects", label: "Projects" },
-  { id: "education", label: "Education" },
-  { id: "contact", label: "Contact" },
+  { id: "home", label: "홈", abbr: "Home"},
+  { id: "about", label: "소개", abbr: "ABOUT" },
+  { id: "devlog", label: "개발일지", abbr: "DEVLOG" },
+  { id: "skill", label: "기술", abbr: "SKILL" },
+  { id: "projects", label: "프로젝트", abbr: "PROJECTS" },
+  { id: "education", label: "교육", abbr: "EDUCATION" },
+  { id: "contact", label: "연락", abbr: "CONTACT" },
 ];
 
 export default function Home() {
