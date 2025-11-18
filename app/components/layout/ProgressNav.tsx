@@ -26,7 +26,7 @@ type ProgressNavProps = {
 };
 
 export default function ProgressNav({ items }: ProgressNavProps) {
-  const { activeId, activate } = useSectionWatch();
+  const { activeId, activate, markInteracted } = useSectionWatch();
 
   const activeIndex = useMemo(() => items.findIndex((item) => item.id === activeId), [items, activeId]);
   const progress = PROGRESS_MAP[activeId] ?? 0;
@@ -48,7 +48,10 @@ export default function ProgressNav({ items }: ProgressNavProps) {
               <Link
                 key={id}
                 href={`#${id}`}
-                onClick={() => activate(id)}
+                onClick={() => {
+                  markInteracted();
+                  activate(id);
+                }}
                 className={`flex flex-col items-center text-[11px] tracking-wide transition ${
                   isActive ? "text-emerald-600" : "text-slate-500"
                 }`}

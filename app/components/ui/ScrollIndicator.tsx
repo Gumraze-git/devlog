@@ -2,14 +2,20 @@
 
 import Link from "next/link";
 
+import { useSectionWatch } from "../layout/SectionWatchProvider";
+
 export default function ScrollIndicator() {
+  const { markInteracted } = useSectionWatch();
+
   return (
     <div className="flex justify-center">
       <Link
         href="#about"
         className="group mt-4 flex flex-col items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-slate-400 transition hover:text-emerald-500"
         aria-label="소개 섹션으로 이동"
+        onClick={markInteracted}
       >
+        <span>Scroll</span>
         <div className="flex flex-col items-center gap-2">
           {[0, 1, 2].map((idx) => (
             <span
