@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 
 type SectionWatchContextValue = {
   activeId: string;
@@ -17,7 +17,9 @@ type SectionWatchProviderProps = {
 };
 
 export function SectionWatchProvider({ sections, children }: SectionWatchProviderProps) {
-  const firstSection = sections[0] ?? "";
+  // 첫 섹션을 Home으로 설정
+  const firstSection = sections[0];
+  // 기본 active 상태
   const [activeId, setActiveId] = useState(firstSection);
   const sectionsKey = sections.join("|");
 
@@ -30,6 +32,19 @@ export function SectionWatchProvider({ sections, children }: SectionWatchProvide
 
   const deactivate = useCallback((id: string) => {
     setActiveId((prev) => (prev === id ? "" : prev));
+  }, []);
+
+  useEffect(() => {
+    const handleTop = () => {
+      // window.scrollY는 document의 세로 스크롤 위치를 나타냄.
+      // window.scrollY < 20은 현재 스크롤이 최상단에 가까운지를 검사함.
+      if (window.scrollY < 20) {
+        setActiveId(firstSection);
+      }
+    };
+    // 페이지가 스크롤 될 때마다 handleTop 함수가 호출
+    window.addEventListener("scroll", handleTop, { passive: true });
+    return () => window.removeEventListener("scroll", handleTop);
   }, []);
 
   const value = useMemo(
