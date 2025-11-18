@@ -11,7 +11,7 @@ export default function AboutSection() {
   return (
     <SectionWatcher id="about" className="scroll-mt-32">
       <SlideUpInView>
-        <div className="space-y-6 rounded-3xl border border-slate-200 bg-white/80 px-8 py-12 shadow-sm">
+        <div className="space-y-6 rounded-3xl border border-slate-200 bg-white/80 px-8 mt-40 py-6 shadow-sm">
           <div className="space-y-3">
             <p className="text-sm font-semibold uppercase tracking-wide text-emerald-600">About</p>
             <h2 className="text-3xl font-bold text-slate-900">소개</h2>

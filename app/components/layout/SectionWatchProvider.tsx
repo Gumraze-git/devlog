@@ -24,8 +24,8 @@ export function SectionWatchProvider({ sections, children }: SectionWatchProvide
     setActiveId(id);
   };
 
-  const deactivate = (id: string) => {
-    setActiveId((prev) => (prev === id ? prev : prev));
+  const deactivate = (_id: string) => {
+    // no-op: active 섹션은 다음 섹션의 onViewportEnter에서 갱신
   };
 
   const value = useMemo(() => ({ activeId, sections, activate, deactivate }), [activeId, sectionsKey]);

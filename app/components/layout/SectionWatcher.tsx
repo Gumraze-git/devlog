@@ -11,14 +11,15 @@ type SectionWatcherProps = PropsWithChildren<{
 }>;
 
 export default function SectionWatcher({ id, className, children }: SectionWatcherProps) {
-  const { activate } = useSectionWatch();
+  const { activate, deactivate } = useSectionWatch();
 
   return (
     <motion.section
       id={id}
       className={className}
-      viewport={{ margin: "-50% 0px -30% 0px" }}
+      viewport={{ margin: "-5% 0px -5% 0px" }}
       onViewportEnter={() => activate(id)}
+      onViewportLeave={() => deactivate(id)}
     >
       {children}
     </motion.section>
