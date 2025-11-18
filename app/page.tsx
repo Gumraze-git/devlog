@@ -7,6 +7,7 @@ import EducationSection from "./sections/EducationSection";
 import ContactSection from "./sections/ContactSection";
 import ProgressNav from "./components/layout/ProgressNav";
 import { SectionWatchProvider } from "./components/layout/SectionWatchProvider";
+import ScrollIndicator from "./components/ui/ScrollIndicator";
 
 const sections = ["home", "about", "devlog", "skill", "projects", "education", "contact"];
 const navItems = [
@@ -25,6 +26,7 @@ export default function Home() {
       <main className="mx-auto flex max-w-6xl flex-col gap-24 px-4 py-16">
         <HomeHero />
         <ProgressNav items={navItems} />
+        <ScrollIndicator />
         <AboutSection />
         <DevlogSection />
         <SkillSection />
