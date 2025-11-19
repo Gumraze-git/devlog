@@ -13,11 +13,10 @@ type NavItem = {
 
 const PROGRESS_MAP: Record<string, number> = {
   home: 2,
-  about: 17,
-  devlog: 32,
-  skill: 47,
-  projects: 62,
-  education: 80,
+  about: 24,
+  devlog: 46,
+  projects: 68,
+  education: 84,
   contact: 100,
 };
 
