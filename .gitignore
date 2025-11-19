@@ -46,3 +46,6 @@ next-env.d.ts
 
 # docs
 /docs/
+/sample_blog/
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/compiler.xml
