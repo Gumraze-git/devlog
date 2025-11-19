@@ -9,12 +9,12 @@ import ProgressNav from "./components/layout/ProgressNav";
 import { SectionWatchProvider } from "./components/layout/SectionWatchProvider";
 import ScrollIndicator from "./components/ui/ScrollIndicator";
 
-const sections = ["home", "about", "devlog", "skill", "projects", "education", "contact"];
+const sections = ["home", "about", "skill", "devlog", "projects", "education", "contact"];
 const navItems = [
   { id: "home", label: "홈", abbr: "Home"},
   { id: "about", label: "소개", abbr: "ABOUT" },
-  { id: "devlog", label: "개발일지", abbr: "DEVLOG" },
   { id: "skill", label: "기술", abbr: "SKILL" },
+  { id: "devlog", label: "개발일지", abbr: "DEVLOG" },
   { id: "projects", label: "프로젝트", abbr: "PROJECTS" },
   { id: "education", label: "교육", abbr: "EDUCATION" },
   { id: "contact", label: "연락", abbr: "CONTACT" },
@@ -28,8 +28,8 @@ export default function Home() {
         <ProgressNav items={navItems} />
         <ScrollIndicator />
         <AboutSection />
-        <DevlogSection />
         <SkillSection />
+        <DevlogSection />
         <ProjectsSection />
         <EducationSection />
         <ContactSection />
