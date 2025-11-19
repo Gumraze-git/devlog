@@ -1,20 +1,32 @@
 "use client";
 
+import Image from "next/image";
+
 type SkillItemProps = {
   label: string;
   active: boolean;
-  icon: string;
+  image: string;
 };
 
-export default function SkillItem({ label, active, icon }: SkillItemProps) {
+export default function SkillItem({ label, active, image }: SkillItemProps) {
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold transition ${
-        active ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"
-      }`}
-    >
-      <span>{icon}</span>
-      <span>{label}</span>
-    </span>
+    <div className="group relative flex h-12 w-12 items-center justify-center">
+      <div className={`relative h-12 w-12 transition-all ${active ? "" : "opacity-20 blur-[1px]"}`}>
+        <Image
+          src={image}
+          alt={label}
+          fill
+          sizes="(max-width: 640px) 16vw, (max-width: 1024px) 10vw, 6vw"
+          className="rounded-md object-cover shadow-md"
+        />
+      </div>
+      <p
+        className={`pointer-events-none absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full rounded bg-slate-900/80 px-1.5 py-0.5 text-xs text-white opacity-0 transition group-hover:opacity-100 ${
+          active ? "" : "hidden"
+        }`}
+      >
+        {label}
+      </p>
+    </div>
   );
 }
