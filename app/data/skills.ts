@@ -13,28 +13,43 @@ export const skillCategories: SkillCategory[] = [
   { id: "all", name: "전체" },
   { id: "backend", name: "백엔드" },
   { id: "frontend", name: "프론트엔드" },
+  { id: "database", name: "데이터베이스" },
   { id: "env", name: "환경 및 배포" },
-  { id: "design", name: "디자인" },
+  { id: "tools", name: "도구" },
+  { id: "ai", name: "AI" },
 ];
 
 const vercelBlob = (file: string) =>
   `https://lh8zlkkhlslw0zyz.public.blob.vercel-storage.com/skills/${file}`;
 
 export const skills: SkillItem[] = [
-  { label: "NestJS", categoryId: "backend", image: vercelBlob("nestjs-A4aT9Yw4MXZ148erSOxC9CpHXnZKBM.png") },
-  { label: "Node.js", categoryId: "backend", image: vercelBlob("nodejs-rEoKmLz0cHVW8q1k0nMl6SZ7e0J8kr.png") },
-  { label: "PostgreSQL", categoryId: "backend", image: vercelBlob("postgresql-vHh9QofCCRP4CTqOeIziGQ1mQ4YxOj.png") },
-  { label: "Prisma", categoryId: "backend", image: vercelBlob("prisma-xvhQX6wEfTFxnJqyW8g9yonC5uHpcc.png") },
-  { label: "Next.js", categoryId: "frontend", image: vercelBlob("Next.js-AhWeuPpDe5INDWIBXqSbbsxoV0OvzS.png") },
+  // 프론트엔드
   { label: "React", categoryId: "frontend", image: vercelBlob("react-VS4Vwy6It1uAZy63ihXuYvHqqYkY1X.png") },
   { label: "TypeScript", categoryId: "frontend", image: vercelBlob("typescript-50YJFG5dzDLgPyvDvGxy6XZ6oMqjKi.png") },
-  { label: "Framer Motion", categoryId: "frontend", image: vercelBlob("framer-CCbvOAkl7edZKmqh3ZCL1G1MjmE9mG.png") },
-  { label: "Docker", categoryId: "env", image: vercelBlob("docker-Fk2t4QeHKC2dVEPxW48pRhS0Gva8Q1.png") },
+  { label: "Next.js", categoryId: "frontend", image: vercelBlob("Next.js-AhWeuPpDe5INDWIBXqSbbsxoV0OvzS.png") },
+  { label: "Kotlin", categoryId: "frontend", image: vercelBlob("kotlin.png") },
+  { label: "Swift", categoryId: "frontend", image: vercelBlob("swift.png") },
+  { label: "Tailwind CSS", categoryId: "frontend", image: vercelBlob("tailwind-css-Ac4YsB1L03P1CGQqjaJlIYKcWjAxtf.png") },
+
+  // 백엔드
+  { label: "Java", categoryId: "backend", image: vercelBlob("java.png") },
+  { label: "Spring", categoryId: "backend", image: vercelBlob("spring.png") },
+
+  // 데이터베이스
+  { label: "MySQL", categoryId: "database", image: vercelBlob("mysql.png") },
+  { label: "MongoDB", categoryId: "database", image: vercelBlob("mongodb.png") },
+  { label: "PostgreSQL", categoryId: "database", image: vercelBlob("postgresql-vHh9QofCCRP4CTqOeIziGQ1mQ4YxOj.png") },
+
+  // 환경 및 배포
   { label: "AWS", categoryId: "env", image: vercelBlob("aws-EfjHi6naHo8QZ1Ct3co51BD8bdvnFx.png") },
   { label: "Vercel", categoryId: "env", image: vercelBlob("Vercel-ALWOzGwrKtAkAFDgkaL3WGbPchkpSF.png") },
-  { label: "GitHub Actions", categoryId: "env", image: vercelBlob("github-Mxif6CX9Gaip3dXvGCrgX7casaJM3D.png") },
-  { label: "Figma", categoryId: "design", image: vercelBlob("figma-IiFO7yrdgnjBSjpxsCokIusUg6AoGO.png") },
-  { label: "Tailwind CSS", categoryId: "design", image: vercelBlob("tailwind-css-Ac4YsB1L03P1CGQqjaJlIYKcWjAxtf.png") },
-  { label: "Storybook", categoryId: "design", image: vercelBlob("Storybook-kGdPF5HNm19qyTpA0b4dcsOvVDRN0F.png") },
-  { label: "Chakra UI", categoryId: "design", image: vercelBlob("Chakra-UI-s50fm8LjGHbhhGdljw6C7DLRGuHrvG.png") },
+
+  // 도구
+  { label: "GitHub", categoryId: "tools", image: vercelBlob("github-Mxif6CX9Gaip3dXvGCrgX7casaJM3D.png") },
+  { label: "Figma", categoryId: "tools", image: vercelBlob("figma-IiFO7yrdgnjBSjpxsCokIusUg6AoGO.png") },
+
+  // AI
+  { label: "Python", categoryId: "ai", image: vercelBlob("python.png") },
+  { label: "PyTorch", categoryId: "ai", image: vercelBlob("pytorch.png") },
+  { label: "TensorFlow", categoryId: "ai", image: vercelBlob("tensorflow.png") },
 ];
