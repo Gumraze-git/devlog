@@ -45,9 +45,15 @@ export default function SkillSectionContent() {
           })}
         </div>
         {/*아이콘 담당 영역*/}
-        <div className="flex flex-wrap gap-5 justify-center">
+        <div className="flex flex-wrap gap-3 justify-center">
           {filteredSkills.map((skill) => (
-            <SkillItem key={skill.label} label={skill.label} active={skill.active} image={skill.image} />
+            <SkillItem
+              key={skill.label}
+              label={skill.label}
+              active={skill.active}
+              image={skill.image}
+              size={skill.size}
+            />
           ))}
         </div>
       </div>
