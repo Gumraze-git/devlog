@@ -6,12 +6,20 @@ type SkillItemProps = {
   label: string;
   active: boolean;
   image: string;
+  size?: number; // rem 단위
 };
 
-export default function SkillItem({ label, active, image }: SkillItemProps) {
+export default function SkillItem({ label, active, image, size = 3 }: SkillItemProps) {
   return (
-    <div className="group relative flex h-12 w-12 items-center justify-center">
-      <div className={`relative h-12 w-12 transition-all ${active ? "" : "opacity-30 blur-[2px]"}`}>
+    <div
+      className="group relative flex items-center justify-center"
+      style={{ width: `${size}rem`, height: `${size}rem` }}
+    >
+      <div
+        className={`relative flex h-full w-full items-center justify-center transition-all ${
+          active ? "" : "opacity-30 blur-[2px]"
+        }`}
+      >
         <Image
           src={image}
           alt={label}
