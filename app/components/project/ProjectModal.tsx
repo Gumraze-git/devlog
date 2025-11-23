@@ -12,32 +12,32 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-8 text-slate-800 shadow-2xl">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[var(--card)] p-8 text-[var(--foreground)] shadow-2xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-400">프로젝트</p>
+            <p className="text-xs uppercase tracking-wide text-[var(--text-soft)]">프로젝트</p>
             <h3 className="mt-2 text-2xl font-bold">{project.title}</h3>
-            <p className="mt-2 text-sm text-slate-600">{project.summary}</p>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">{project.summary}</p>
           </div>
-          <button className="text-sm text-slate-500" onClick={onClose}>
+          <button className="text-sm text-[var(--text-soft)]" onClick={onClose}>
             닫기
           </button>
         </div>
 
-        <dl className="mt-6 grid gap-4 rounded-2xl border border-slate-200 p-4 text-sm">
+        <dl className="mt-6 grid gap-4 rounded-2xl border border-[var(--border)] p-4 text-sm">
           <div className="flex justify-between">
-            <dt className="font-semibold text-slate-500">기간</dt>
-            <dd className="text-slate-800">{project.period}</dd>
+            <dt className="font-semibold text-[var(--text-soft)]">기간</dt>
+            <dd className="text-[var(--foreground)]">{project.period}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="font-semibold text-slate-500">인원</dt>
-            <dd className="text-slate-800">{project.members}</dd>
+            <dt className="font-semibold text-[var(--text-soft)]">인원</dt>
+            <dd className="text-[var(--foreground)]">{project.members}</dd>
           </div>
           <div>
-            <dt className="font-semibold text-slate-500">기술 스택</dt>
+            <dt className="font-semibold text-[var(--text-soft)]">기술 스택</dt>
             <dd className="mt-2 flex flex-wrap gap-2">
               {project.stack.map((tech) => (
-                <span key={tech} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <span key={tech} className="rounded-full bg-[var(--border-muted)] px-3 py-1 text-xs font-semibold text-[var(--foreground)]">
                   {tech}
                 </span>
               ))}
@@ -47,7 +47,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
         <div className="mt-6 space-y-3">
           {project.highlights.map((highlight, index) => (
-            <p key={index} className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-700">
+            <p key={index} className="rounded-2xl bg-[var(--card-muted)] p-3 text-sm text-[var(--text-muted)]">
               {highlight}
             </p>
           ))}

@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="font-sans bg-slate-50 text-slate-900">
+      <body className="font-sans bg-[var(--background)] text-[var(--foreground)]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2">
           Skip to content
       </a>
@@ -33,4 +33,3 @@ export default function RootLayout({
     </html>
   );
 }
-
