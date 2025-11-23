@@ -10,7 +10,7 @@ type SkillItemProps = {
 };
 
 export default function SkillItem({ label, active, image, size = 3 }: SkillItemProps) {
-  const scale = Math.max(size, 0.5);
+  const scale = Math.min(Math.max(size ?? 1, 0.7), 1.3);
 
   return (
     <div
@@ -19,16 +19,17 @@ export default function SkillItem({ label, active, image, size = 3 }: SkillItemP
       aria-label={label}
     >
       <div
-        className={`relative flex h-[64px] w-[64px] items-center justify-center rounded-md bg-[var(--icon-surface)] ring-1 ring-[var(--border)] transition-all ${
+        className={`relative flex h-[64px] w-[64px] items-center justify-center rounded-xl bg-[var(--icon-surface)] p-2 ring-1 ring-[var(--border)] transition-all ${
           active ? "" : "opacity-30 blur-[2px]"
         }`}
-        style={{ zIndex: 10, boxShadow: "0 6px 18px rgba(0,0,0,0.08)" }}
+        style={{ zIndex: 10 }}
       >
         <Image
           src={image}
           alt={label}
-          fill
-          className="rounded-md object-contain shadow-md"
+          width={48}
+          height={48}
+          className="rounded-md object-contain"
           style={{ transform: `scale(${scale})` }}
         />
       </div>
