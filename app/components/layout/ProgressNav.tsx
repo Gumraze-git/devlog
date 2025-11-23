@@ -11,11 +11,11 @@ type NavItem = {
 };
 
 const PROGRESS_MAP: Record<string, number> = {
-  home: 2,
-  about: 24,
-  devlog: 46,
-  projects: 68,
-  education: 84,
+  home: 5,
+  about: 23,
+  devlog: 43,
+  projects: 59,
+  education: 77,
   contact: 100,
 };
 
