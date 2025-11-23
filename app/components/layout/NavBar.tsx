@@ -55,10 +55,10 @@ export default function NavBar() {
   };
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-slate-200 bg-slate-50/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in srgb, var(--background) 82%, transparent)] backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         {/* 홈으로 이동, 로고 역할 */}
-        <Link href="/" className="text-lg font-semibold">
+        <Link href="/" className="text-lg font-semibold text-[var(--foreground)]">
           DKim Devlog
         </Link>
 
@@ -74,8 +74,8 @@ export default function NavBar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => handleNavClick(targetId)}
-                className={`text-base font-semibold transition hover:text-emerald-500 ${
-                  isActive ? "text-emerald-600" : "text-slate-700"
+                className={`text-base font-semibold transition hover:text-[var(--accent-strong)] ${
+                  isActive ? "text-[var(--accent-strong)]" : "text-[var(--text-muted)]"
                 }`}
               >
                 {item.name}
@@ -86,7 +86,7 @@ export default function NavBar() {
 
         {/* 모바일 메뉴 버튼(햄버거 버튼) */}
         <button
-          className="md:hidden text-slate-700"
+          className="md:hidden text-[var(--foreground)]"
           onClick={() => setIsOpen((prev) => !prev)}   //  토글
         >
           {isOpen ? <X size={22} /> : <Menu size={22} />}
@@ -96,7 +96,7 @@ export default function NavBar() {
 
       {/* 모바일 메뉴 드롭다운 */}
       {isOpen && (
-        <div className="border-t border-slate-200 bg-white/90 px-4 py-3 md:hidden">
+        <div className="border-t border-[var(--border)] bg-[var(--card-muted)] px-4 py-3 md:hidden">
           {navItems.map((item) => {
             const targetId = item.href.replace("#", "");
             const isActive = activeSection === targetId;
@@ -106,8 +106,8 @@ export default function NavBar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => handleNavClick(targetId)}  // 항목 클릭하면 메뉴 닫기
-                className={`block px-2 py-2 text-base font-semibold rounded-md transition hover:text-emerald-500 ${
-                  isActive ? "text-emerald-600" : "text-slate-700"
+                className={`block px-2 py-2 text-base font-semibold rounded-md transition hover:text-[var(--accent-strong)] ${
+                  isActive ? "text-[var(--accent-strong)]" : "text-[var(--text-muted)]"
                 }`}
               >
                 {item.name}

@@ -1,6 +1,6 @@
 "use client";
 
-import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 type SectionWatchContextValue = {
   activeId: string;
@@ -21,7 +21,6 @@ export function SectionWatchProvider({ sections, children }: SectionWatchProvide
   const firstSection = sections[0];
   // 기본 active 상태
   const [activeId, setActiveId] = useState(firstSection);
-  const sectionsKey = sections.join("|");
 
   const activate = useCallback(
     (id: string) => {
@@ -53,11 +52,11 @@ export function SectionWatchProvider({ sections, children }: SectionWatchProvide
     // 페이지가 스크롤 될 때마다 checkScrollEnds 함수가 호출
     window.addEventListener("scroll", checkScrollEnds, { passive: true });
     return () => window.removeEventListener("scroll", checkScrollEnds);
-  }, []);
+  }, [firstSection, sections]);
 
   const value = useMemo(
     () => ({ activeId, sections, activate, deactivate }),
-    [activeId, sectionsKey, activate, deactivate]
+    [activeId, sections, activate, deactivate]
   );
 
   return <SectionWatchContext.Provider value={value}>{children}</SectionWatchContext.Provider>;
