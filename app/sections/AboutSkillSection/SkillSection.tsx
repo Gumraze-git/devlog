@@ -8,6 +8,10 @@ export default function SkillSectionContent() {
   const trackRef = useRef<HTMLDivElement>(null);
 
   const handleCategoryClick = useCallback((id: string) => {
+    if (id === "all") {
+      setActiveCategory(null);
+      return;
+    }
     setActiveCategory((prev) => (prev === id ? null : id));
   }, []);
 
@@ -30,7 +34,7 @@ export default function SkillSectionContent() {
           className="flex flex-wrap items-center justify-center rounded-full border border-slate-200 bg-slate-50 p-1.5"
         >
           {skillCategories.map((category) => {
-            const isActive = activeCategory === category.id;
+            const isActive = category.id === "all" ? activeCategory === null : activeCategory === category.id;
             return (
               <button
                 key={category.id}
