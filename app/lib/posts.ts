@@ -18,7 +18,7 @@ export type Post = PostMeta & {
   content: string;
 };
 
-const postsDir = path.join(process.cwd(), "posts");
+const postsDir = path.join(process.cwd(), "posts/devlog");
 
 export function getAllPosts(): PostMeta[] {
   if (!fs.existsSync(postsDir)) return [];
