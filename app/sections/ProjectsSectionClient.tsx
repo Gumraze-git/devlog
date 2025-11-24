@@ -1,13 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 
 import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
+import ItemCardList from "../components/ui/ItemCardList";
 import { type ProjectMeta } from "../lib/projects";
+import Image from "next/image";
 
 type ProjectsSectionClientProps = {
   projects: ProjectMeta[];
@@ -15,6 +16,19 @@ type ProjectsSectionClientProps = {
 
 export default function ProjectsSectionClient({ projects }: ProjectsSectionClientProps) {
   const [selected, setSelected] = useState<ProjectMeta | null>(null);
+
+  const cards = useMemo(
+    () =>
+      projects.map((project) => ({
+        slug: project.slug,
+        title: project.title,
+        summary: project.summary,
+        thumbnail: project.thumbnail,
+        tags: project.stack,
+        meta: project.period,
+      })),
+    [projects],
+  );
 
   return (
     <SectionWatcher id="projects" className="scroll-mt-32">
@@ -34,43 +48,19 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
             </Link>
           </div>
 
-          <div className="no-scrollbar flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 px-2">
-            {projects.map((project) => (
-              <button
-                key={project.slug}
-                onClick={() => setSelected(project)}
-                className="relative min-w-[300px] max-w-[320px] flex-shrink-0 rounded-3xl border border-[var(--border)] bg-[var(--card)] p-4 text-left shadow-sm transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg hover:z-10"
-              >
-                <div className="relative h-40 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
-                  <Image
-                    src={project.thumbnail ?? "/devlog-placeholder.svg"}
-                    alt={project.title}
-                    fill
-                    sizes="320px"
-                    className="object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="mt-4 space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">{project.period}</p>
-                  <h3 className="text-lg font-semibold text-[var(--foreground)] line-clamp-2">{project.title}</h3>
-                  <p className="text-sm text-[var(--text-muted)] line-clamp-2">{project.summary}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.stack.slice(0, 3).map((tech) => (
-                      <span key={tech} className="rounded-full bg-[var(--border-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--foreground)]">
-                        {tech}
-                      </span>
-                    ))}
-                    {project.stack.length > 3 && (
-                      <span className="rounded-full bg-[var(--card-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--text-soft)]">
-                        +{project.stack.length - 3}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
+          <ItemCardList
+            items={cards}
+            onSelect={(item) => {
+              const found = projects.find((p) => p.slug === item.slug);
+              if (found) setSelected(found);
+            }}
+            renderTitle={(item) => (
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-lg font-semibold text-[var(--foreground)] line-clamp-2">{item.title}</h3>
+                {item.meta && <span className="text-[11px] font-normal text-[var(--text-soft)]">{item.meta}</span>}
+              </div>
+            )}
+          />
         </div>
       </SlideUpInView>
 

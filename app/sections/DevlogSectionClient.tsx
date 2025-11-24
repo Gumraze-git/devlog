@@ -2,19 +2,37 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 
 import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
+import ItemCardList from "../components/ui/ItemCardList";
 import { type PostMeta } from "../lib/posts";
 
 type DevlogSectionClientProps = {
   posts: PostMeta[];
 };
 
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString("ko-KR").replace(/\s/g, "").replace(/\.$/, "");
+}
+
 export default function DevlogSectionClient({ posts }: DevlogSectionClientProps) {
   const [selected, setSelected] = useState<PostMeta | null>(null);
+
+  const cards = useMemo(
+    () =>
+      posts.map((post) => ({
+        slug: post.slug,
+        title: post.title,
+        summary: post.description,
+        meta: formatDate(post.date),
+        thumbnail: post.thumbnail,
+        tags: post.tags,
+      })),
+    [posts],
+  );
 
   return (
     <SectionWatcher id="devlog" className="scroll-mt-32">
@@ -34,39 +52,26 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
             </Link>
           </div>
 
-          <div className="no-scrollbar flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 px-2">
-            {posts.map((post) => (
-              <button
-                key={post.slug}
-                onClick={() => setSelected(post)}
-                className="relative min-w-[300px] max-w-[320px] flex-shrink-0 rounded-3xl border border-[var(--border)] bg-[var(--card)] p-4 text-left shadow-sm transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg hover:z-10"
-              >
-                <div className="relative h-40 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
-                  <Image
-                    src={post.thumbnail ?? "/devlog-placeholder.svg"}
-                    alt={post.title}
-                    fill
-                    sizes="320px"
-                    className="object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="mt-4 space-y-2">
-                  <h3 className="text-lg font-semibold text-[var(--foreground)] line-clamp-2">{post.title}</h3>
-                  <p className="text-sm text-[var(--text-muted)] line-clamp-2">{post.description}</p>
-                  <p className="text-xs text-[var(--text-soft)]">
-                    작성일 {new Date(post.date).toLocaleDateString("ko-KR")}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
+          <ItemCardList
+            items={cards}
+            onSelect={(item) => {
+              const found = posts.find((p) => p.slug === item.slug);
+              if (found) setSelected(found);
+            }}
+            ariaLabel="Devlog"
+            renderTitle={(item) => (
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-lg font-semibold text-[var(--foreground)] line-clamp-2">{item.title}</h3>
+                {item.meta && <span className="text-[11px] font-normal text-[var(--text-soft)]">{item.meta}</span>}
+              </div>
+            )}
+          />
         </div>
       </SlideUpInView>
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8">
-          <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[var(--card)] p-6 shadow-2xl border border-[var(--border)]">
+          <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-2xl">
             <button
               className="absolute right-4 top-4 text-[var(--text-soft)]"
               onClick={() => setSelected(null)}
@@ -75,9 +80,7 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
               <X size={20} />
             </button>
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">
-                {new Date(selected.date).toLocaleDateString("ko-KR")}
-              </p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">{formatDate(selected.date)}</p>
               <h3 className="text-2xl font-bold text-[var(--foreground)]">{selected.title}</h3>
               <p className="text-sm text-[var(--text-muted)]">{selected.description}</p>
               <div className="relative h-48 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
