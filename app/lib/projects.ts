@@ -15,11 +15,11 @@ export type ProjectMeta = {
   published?: boolean;
 };
 
-export type Project = ProjectMeta;
+export type Project = ProjectMeta & { content: string };
 
 const projectsDir = path.join(process.cwd(), "posts/projects");
 
-export function getAllProjects(): ProjectMeta[] {
+export function getAllProjects(): Project[] {
   if (!fs.existsSync(projectsDir)) return [];
 
   const files = fs.readdirSync(projectsDir).filter((file) => file.endsWith(".md"));
@@ -29,7 +29,7 @@ export function getAllProjects(): ProjectMeta[] {
       const slug = file.replace(/\.md$/, "");
       const fullPath = path.join(projectsDir, file);
       const fileContents = fs.readFileSync(fullPath, "utf8");
-      const { data } = matter(fileContents);
+      const { data, content } = matter(fileContents);
 
       return {
         slug,
@@ -41,7 +41,8 @@ export function getAllProjects(): ProjectMeta[] {
         highlights: data.highlights ?? [],
         thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
         published: data.published !== false,
-      } as ProjectMeta;
+        content,
+      } as Project;
     })
     .filter((p) => p.published);
 
@@ -53,7 +54,7 @@ export function getProject(slug: string): Project | null {
   if (!fs.existsSync(fullPath)) return null;
 
   const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data } = matter(fileContents);
+  const { data, content } = matter(fileContents);
 
   return {
     slug,
@@ -65,5 +66,6 @@ export function getProject(slug: string): Project | null {
     highlights: data.highlights ?? [],
     thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
     published: data.published !== false,
+    content,
   };
 }

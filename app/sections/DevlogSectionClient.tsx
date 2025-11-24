@@ -8,10 +8,10 @@ import { X } from "lucide-react";
 import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
 import ItemCardList from "../components/ui/ItemCardList";
-import { type PostMeta } from "../lib/posts";
+import { type Post } from "../lib/posts";
 
 type DevlogSectionClientProps = {
-  posts: PostMeta[];
+  posts: Post[];
 };
 
 function formatDate(date: string) {
@@ -19,7 +19,7 @@ function formatDate(date: string) {
 }
 
 export default function DevlogSectionClient({ posts }: DevlogSectionClientProps) {
-  const [selected, setSelected] = useState<PostMeta | null>(null);
+  const [selected, setSelected] = useState<Post | null>(null);
 
   const cards = useMemo(
     () =>
@@ -92,6 +92,12 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
                   className="object-cover"
                 />
               </div>
+              {selected.content && (
+                <div
+                  className="prose prose-sm prose-invert text-[var(--text-muted)] max-w-none"
+                  dangerouslySetInnerHTML={{ __html: selected.content }}
+                />
+              )}
               <Link
                 href={`/devlog/${selected.slug}`}
                 className="inline-flex items-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"

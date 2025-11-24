@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
@@ -7,15 +8,14 @@ import { X } from "lucide-react";
 import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
 import ItemCardList from "../components/ui/ItemCardList";
-import { type ProjectMeta } from "../lib/projects";
-import Image from "next/image";
+import { type Project } from "../lib/projects";
 
 type ProjectsSectionClientProps = {
-  projects: ProjectMeta[];
+  projects: Project[];
 };
 
 export default function ProjectsSectionClient({ projects }: ProjectsSectionClientProps) {
-  const [selected, setSelected] = useState<ProjectMeta | null>(null);
+  const [selected, setSelected] = useState<Project | null>(null);
 
   const cards = useMemo(
     () =>
@@ -87,6 +87,12 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                   className="object-cover"
                 />
               </div>
+              {selected.content && (
+                <div
+                  className="prose prose-sm prose-invert text-[var(--text-muted)] max-w-none"
+                  dangerouslySetInnerHTML={{ __html: selected.content }}
+                />
+              )}
               <dl className="grid gap-2 text-sm text-[var(--text-muted)]">
                 <div className="flex justify-between">
                   <dt className="font-semibold text-[var(--text-soft)]">인원</dt>
