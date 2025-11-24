@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-import { getAllPosts, getPost } from "../../lib/posts";
+import { getPost } from "../../lib/posts";
 
 type Params = {
   slug: string;
