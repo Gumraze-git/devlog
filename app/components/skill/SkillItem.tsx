@@ -6,21 +6,37 @@ type SkillItemProps = {
   label: string;
   active: boolean;
   image: string;
+  size?: number; // 배율
 };
 
-export default function SkillItem({ label, active, image }: SkillItemProps) {
+export default function SkillItem({ label, active, image, size = 3 }: SkillItemProps) {
+  const scale = Math.min(Math.max(size ?? 1, 0.7), 1.3);
+
   return (
-    <div className="group relative flex h-12 w-12 items-center justify-center">
-      <div className={`relative h-12 w-12 transition-all ${active ? "" : "opacity-30 blur-[2px]"}`}>
+    <div
+      className="group relative flex h-16 w-16 items-center justify-center focus:outline-none"
+      tabIndex={0}
+      aria-label={label}
+    >
+      <div
+        className={`relative flex h-[64px] w-[64px] items-center justify-center rounded-xl bg-[var(--icon-surface)] p-2 ring-1 ring-[var(--border)] transition-all ${
+          active ? "" : "opacity-30 blur-[2px]"
+        }`}
+        style={{ zIndex: 10 }}
+      >
         <Image
           src={image}
           alt={label}
-          fill
-          sizes="(max-width: 640px) 16vw, (max-width: 1024px) 10vw, 6vw"
-          className="rounded-md object-cover shadow-md"
+          width={48}
+          height={48}
+          className="rounded-md object-contain"
+          style={{ transform: `scale(${scale})` }}
         />
       </div>
-      <p className="pointer-events-none absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full rounded bg-slate-900/80 px-1.5 py-0.5 text-xs text-white opacity-0 transition group-hover:opacity-100">
+      <p
+        className="pointer-events-none absolute left-1/2 top-full z-20 mt-0.5 -translate-x-1/2 translate-y-0.5 whitespace-nowrap rounded-lg bg-[color-mix(in_srgb,var(--foreground)_92%,transparent)] px-2 py-1 text-xs text-[var(--background)] shadow-lg ring-1 ring-[color-mix(in_srgb,var(--foreground)_24%,transparent)] opacity-0 transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+        role="tooltip"
+      >
         {label}
       </p>
     </div>

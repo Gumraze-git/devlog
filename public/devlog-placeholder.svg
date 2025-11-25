@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Devlog placeholder image</title>
+  <desc id="desc">Placeholder for devlog post without a thumbnail</desc>
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="60%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#1f2937" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0f172a" />
+  <rect width="1200" height="260" fill="url(#g)" />
+  <rect y="618" width="1200" height="12" fill="#34d399" />
+  <text x="50%" y="310" fill="#34d399" font-family="'Arial', 'Helvetica', sans-serif" font-size="96" font-weight="700" text-anchor="middle">Devlog</text>
+  <text x="50%" y="370" fill="#e2e8f0" font-family="'Arial', 'Helvetica', sans-serif" font-size="32" text-anchor="middle">Markdown Post</text>
+</svg>

@@ -1,10 +1,4 @@
-export type EducationItem = {
-  id: number;
-  type: "education" | "certification";
-  name: string;
-  organization: string;
-  period: string;
-  details?: string[];
-};
+import { type EducationMeta } from "../lib/education";
 
+export type EducationItem = EducationMeta;
 export const educationItems: EducationItem[] = [];

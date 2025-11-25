@@ -7,34 +7,50 @@ export type SkillItem = {
   label: string;
   categoryId: string;
   image: string;
+  size?: number;
 };
 
 export const skillCategories: SkillCategory[] = [
   { id: "all", name: "전체" },
   { id: "backend", name: "백엔드" },
   { id: "frontend", name: "프론트엔드" },
+  { id: "database", name: "데이터베이스" },
   { id: "env", name: "환경 및 배포" },
-  { id: "design", name: "디자인" },
+  { id: "tools", name: "도구" },
+  { id: "ai", name: "AI" },
 ];
 
 const vercelBlob = (file: string) =>
-  `https://lh8zlkkhlslw0zyz.public.blob.vercel-storage.com/skills/${file}`;
+  `https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/${file}`;
 
 export const skills: SkillItem[] = [
-  { label: "NestJS", categoryId: "backend", image: vercelBlob("nestjs-A4aT9Yw4MXZ148erSOxC9CpHXnZKBM.png") },
-  { label: "Node.js", categoryId: "backend", image: vercelBlob("nodejs-rEoKmLz0cHVW8q1k0nMl6SZ7e0J8kr.png") },
-  { label: "PostgreSQL", categoryId: "backend", image: vercelBlob("postgresql-vHh9QofCCRP4CTqOeIziGQ1mQ4YxOj.png") },
-  { label: "Prisma", categoryId: "backend", image: vercelBlob("prisma-xvhQX6wEfTFxnJqyW8g9yonC5uHpcc.png") },
-  { label: "Next.js", categoryId: "frontend", image: vercelBlob("Next.js-AhWeuPpDe5INDWIBXqSbbsxoV0OvzS.png") },
-  { label: "React", categoryId: "frontend", image: vercelBlob("react-VS4Vwy6It1uAZy63ihXuYvHqqYkY1X.png") },
-  { label: "TypeScript", categoryId: "frontend", image: vercelBlob("typescript-50YJFG5dzDLgPyvDvGxy6XZ6oMqjKi.png") },
-  { label: "Framer Motion", categoryId: "frontend", image: vercelBlob("framer-CCbvOAkl7edZKmqh3ZCL1G1MjmE9mG.png") },
-  { label: "Docker", categoryId: "env", image: vercelBlob("docker-Fk2t4QeHKC2dVEPxW48pRhS0Gva8Q1.png") },
-  { label: "AWS", categoryId: "env", image: vercelBlob("aws-EfjHi6naHo8QZ1Ct3co51BD8bdvnFx.png") },
-  { label: "Vercel", categoryId: "env", image: vercelBlob("Vercel-ALWOzGwrKtAkAFDgkaL3WGbPchkpSF.png") },
-  { label: "GitHub Actions", categoryId: "env", image: vercelBlob("github-Mxif6CX9Gaip3dXvGCrgX7casaJM3D.png") },
-  { label: "Figma", categoryId: "design", image: vercelBlob("figma-IiFO7yrdgnjBSjpxsCokIusUg6AoGO.png") },
-  { label: "Tailwind CSS", categoryId: "design", image: vercelBlob("tailwind-css-Ac4YsB1L03P1CGQqjaJlIYKcWjAxtf.png") },
-  { label: "Storybook", categoryId: "design", image: vercelBlob("Storybook-kGdPF5HNm19qyTpA0b4dcsOvVDRN0F.png") },
-  { label: "Chakra UI", categoryId: "design", image: vercelBlob("Chakra-UI-s50fm8LjGHbhhGdljw6C7DLRGuHrvG.png") },
+  // 백엔드
+  { label: "Java", categoryId: "backend", image: vercelBlob("java-vertical.svg"), size: .8 },
+  { label: "Spring", categoryId: "backend", image: vercelBlob("Spring%20Framework_idtAgBcShw_2.png"), size: .8 },
+
+  // 프론트엔드
+  { label: "React", categoryId: "frontend", image: vercelBlob("React_Logo_3.svg"), size: .8 },
+  { label: "TypeScript", categoryId: "frontend", image: vercelBlob("ts-logo-512.svg"), size: .8 },
+  { label: "Next.js", categoryId: "frontend", image: vercelBlob("nextjs-icon-light-background.svg"), size: .8 },
+  { label: "Kotlin", categoryId: "frontend", image: vercelBlob("Kotlin%20icon.svg"), size: .8 },
+  { label: "Swift", categoryId: "frontend", image: vercelBlob("Swift_logo_color.svg"), size: .8 },
+  { label: "Tailwind CSS", categoryId: "frontend", image: vercelBlob("tailwindcss-mark.d52e9897.svg"), size: .8 },
+
+  // 데이터베이스
+  { label: "MySQL", categoryId: "database", image: vercelBlob("logo-mysql-170x115.png"), size: 0.8 },
+  { label: "MongoDB", categoryId: "database", image: vercelBlob("MongoDB.svg"), size: .8 },
+  { label: "PostgreSQL", categoryId: "database", image: vercelBlob("elephant.png"), size: .8 },
+
+  // 환경 및 배포
+  { label: "AWS", categoryId: "env", image: vercelBlob("AWS-Cloud-logo_32_Dark.svg"), size: .8 },
+  { label: "Vercel", categoryId: "env", image: vercelBlob("vercel-icon-light.svg"), size: .8 },
+
+  // 도구
+  { label: "GitHub", categoryId: "tools", image: vercelBlob("GitHub_Logo.png"), size: .8 },
+  { label: "Figma", categoryId: "tools", image: vercelBlob("Figma%20Icon%20%28Full-color%29.svg"), size: .8 },
+
+  // AI
+  { label: "Python", categoryId: "ai", image: vercelBlob("python-logo-only.svg"), size: .8 },
+  { label: "PyTorch", categoryId: "ai", image: vercelBlob("PyTorch.svg"), size: .8 },
+  { label: "TensorFlow", categoryId: "ai", image: vercelBlob("FullColorPrimary%20Icon.svg"), size: .8 },
 ];
