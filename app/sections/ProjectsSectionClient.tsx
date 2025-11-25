@@ -31,14 +31,14 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
   );
 
   return (
-    <SectionWatcher id="projects" className="scroll-mt-32">
+    <SectionWatcher id="projects" className="scroll-mt-24 md:scroll-mt-32">
       <SlideUpInView>
-        <div className="space-y-6">
+        <div className="space-y-6 md:space-y-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-2">
               <p className="text-sm font-semibold uppercase tracking-wide text-[var(--accent-strong)]">Projects</p>
-              <h2 className="text-3xl font-bold text-[var(--foreground)]">사이드 프로젝트</h2>
-              <p className="text-[var(--text-muted)]">진행 중 혹은 완료한 프로젝트의 하이라이트를 모았습니다.</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[var(--foreground)]">사이드 프로젝트</h2>
+              <p className="text-sm md:text-base text-[var(--text-muted)]">진행 중 혹은 완료한 프로젝트의 하이라이트를 모았습니다.</p>
             </div>
             <Link
               href="/projects"
@@ -56,7 +56,7 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
             }}
             renderTitle={(item) => (
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-lg font-semibold text-[var(--foreground)] line-clamp-2">{item.title}</h3>
+                <h3 className="text-base md:text-lg font-semibold text-[var(--foreground)] line-clamp-2">{item.title}</h3>
                 {item.meta && <span className="text-[11px] font-normal text-[var(--text-soft)]">{item.meta}</span>}
               </div>
             )}
@@ -66,9 +66,9 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8">
-          <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[var(--card)] p-6 shadow-2xl border border-[var(--border)]">
+          <div className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto rounded-3xl bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]">
             <button
-              className="absolute right-4 top-4 text-[var(--text-soft)]"
+              className="absolute right-3 top-3 md:right-4 md:top-4 text-[var(--text-soft)] p-2"
               onClick={() => setSelected(null)}
               aria-label="닫기"
             >
@@ -76,9 +76,9 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
             </button>
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">{selected.period}</p>
-              <h3 className="text-2xl font-bold text-[var(--foreground)]">{selected.title}</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-[var(--foreground)]">{selected.title}</h3>
               <p className="text-sm text-[var(--text-muted)]">{selected.summary}</p>
-              <div className="relative h-48 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
+              <div className="relative h-40 md:h-48 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
                 <Image
                   src={selected.thumbnail ?? "/devlog-placeholder.svg"}
                   alt={selected.title}

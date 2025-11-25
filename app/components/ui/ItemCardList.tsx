@@ -20,15 +20,15 @@ type ItemCardListProps = PropsWithChildren<{
 
 export default function ItemCardList({ items, onSelect, renderFooter, renderTitle, ariaLabel }: ItemCardListProps) {
   return (
-    <div className="no-scrollbar flex gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 px-2">
+    <div className="no-scrollbar flex gap-3 md:gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 px-1 md:px-2">
       {items.map((item) => (
         <button
           key={item.slug}
           onClick={() => onSelect(item)}
-          className="relative min-w-[300px] max-w-[320px] flex-shrink-0 rounded-3xl border border-[var(--border)] bg-[var(--card)] text-left shadow-sm transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg hover:z-10"
+          className="relative min-w-[280px] md:min-w-[300px] max-w-[320px] flex-shrink-0 rounded-3xl border border-[var(--border)] bg-[var(--card)] text-left shadow-sm transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg hover:z-10"
           aria-label={ariaLabel ? `${ariaLabel} ${item.title}` : `${item.title} 상세 보기`}
         >
-          <div className="relative mx-4 mt-4 h-40 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
+          <div className="relative mx-4 mt-4 h-32 md:h-40 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
             <Image
               src={item.thumbnail ?? "/devlog-placeholder.svg"}
               alt={item.title}
