@@ -18,7 +18,7 @@ export async function fetchVelogRSS(username: string): Promise<VelogPost[]> {
   const feed = await parser.parseURL(RSS_URL);
 
   // 필요한 필드만 변환하여 반환
-  return feed.items.map((item) => ({
+  return feed.items.map((item: any) => ({
     title: item.title ?? "",
     link: item.link ?? "",
     pubDate: item.pubDate ?? "",
