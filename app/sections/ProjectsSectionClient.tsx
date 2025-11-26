@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 
 import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
-import ItemCardList from "../components/ui/ItemCardList";
+import OverlayCard from "../components/ui/OverlayCard";
 import { type Project } from "../lib/projects";
 
 type ProjectsSectionClientProps = {
@@ -48,19 +48,22 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
             </Link>
           </div>
 
-          <ItemCardList
-            items={cards}
-            onSelect={(item) => {
-              const found = projects.find((p) => p.slug === item.slug);
-              if (found) setSelected(found);
-            }}
-            renderTitle={(item) => (
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="text-base md:text-lg font-semibold text-[var(--foreground)] line-clamp-2">{item.title}</h3>
-                {item.meta && <span className="text-[11px] font-normal text-[var(--text-soft)]">{item.meta}</span>}
-              </div>
-            )}
-          />
+          <div className="no-scrollbar flex gap-3 md:gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 px-1 md:px-2">
+            {cards.map((item) => (
+              <OverlayCard
+                key={item.slug}
+                as="button"
+                title={item.title}
+                date={item.meta ?? ""}
+                thumbnail={item.thumbnail}
+                ariaLabel={`Project ${item.title}`}
+                onSelect={() => {
+                  const found = projects.find((p) => p.slug === item.slug);
+                  if (found) setSelected(found);
+                }}
+              />
+            ))}
+          </div>
         </div>
       </SlideUpInView>
 
