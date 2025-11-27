@@ -9,7 +9,6 @@ type BaseProps = {
   ctaLabel?: string;
   description?: string;
   tags?: string[];
-  tags?: string[];
   ariaLabel?: string;
 };
 
