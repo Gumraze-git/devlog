@@ -54,7 +54,7 @@ function stripHtmlAndTrim(html: string, maxLen = 140): string {
 }
 
 function normalizeUrl(url?: string | null): string | undefined {
-  if (!url) return null;
+  if (!url) return undefined;
   if (url.startsWith("//")) return `https:${url}`;
   return url;
 }
