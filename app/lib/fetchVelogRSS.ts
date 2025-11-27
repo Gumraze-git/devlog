@@ -53,7 +53,7 @@ function stripHtmlAndTrim(html: string, maxLen = 140): string {
   return text.length > maxLen ? `${text.slice(0, maxLen)}…` : text;
 }
 
-function normalizeUrl(url?: string | null): string | null {
+function normalizeUrl(url?: string | null): string | undefined {
   if (!url) return null;
   if (url.startsWith("//")) return `https:${url}`;
   return url;
@@ -92,7 +92,7 @@ export function mapVelogToCard(post: VelogPost, index = 0): VelogCardData {
     title: post.title || slug,
     description,
     date: post.pubDate ?? "",
-    thumbnail: normalizeUrl(post.thumbnail ?? thumbnailFromContent ?? undefined),
+    thumbnail: normalizeUrl(post.thumbnail ?? thumbnailFromContent ?? undefined) ?? undefined,
     tags: post.categories,
     link: post.link,
   };
