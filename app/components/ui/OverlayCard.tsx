@@ -9,6 +9,7 @@ type BaseProps = {
   ctaLabel?: string;
   description?: string;
   tags?: string[];
+  tags?: string[];
   ariaLabel?: string;
 };
 
@@ -42,11 +43,28 @@ export default function OverlayCard(props: OverlayCardProps) {
           className="object-cover"
           loading="lazy"
         />
-        <div className="overlay absolute inset-0 bg-black/45 transition-[backdrop-filter,background-color] group-hover:bg-black/55 group-hover:backdrop-blur-sm" />
+        <div className="overlay absolute inset-0 bg-black/45 transition-[backdrop-filter,background-color] group-hover:bg-black/55 group-hover:backdrop-blur-[2px]" />
       </div>
 
       <div className="absolute inset-0 z-10 flex flex-col p-5 md:p-6">
-        <p className="mb-6 md:mb-4 text-white text-base md:text-lg font-bold line-clamp-2 drop-shadow">{props.title}</p>
+        <p className="text-white text-base md:text-lg font-bold line-clamp-2 drop-shadow">{props.title}</p>
+        {props.description && (
+          <p className="mt-1 text-white/80 text-xs md:text-sm font-medium line-clamp-2 drop-shadow">{props.description}</p>
+        )}
+        {props.tags && props.tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {props.tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white/90 backdrop-blur">
+                {tag}
+              </span>
+            ))}
+            {props.tags.length > 3 && (
+              <span className="rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-semibold text-white/70 backdrop-blur">
+                +{props.tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
         <div className="mt-auto flex items-center justify-between gap-3 text-white/70 text-xs md:text-sm font-medium">
           <p>{props.date}</p>
           <div className="flex items-center gap-1 text-white">
