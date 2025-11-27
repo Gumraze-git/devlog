@@ -98,16 +98,16 @@ export function mapVelogToCard(post: VelogPost, index = 0): VelogCardData {
   };
 }
 
-export async function fetchVelogOgImage(url: string): Promise<string | null> {
+export async function fetchVelogOgImage(url: string): Promise<string | undefined> {
   try {
     const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return null;
+    if (!res.ok) return undefined;
     const html = await res.text();
     const metaMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'>]+)["']/i)
       ?? html.match(/<meta[^>]+content=["']([^"'>]+)["'][^>]+property=["']og:image["']/i)
       ?? html.match(/<meta[^>]+name=["']og:image["'][^>]+content=["']([^"'>]+)["']/i);
-    return normalizeUrl(metaMatch ? metaMatch[1] : null);
+    return normalizeUrl(metaMatch ? metaMatch[1] : undefined);
   } catch {
-    return null;
+    return undefined;
   }
 }
