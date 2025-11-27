@@ -1,12 +1,20 @@
-import Link from "next/link";
-import Image from "next/image";
-
-import { getAllPosts } from "../lib/posts";
+import { getAllPostsWithVelog } from "../lib/posts";
+import OverlayCard from "../components/ui/OverlayCard";
 
 export const dynamic = "force-dynamic";
 
-export default function DevlogListPage() {
-  const posts = getAllPosts();
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString("ko-KR").replace(/\s/g, "").replace(/\.$/, "");
+}
+
+export default async function DevlogListPage() {
+  const username = process.env.VELOG_USERNAME ?? process.env.NEXT_PUBLIC_VELOG_USERNAME ?? "gumraze";
+  const posts = await getAllPostsWithVelog({ includeVelog: true, username });
+  const velogPosts = posts.filter((post) => post.source === "velog");
+  const fillers =
+    velogPosts.length < 3
+      ? Array.from({ length: 3 - velogPosts.length }).map((_, idx) => ({ key: `placeholder-${idx}` }))
+      : [];
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-16">
@@ -16,33 +24,38 @@ export default function DevlogListPage() {
         <p className="text-[var(--text-muted)]">최신순으로 정렬된 전체 Devlog 목록입니다.</p>
       </header>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post) => (
-          <Link
-            key={post.slug}
-            href={`/devlog/${post.slug}`}
-            className="group block overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--card)] shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="relative h-40 overflow-hidden bg-[var(--card-subtle)]">
-              <Image
-                src={post.thumbnail ?? "/devlog-placeholder.svg"}
-                alt={post.title}
-                fill
-                sizes="400px"
-                className="object-cover transition duration-300 group-hover:scale-105"
-                loading="lazy"
-              />
+      {velogPosts.length === 0 ? (
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card-muted)] p-6 text-sm text-[var(--text-muted)]">
+          Velog 포스트를 불러오지 못했어요. 네트워크 허용 후 새로고침 해주세요.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {velogPosts.map((post) => (
+            <OverlayCard
+              key={post.slug}
+              href={post.externalLink ?? "#"}
+              title={post.title}
+              date={formatDate(post.date)}
+              description={post.description}
+              tags={post.tags}
+              thumbnail={post.thumbnail}
+              ariaLabel={`Velog ${post.title}`}
+              ctaLabel="자세히 보기"
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+          ))}
+          {fillers.map((placeholder) => (
+            <div
+              key={placeholder.key}
+              className="relative h-[13rem] md:h-[16rem] xl:h-[18rem] w-full rounded-lg md:rounded-xl border border-dashed border-[var(--border)] bg-[var(--card-muted)]/60 text-sm text-[var(--text-muted)] grid place-items-center"
+              aria-hidden
+            >
+              준비 중
             </div>
-            <div className="space-y-2 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">
-                {new Date(post.date).toLocaleDateString("ko-KR")}
-              </p>
-              <h2 className="text-lg font-semibold text-[var(--foreground)] line-clamp-2">{post.title}</h2>
-              <p className="text-sm text-[var(--text-muted)] line-clamp-2">{post.description}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
