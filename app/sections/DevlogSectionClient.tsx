@@ -25,14 +25,18 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
 
   const cards = useMemo(
     () =>
-      posts.map((post) => ({
-        slug: post.slug,
-        title: post.title,
-        summary: post.description,
-        meta: formatDate(post.date),
-        thumbnail: post.thumbnail,
-        tags: post.tags,
-      })),
+      posts
+        .filter((post) => post.source === "velog")
+        .map((post) => ({
+          slug: post.slug,
+          title: post.title,
+          summary: post.description,
+          meta: formatDate(post.date),
+          thumbnail: post.thumbnail,
+          tags: post.tags,
+          source: post.source,
+          externalLink: post.externalLink,
+        })),
     [posts],
   );
 
@@ -80,22 +84,46 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
               </div>
             )}
 
-            <div className="no-scrollbar flex gap-3 md:gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 px-1 md:px-2">
-              {visibleCards.map((item) => (
-                <OverlayCard
-                  key={item.slug}
-                  as="button"
-                  title={item.title}
-                  date={item.meta ?? ""}
-                  thumbnail={item.thumbnail}
-                  ariaLabel={`Devlog ${item.title}`}
-                  onSelect={() => {
-                    const found = posts.find((p) => p.slug === item.slug);
-                    if (found) setSelected(found);
-                  }}
-                />
-              ))}
-            </div>
+            {visibleCards.length === 0 ? (
+              <div className="flex h-[14rem] md:h-[16rem] items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card-muted)] px-4 text-sm text-[var(--text-muted)]">
+                Velog 포스트를 불러오지 못했어요. 네트워크 허용 후 새로고침 해주세요.
+              </div>
+            ) : (
+              <div className="no-scrollbar flex gap-3 md:gap-4 overflow-x-auto overflow-y-visible pb-4 pt-2 px-1 md:px-2">
+                {visibleCards.map((item) => (
+                  item.source === "velog" && item.externalLink ? (
+                    <OverlayCard
+                      key={item.slug}
+                      href={item.externalLink}
+                      title={item.title}
+                      date={item.meta ?? ""}
+                      description={item.summary}
+                      tags={item.tags}
+                      thumbnail={item.thumbnail}
+                      ariaLabel={`Velog ${item.title}`}
+                      ctaLabel="자세히 보기"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  ) : (
+                    <OverlayCard
+                      key={item.slug}
+                      as="button"
+                      title={item.title}
+                      date={item.meta ?? ""}
+                      description={item.summary}
+                      tags={item.tags}
+                      thumbnail={item.thumbnail}
+                      ariaLabel={`Devlog ${item.title}`}
+                      onSelect={() => {
+                        const found = posts.find((p) => p.slug === item.slug);
+                        if (found) setSelected(found);
+                      }}
+                    />
+                  )
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </SlideUpInView>
@@ -124,10 +152,14 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
                 />
               </div>
               {selected.content && (
-                <div
-                  className="prose prose-sm prose-invert text-[var(--text-muted)] max-w-none"
-                  dangerouslySetInnerHTML={{ __html: selected.content }}
-                />
+                <div className="prose prose-sm prose-invert text-[var(--text-muted)] max-w-none">
+                  {selected.content
+                    .split("\n")
+                    .filter((line) => line.trim().length > 0)
+                    .map((line, idx) => (
+                      <p key={idx}>{line}</p>
+                    ))}
+                </div>
               )}
               <Link
                 href={`/devlog/${selected.slug}`}

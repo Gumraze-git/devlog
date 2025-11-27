@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "htmacgfeigx1pttr.public.blob.vercel-storage.com",
       },
+      {
+        protocol: "https",
+        hostname: "velog.velcdn.com",
+      },
     ],
   },
 };
