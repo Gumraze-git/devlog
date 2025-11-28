@@ -3,12 +3,59 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Link as LinkIcon, X } from "lucide-react";
 
 import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
 import OverlayCard from "../components/ui/OverlayCard";
 import { type Project } from "../lib/projects";
+import { useEffect } from "react";
+import { getTechIconMeta } from "../data/skills";
+import ReactMarkdown from "react-markdown";
+
+const markdownComponents = {
+  h1: (props: any) => (
+    <h1 className="mt-3 mb-1 text-xl font-bold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  h2: (props: any) => (
+    <h2 className="mt-3 mb-1 text-lg font-bold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  h3: (props: any) => (
+    <h3 className="mt-2.5 mb-1 text-base font-semibold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  h4: (props: any) => (
+    <h4 className="mt-2 mb-1 text-sm font-semibold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  p: (props: any) => (
+    <p className="my-1.5 leading-6 text-sm" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  li: (props: any) => (
+    <li className="leading-6 text-sm" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  ul: (props: any) => (
+    <ul className="my-1.5 ml-5 list-disc space-y-1" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  ol: (props: any) => (
+    <ol className="my-1.5 ml-5 list-decimal space-y-1" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  blockquote: (props: any) => (
+    <blockquote
+      className="my-2 border-l-4 border-[var(--border)] pl-3 text-sm leading-6"
+      style={{ color: "#0f0f0f" }}
+      {...props}
+    />
+  ),
+  a: (props: any) => (
+    <a
+      className="underline underline-offset-2"
+      style={{ color: "#0f0f0f", wordBreak: "break-all" }}
+      {...props}
+    />
+  ),
+  code: (props: any) => (
+    <code className="text-xs" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+};
 
 type ProjectsSectionClientProps = {
   projects: Project[];
@@ -16,6 +63,34 @@ type ProjectsSectionClientProps = {
 
 export default function ProjectsSectionClient({ projects }: ProjectsSectionClientProps) {
   const [selected, setSelected] = useState<Project | null>(null);
+  useEffect(() => {
+    if (!selected) return;
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    // 스크롤바가 사라질 때 레이아웃 시프트 방지 (약 16px)
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+    };
+  }, [selected]);
+
+  useEffect(() => {
+    if (!selected) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelected(null);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [selected]);
 
   const cards = useMemo(
     () =>
@@ -37,8 +112,8 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-2">
               <p className="text-sm font-semibold uppercase tracking-wide text-[var(--accent-strong)]">Projects</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[var(--foreground)]">사이드 프로젝트</h2>
-              <p className="text-sm md:text-base text-[var(--text-muted)]">진행 중 혹은 완료한 프로젝트의 하이라이트를 모았습니다.</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[var(--foreground)]">프로젝트</h2>
+              <p className="text-sm md:text-base text-[var(--text-muted)]">완료한 프로젝트의 하이라이트를 모았습니다.</p>
             </div>
             <Link
               href="/projects"
@@ -68,8 +143,17 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
       </SlideUpInView>
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8">
-          <div className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto rounded-3xl bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${selected.title} 상세보기`}
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto no-scrollbar rounded-[10px] bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className="absolute right-3 top-3 md:right-4 md:top-4 text-[var(--text-soft)] p-2"
               onClick={() => setSelected(null)}
@@ -77,54 +161,87 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
             >
               <X size={20} />
             </button>
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">{selected.period}</p>
+            <div className="space-y-4">
               <h3 className="text-xl md:text-2xl font-bold text-[var(--foreground)]">{selected.title}</h3>
               <p className="text-sm text-[var(--text-muted)]">{selected.summary}</p>
-              <div className="relative h-40 md:h-48 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
+
+              <div className="relative h-44 md:h-56 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
                 <Image
                   src={selected.thumbnail ?? "/devlog-placeholder.svg"}
                   alt={selected.title}
                   fill
-                  sizes="600px"
+                  sizes="700px"
                   className="object-cover"
                 />
               </div>
-              {selected.content && (
-                <div
-                  className="prose prose-sm prose-invert text-[var(--text-muted)] max-w-none"
-                  dangerouslySetInnerHTML={{ __html: selected.content }}
-                />
-              )}
-              <dl className="grid gap-2 text-sm text-[var(--text-muted)]">
-                <div className="flex justify-between">
-                  <dt className="font-semibold text-[var(--text-soft)]">인원</dt>
-                  <dd className="text-[var(--foreground)]">{selected.members}</dd>
+
+              {/* 기술 스택 - 메타 형태로 정렬 */}
+              <div className="space-y-2 border-b border-[var(--border)] pb-2">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">기술 스택</p>
+                  <div className="flex flex-wrap justify-end gap-2 md:gap-3">
+                    {selected.stack.map((tech) => {
+                      const meta = getTechIconMeta(tech);
+                      return (
+                        <div
+                          key={tech}
+                          className="flex items-center justify-center"
+                          aria-label={meta?.label ?? tech}
+                          title={meta?.label ?? tech}
+                        >
+                          {meta?.icon ? (
+                            <div className="relative h-7 w-7 md:h-8 md:w-8">
+                              <Image
+                                src={meta.icon}
+                                alt={meta.label}
+                                fill
+                                sizes="64px"
+                                className="object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <span className="rounded-full bg-[var(--border-muted)] px-2 py-1 text-[11px] font-semibold text-[var(--foreground)]">
+                              {meta?.label ?? tech}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div>
-                  <dt className="font-semibold text-[var(--text-soft)]">기술 스택</dt>
-                  <dd className="mt-1 flex flex-wrap gap-2">
-                    {selected.stack.map((tech) => (
-                      <span key={tech} className="rounded-full bg-[var(--border-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--foreground)]">
-                        {tech}
-                      </span>
-                    ))}
-                  </dd>
-                </div>
-              </dl>
-              <div className="space-y-2">
-                {selected.highlights.map((h, idx) => (
-                  <p key={idx} className="rounded-2xl bg-[var(--card-muted)] p-2 text-sm text-[var(--text-muted)]">
-                    {h}
-                  </p>
-                ))}
               </div>
-              <Link
-                href={`/projects/${selected.slug}`}
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-              >
-                자세히 보기
-              </Link>
+
+              <div className="space-y-2 text-sm text-[var(--text-muted)]">
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">인원</span>
+                  <span className="font-semibold text-[var(--foreground)]">{selected.members}</span>
+                </div>
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">기간</span>
+                  <span className="font-semibold text-[var(--foreground)]">{selected.period}</span>
+                </div>
+                {selected.repo && (
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">Repo</span>
+                    <Link
+                      href={selected.repo}
+                      className="inline-flex items-center gap-1 text-[var(--accent-strong)] underline underline-offset-2 hover:text-[var(--accent)]"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <LinkIcon size={16} aria-hidden />
+                      {selected.repo}
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* 본문을 Markdown으로 렌더 */}
+              {selected.content && (
+                <div className="prose prose-sm prose-modal max-w-none border-t border-[var(--border)] pt-4" style={{ color: "#0f0f0f" }}>
+                  <ReactMarkdown components={markdownComponents}>{selected.content}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -54,3 +54,46 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Utility: hide scrollbars while keeping scroll functionality */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prose tweaks for modal markdown */
+.prose-modal :is(h1, h2) {
+  font-size: 1.15rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+.prose-modal :is(h3, h4) {
+  font-size: 1rem;
+  margin-top: 0.6rem;
+  margin-bottom: 0.2rem;
+}
+.prose-modal p {
+  margin: 0.35rem 0;
+  line-height: 1.5;
+}
+.prose-modal ul,
+.prose-modal ol {
+  margin: 0.3rem 0 0.3rem 1.1rem;
+}
+.prose-modal blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 0.75rem;
+  color: var(--text-muted);
+}
+.prose-modal a {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+.prose-modal code {
+  font-size: 0.9em;
+}

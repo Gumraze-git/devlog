@@ -10,6 +10,12 @@ export type SkillItem = {
   size?: number;
 };
 
+export type TechIconMeta = {
+  key: string;
+  label: string;
+  icon: string | null;
+};
+
 export const skillCategories: SkillCategory[] = [
   { id: "all", name: "전체" },
   { id: "backend", name: "백엔드" },
@@ -54,3 +60,42 @@ export const skills: SkillItem[] = [
   { label: "PyTorch", categoryId: "ai", image: vercelBlob("PyTorch.svg"), size: .8 },
   { label: "TensorFlow", categoryId: "ai", image: vercelBlob("FullColorPrimary%20Icon.svg"), size: .8 },
 ];
+
+const normalize = (value: string) => value.trim().toLowerCase();
+
+// Build a base map from skills list
+const baseTechIconMap: Record<string, TechIconMeta> = skills.reduce((acc, item) => {
+  const key = normalize(item.label);
+  acc[key] = { key, label: item.label, icon: item.image ?? null };
+  return acc;
+}, {} as Record<string, TechIconMeta>);
+
+// Additional aliases / tools not listed in skills array but used in projects
+const extraTechIconMap: Record<string, TechIconMeta> = {
+  "spring boot": { key: "spring boot", label: "Spring Boot", icon: baseTechIconMap["spring"]?.icon ?? vercelBlob("Spring%20Framework_idtAgBcShw_2.png") },
+  "aws ecs": { key: "aws ecs", label: "AWS ECS", icon: baseTechIconMap["aws"]?.icon ?? vercelBlob("AWS-Cloud-logo_32_Dark.svg") },
+  ec2: { key: "ec2", label: "Amazon EC2", icon: baseTechIconMap["aws"]?.icon ?? vercelBlob("AWS-Cloud-logo_32_Dark.svg") },
+  redis: { key: "redis", label: "Redis", icon: null },
+  firebase: { key: "firebase", label: "Firebase", icon: vercelBlob("firebase.svg") },
+  "react native": { key: "react native", label: "React Native", icon: baseTechIconMap["react"]?.icon ?? vercelBlob("React_Logo_3.svg") },
+  "react query": { key: "react query", label: "React Query", icon: null },
+  recoil: { key: "recoil", label: "Recoil", icon: null },
+  "next.js": { key: "next.js", label: "Next.js", icon: baseTechIconMap["next.js"]?.icon ?? vercelBlob("nextjs-icon-light-background.svg") },
+  "tailwind css": { key: "tailwind css", label: "Tailwind CSS", icon: baseTechIconMap["tailwind css"]?.icon ?? vercelBlob("tailwindcss-mark.d52e9897.svg") },
+  typescript: { key: "typescript", label: "TypeScript", icon: baseTechIconMap["typescript"]?.icon ?? vercelBlob("ts-logo-512.svg") },
+  "type script": { key: "type script", label: "TypeScript", icon: baseTechIconMap["typescript"]?.icon ?? vercelBlob("ts-logo-512.svg") },
+};
+
+export function getTechIconMeta(name: string): TechIconMeta | null {
+  const key = normalize(name);
+  return extraTechIconMap[key] ?? baseTechIconMap[key] ?? null;
+}
+
+export function hasTechIcon(name: string): boolean {
+  return Boolean(getTechIconMeta(name));
+}
+
+export function listTechIcons(): TechIconMeta[] {
+  const merged = { ...baseTechIconMap, ...extraTechIconMap };
+  return Object.values(merged);
+}
