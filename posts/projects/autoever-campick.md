@@ -13,10 +13,6 @@ period: "2025.07 - 2025.10"
 members: "총 4명 (프론트 2, 백엔드 2)"
 repo: "https://github.com/autoever-ob"
 published: true
-highlights:
-  - "VIN 기반 차량 이력 조회와 시세 데이터(오픈 API)를 결합해 신뢰도 점수를 계산."
-  - "채팅/푸시 알림을 Firebase로 구현하여 실시간 상담 플로우를 완성."
-  - "오프라인 캐시 + 이미지 프리페치로 느린 네트워크에서도 주요 화면이 1초 내 로드."
 ---
 
 ## 역할
