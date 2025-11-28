@@ -8,7 +8,18 @@ export type VelogPost = {
   categories?: string[];      // 태그 배열
   thumbnail?: string;         // 썸네일(있다면)
   content?: string;           // 본문(HTML)
-}
+};
+
+type VelogRssItem = {
+  title?: string;
+  link?: string;
+  pubDate?: string;
+  contentSnippet?: string;
+  categories?: string[];
+  content?: string;
+  ["content:encoded"]?: string;
+  thumbnail?: string;
+};
 
 export async function fetchVelogRSS(username: string): Promise<VelogPost[]> {
   const parser = new Parser();
@@ -21,15 +32,18 @@ export async function fetchVelogRSS(username: string): Promise<VelogPost[]> {
   const xml = await res.text();
   const feed = await parser.parseString(xml);
 
-  return feed.items.map((item: any) => ({
-    title: item.title ?? "",
-    link: item.link ?? "",
-    pubDate: item.pubDate ?? "",
-    contentSnippet: item.contentSnippet ?? "",
-    categories: item.categories ?? [],
-    thumbnail: (item as any).thumbnail ?? undefined,
-    content: (item as any)["content:encoded"] ?? item.content ?? "",
-  }));
+  return feed.items.map((item) => {
+    const typed = item as VelogRssItem;
+    return {
+      title: typed.title ?? "",
+      link: typed.link ?? "",
+      pubDate: typed.pubDate ?? "",
+      contentSnippet: typed.contentSnippet ?? "",
+      categories: typed.categories ?? [],
+      thumbnail: typed.thumbnail ?? undefined,
+      content: typed["content:encoded"] ?? typed.content ?? "",
+    };
+  });
 }
 
 // Velog 포스트를 카드/Devlog 형태로 매핑하기 위한 헬퍼

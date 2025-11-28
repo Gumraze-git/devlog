@@ -35,7 +35,7 @@ export async function getAllPostsWithVelog(opts?: { username?: string; includeVe
     }));
 
     return mapped.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  } catch (error) {
+  } catch {
     // Velog fetch 실패 시 빈 배열 반환
     return base;
   }
