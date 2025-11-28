@@ -1,14 +1,14 @@
 ---
-title: "중고 자동차 모바일 애플리케이션"
-summary: "실시간 시세 기반 추천, 판매자-구매자 채팅, 차량 이력 조회를 통합한 중고차 모바일 앱을 설계하고 프로토타입을 구현했습니다."
+title: "중고 캠핑 자동차 모바일 애플리케이션"
+summary: "모바일 중고 캠핑 자동차 거래 앱 구현 프로젝트"
 date: "2025-10-15"
 thumbnail: "/devlog-placeholder.svg"
 stack:
-  - React Native
-  - TypeScript
-  - Recoil
-  - React Query
-  - Firebase
+  - Swift
+  - Kotlin
+  - Spring Boot
+  - MySql
+  - EC2
 period: "2025.07 - 2025.10"
 members: "총 4명 (프론트 2, 백엔드 2)"
 repo: "https://github.com/autoever-ob"
