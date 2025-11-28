@@ -11,6 +11,7 @@ export type ProjectMeta = {
   members: string;
   stack: string[];
   highlights: string[];
+  repo?: string;
   thumbnail?: string;
   published?: boolean;
 };
@@ -36,12 +37,13 @@ export function getAllProjects(): Project[] {
         title: data.title ?? slug,
         summary: data.summary ?? "",
         period: data.period ?? "",
-        members: data.members ?? "",
-        stack: data.stack ?? [],
-        highlights: data.highlights ?? [],
-        thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
-        published: data.published !== false,
-        content,
+      members: data.members ?? "",
+      stack: data.stack ?? [],
+      highlights: data.highlights ?? [],
+      repo: data.repo,
+      thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
+      published: data.published !== false,
+      content,
       } as Project;
     })
     .filter((p) => p.published);
@@ -64,6 +66,7 @@ export function getProject(slug: string): Project | null {
     members: data.members ?? "",
     stack: data.stack ?? [],
     highlights: data.highlights ?? [],
+    repo: data.repo,
     thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
     published: data.published !== false,
     content,

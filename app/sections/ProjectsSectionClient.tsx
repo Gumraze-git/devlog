@@ -23,7 +23,7 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
     if (!selected) return;
     const originalOverflow = document.body.style.overflow;
     const originalPaddingRight = document.body.style.paddingRight;
-    // prevent layout shift when scrollbar disappears (approx 16px)
+    // 스크롤바가 사라질 때 레이아웃 시프트 방지 (약 16px)
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     if (scrollbarWidth > 0) {
       document.body.style.paddingRight = `${scrollbarWidth}px`;
@@ -94,7 +94,7 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
           onClick={() => setSelected(null)}
         >
           <div
-            className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto no-scrollbar rounded-[28px] bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]"
+            className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto no-scrollbar rounded-[10px] bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
