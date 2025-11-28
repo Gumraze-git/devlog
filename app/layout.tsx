@@ -4,6 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "DKim Devlog",
   description: "기술 블로그 & 포트폴리오",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

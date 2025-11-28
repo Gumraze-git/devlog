@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="DK favicon">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4f6f3"/>
+      <stop offset="100%" stop-color="#ecefea"/>
+    </linearGradient>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0e6a3a"/>
+      <stop offset="100%" stop-color="#0b5a2f"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0.8" dy="1.4" stdDeviation="1.2" flood-color="#0b5a2f" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="76" fill="url(#bg)" />
+  <text
+    x="50%"
+    y="54%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    font-family="'Manrope', 'Poppins', 'Montserrat', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="300"
+    font-weight="900"
+    fill="url(#fg)"
+    filter="url(#shadow)"
+    letter-spacing="-6"
+  >
+    DK
+  </text>
+</svg>
