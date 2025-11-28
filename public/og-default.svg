@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="DKIM DEVLOG">
+  <g font-family="'Manrope', 'Poppins', 'Montserrat', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-weight="800" letter-spacing="-2">
+    <!-- 상단 -->
+    <g transform="translate(-24,0)">
+      <text x="40.4%" y="50%" font-size="150" text-anchor="middle" fill="#0b5a2f">D</text>
+      <text x="50%" y="50%" font-size="150" text-anchor="middle" fill="#0f0f0f" dx="70">KIM</text>
+    </g>
+    <!-- 하단 -->
+    <g transform="translate(-20,0)">
+      <text x="36.4%" y="62%" font-size="110" text-anchor="middle" fill="#0b5a2f">D</text>
+      <text x="50%" y="62%" font-size="110" text-anchor="middle" fill="#0f0f0f" dx="52">EVLOG</text>
+    </g>
+  </g>
+</svg>
