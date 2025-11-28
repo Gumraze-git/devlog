@@ -10,6 +10,8 @@ import SlideUpInView from "../components/layout/SlideUpInView";
 import OverlayCard from "../components/ui/OverlayCard";
 import { type Project } from "../lib/projects";
 import { useEffect } from "react";
+import { getTechIconMeta } from "../data/skills";
+import ReactMarkdown from "react-markdown";
 
 type ProjectsSectionClientProps = {
   projects: Project[];
@@ -84,8 +86,17 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
       </SlideUpInView>
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8">
-          <div className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto no-scrollbar rounded-3xl bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${selected.title} 상세보기`}
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto no-scrollbar rounded-[28px] bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className="absolute right-3 top-3 md:right-4 md:top-4 text-[var(--text-soft)] p-2"
               onClick={() => setSelected(null)}
@@ -93,41 +104,88 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
             >
               <X size={20} />
             </button>
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">{selected.period}</p>
+            <div className="space-y-4">
               <h3 className="text-xl md:text-2xl font-bold text-[var(--foreground)]">{selected.title}</h3>
               <p className="text-sm text-[var(--text-muted)]">{selected.summary}</p>
-              <div className="relative h-40 md:h-48 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
+
+              <div className="relative h-44 md:h-56 overflow-hidden rounded-2xl bg-[var(--card-subtle)]">
                 <Image
                   src={selected.thumbnail ?? "/devlog-placeholder.svg"}
                   alt={selected.title}
                   fill
-                  sizes="600px"
+                  sizes="700px"
                   className="object-cover"
                 />
               </div>
-              {selected.content && (
-                <div
-                  className="prose prose-sm prose-invert text-[var(--text-muted)] max-w-none"
-                  dangerouslySetInnerHTML={{ __html: selected.content }}
-                />
-              )}
-              <dl className="grid gap-2 text-sm text-[var(--text-muted)]">
-                <div className="flex justify-between">
+
+              {/* 기술 스택 아이콘 그리드 */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">기술 스택</p>
+                <div className="mt-3 grid grid-cols-4 gap-3 md:grid-cols-5">
+                  {selected.stack.map((tech) => {
+                    const meta = getTechIconMeta(tech);
+                    return (
+                      <div
+                        key={tech}
+                        className="flex h-16 flex-col items-center justify-center gap-1 rounded-2xl bg-[var(--card-muted)] p-2 text-xs text-[var(--text-muted)] shadow-sm"
+                        aria-label={meta?.label ?? tech}
+                        title={meta?.label ?? tech}
+                      >
+                        {meta?.icon ? (
+                          <div className="relative h-7 w-7 md:h-8 md:w-8">
+                            <Image
+                              src={meta.icon}
+                              alt={meta.label}
+                              fill
+                              sizes="64px"
+                              className="object-contain"
+                            />
+                          </div>
+                        ) : (
+                          <span className="rounded-full bg-[var(--border-muted)] px-2 py-1 text-[11px] font-semibold text-[var(--foreground)]">
+                            {meta?.label ?? tech}
+                          </span>
+                        )}
+                        <span className="text-[11px] text-[var(--text-soft)] leading-tight">{meta?.label ?? tech}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <dl className="space-y-3 text-sm text-[var(--text-muted)]">
+                <div className="flex items-center justify-between gap-4">
                   <dt className="font-semibold text-[var(--text-soft)]">인원</dt>
                   <dd className="text-[var(--foreground)]">{selected.members}</dd>
                 </div>
-                <div>
-                  <dt className="font-semibold text-[var(--text-soft)]">기술 스택</dt>
-                  <dd className="mt-1 flex flex-wrap gap-2">
-                    {selected.stack.map((tech) => (
-                      <span key={tech} className="rounded-full bg-[var(--border-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--foreground)]">
-                        {tech}
-                      </span>
-                    ))}
-                  </dd>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="font-semibold text-[var(--text-soft)]">기간</dt>
+                  <dd className="text-[var(--foreground)]">{selected.period}</dd>
                 </div>
+                {selected.repo && (
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="font-semibold text-[var(--text-soft)]">Repo</dt>
+                    <dd>
+                      <Link
+                        href={selected.repo}
+                        className="text-[var(--accent-strong)] underline underline-offset-2 hover:text-[var(--accent)]"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {selected.repo}
+                      </Link>
+                    </dd>
+                  </div>
+                )}
               </dl>
+
+              {/* 본문을 Markdown으로 렌더 */}
+              {selected.content && (
+                <div className="prose prose-sm prose-invert max-w-none text-[var(--text-muted)]">
+                  <ReactMarkdown>{selected.content}</ReactMarkdown>
+                </div>
+              )}
+
               <div className="space-y-2">
                 {selected.highlights.map((h, idx) => (
                   <p key={idx} className="rounded-2xl bg-[var(--card-muted)] p-2 text-sm text-[var(--text-muted)]">
@@ -135,12 +193,6 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                   </p>
                 ))}
               </div>
-              <Link
-                href={`/projects/${selected.slug}`}
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
-              >
-                자세히 보기
-              </Link>
             </div>
           </div>
         </div>
