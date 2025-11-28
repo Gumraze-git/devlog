@@ -35,6 +35,19 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
     };
   }, [selected]);
 
+  useEffect(() => {
+    if (!selected) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelected(null);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [selected]);
+
   const cards = useMemo(
     () =>
       projects.map((project) => ({
