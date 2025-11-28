@@ -13,6 +13,50 @@ import { useEffect } from "react";
 import { getTechIconMeta } from "../data/skills";
 import ReactMarkdown from "react-markdown";
 
+const markdownComponents = {
+  h1: (props: any) => (
+    <h1 className="mt-3 mb-1 text-xl font-bold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  h2: (props: any) => (
+    <h2 className="mt-3 mb-1 text-lg font-bold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  h3: (props: any) => (
+    <h3 className="mt-2.5 mb-1 text-base font-semibold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  h4: (props: any) => (
+    <h4 className="mt-2 mb-1 text-sm font-semibold" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  p: (props: any) => (
+    <p className="my-1.5 leading-6 text-sm" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  li: (props: any) => (
+    <li className="leading-6 text-sm" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  ul: (props: any) => (
+    <ul className="my-1.5 ml-5 list-disc space-y-1" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  ol: (props: any) => (
+    <ol className="my-1.5 ml-5 list-decimal space-y-1" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+  blockquote: (props: any) => (
+    <blockquote
+      className="my-2 border-l-4 border-[var(--border)] pl-3 text-sm leading-6"
+      style={{ color: "#0f0f0f" }}
+      {...props}
+    />
+  ),
+  a: (props: any) => (
+    <a
+      className="underline underline-offset-2"
+      style={{ color: "#0f0f0f", wordBreak: "break-all" }}
+      {...props}
+    />
+  ),
+  code: (props: any) => (
+    <code className="text-xs" style={{ color: "#0f0f0f" }} {...props} />
+  ),
+};
+
 type ProjectsSectionClientProps = {
   projects: Project[];
 };
@@ -194,8 +238,8 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
 
               {/* 본문을 Markdown으로 렌더 */}
               {selected.content && (
-                <div className="prose prose-sm prose-invert max-w-none text-[var(--text-muted)]">
-                  <ReactMarkdown>{selected.content}</ReactMarkdown>
+                <div className="prose prose-sm prose-modal max-w-none border-t border-[var(--border)] pt-4" style={{ color: "#0f0f0f" }}>
+                  <ReactMarkdown components={markdownComponents}>{selected.content}</ReactMarkdown>
                 </div>
               )}
             </div>
