@@ -9,6 +9,7 @@ import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
 import OverlayCard from "../components/ui/OverlayCard";
 import { type Project } from "../lib/projects";
+import { useEffect } from "react";
 
 type ProjectsSectionClientProps = {
   projects: Project[];
@@ -16,6 +17,21 @@ type ProjectsSectionClientProps = {
 
 export default function ProjectsSectionClient({ projects }: ProjectsSectionClientProps) {
   const [selected, setSelected] = useState<Project | null>(null);
+  useEffect(() => {
+    if (!selected) return;
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    // prevent layout shift when scrollbar disappears (approx 16px)
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+    };
+  }, [selected]);
 
   const cards = useMemo(
     () =>
@@ -37,8 +53,8 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-2">
               <p className="text-sm font-semibold uppercase tracking-wide text-[var(--accent-strong)]">Projects</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[var(--foreground)]">사이드 프로젝트</h2>
-              <p className="text-sm md:text-base text-[var(--text-muted)]">진행 중 혹은 완료한 프로젝트의 하이라이트를 모았습니다.</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[var(--foreground)]">프로젝트</h2>
+              <p className="text-sm md:text-base text-[var(--text-muted)]">완료한 프로젝트의 하이라이트를 모았습니다.</p>
             </div>
             <Link
               href="/projects"
@@ -69,7 +85,7 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8">
-          <div className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto rounded-3xl bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]">
+          <div className="relative max-h-[85vh] w-full max-w-xl md:max-w-2xl overflow-y-auto no-scrollbar rounded-3xl bg-[var(--card)] p-5 md:p-6 shadow-2xl border border-[var(--border)]">
             <button
               className="absolute right-3 top-3 md:right-4 md:top-4 text-[var(--text-soft)] p-2"
               onClick={() => setSelected(null)}

@@ -54,3 +54,12 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Utility: hide scrollbars while keeping scroll functionality */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
