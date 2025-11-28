@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Link as LinkIcon, X } from "lucide-react";
 
 import SectionWatcher from "../components/layout/SectionWatcher";
 import SlideUpInView from "../components/layout/SlideUpInView";
@@ -131,66 +131,66 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                 />
               </div>
 
-              {/* 기술 스택 아이콘 그리드 */}
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">기술 스택</p>
-                <div className="mt-3 grid grid-cols-4 gap-3 md:grid-cols-5">
-                  {selected.stack.map((tech) => {
-                    const meta = getTechIconMeta(tech);
-                    return (
-                      <div
-                        key={tech}
-                        className="flex h-16 flex-col items-center justify-center gap-1 rounded-2xl bg-[var(--card-muted)] p-2 text-xs text-[var(--text-muted)] shadow-sm"
-                        aria-label={meta?.label ?? tech}
-                        title={meta?.label ?? tech}
-                      >
-                        {meta?.icon ? (
-                          <div className="relative h-7 w-7 md:h-8 md:w-8">
-                            <Image
-                              src={meta.icon}
-                              alt={meta.label}
-                              fill
-                              sizes="64px"
-                              className="object-contain"
-                            />
-                          </div>
-                        ) : (
-                          <span className="rounded-full bg-[var(--border-muted)] px-2 py-1 text-[11px] font-semibold text-[var(--foreground)]">
-                            {meta?.label ?? tech}
-                          </span>
-                        )}
-                        <span className="text-[11px] text-[var(--text-soft)] leading-tight">{meta?.label ?? tech}</span>
-                      </div>
-                    );
-                  })}
+              {/* 기술 스택 - 메타 형태로 정렬 */}
+              <div className="space-y-2 border-b border-[var(--border)] pb-2">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">기술 스택</p>
+                  <div className="flex flex-wrap justify-end gap-2 md:gap-3">
+                    {selected.stack.map((tech) => {
+                      const meta = getTechIconMeta(tech);
+                      return (
+                        <div
+                          key={tech}
+                          className="flex items-center justify-center"
+                          aria-label={meta?.label ?? tech}
+                          title={meta?.label ?? tech}
+                        >
+                          {meta?.icon ? (
+                            <div className="relative h-7 w-7 md:h-8 md:w-8">
+                              <Image
+                                src={meta.icon}
+                                alt={meta.label}
+                                fill
+                                sizes="64px"
+                                className="object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <span className="rounded-full bg-[var(--border-muted)] px-2 py-1 text-[11px] font-semibold text-[var(--foreground)]">
+                              {meta?.label ?? tech}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              <dl className="space-y-3 text-sm text-[var(--text-muted)]">
-                <div className="flex items-center justify-between gap-4">
-                  <dt className="font-semibold text-[var(--text-soft)]">인원</dt>
-                  <dd className="text-[var(--foreground)]">{selected.members}</dd>
+              <div className="space-y-2 text-sm text-[var(--text-muted)]">
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">인원</span>
+                  <span className="font-semibold text-[var(--foreground)]">{selected.members}</span>
                 </div>
-                <div className="flex items-center justify-between gap-4">
-                  <dt className="font-semibold text-[var(--text-soft)]">기간</dt>
-                  <dd className="text-[var(--foreground)]">{selected.period}</dd>
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">기간</span>
+                  <span className="font-semibold text-[var(--foreground)]">{selected.period}</span>
                 </div>
                 {selected.repo && (
                   <div className="flex items-center justify-between gap-4">
-                    <dt className="font-semibold text-[var(--text-soft)]">Repo</dt>
-                    <dd>
-                      <Link
-                        href={selected.repo}
-                        className="text-[var(--accent-strong)] underline underline-offset-2 hover:text-[var(--accent)]"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {selected.repo}
-                      </Link>
-                    </dd>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">Repo</span>
+                    <Link
+                      href={selected.repo}
+                      className="inline-flex items-center gap-1 text-[var(--accent-strong)] underline underline-offset-2 hover:text-[var(--accent)]"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <LinkIcon size={16} aria-hidden />
+                      {selected.repo}
+                    </Link>
                   </div>
                 )}
-              </dl>
+              </div>
 
               {/* 본문을 Markdown으로 렌더 */}
               {selected.content && (
@@ -198,14 +198,6 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                   <ReactMarkdown>{selected.content}</ReactMarkdown>
                 </div>
               )}
-
-              <div className="space-y-2">
-                {selected.highlights.map((h, idx) => (
-                  <p key={idx} className="rounded-2xl bg-[var(--card-muted)] p-2 text-sm text-[var(--text-muted)]">
-                    {h}
-                  </p>
-                ))}
-              </div>
             </div>
           </div>
         </div>
