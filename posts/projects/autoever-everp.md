@@ -12,6 +12,9 @@ stack:
   - AWS ECS
   - Swift
   - Kotlin
+  - Kafka
+  - TanStack Query
+  - GitHub Actions
 period: "2025.09.29 - 2025.11.12"
 members: "총 6명 (프론트 3, 백엔드 3)"
 role: "백엔드"
@@ -48,6 +51,8 @@ published: true
 - 권한·세션은 Auth, 주문·견적·재고·생산·정산은 Business/SCM, 권한 필터링은 GW에서 1차 적용
 - SAGA 코레오그래피 방식으로 견적→주문→재고/생산→정산 이벤트를 처리해 분산 트랜잭션 보상
 - Docker Compose로 공통 인프라(Kafka, PostgreSQL, Redis)와 서비스 컨테이너를 일괄 기동, GitHub Actions로 CI
+
+![MSA 구조 다이어그램](../assets/everp_msa_stru.png)
 
 ## Contribution
 - iOS: SwiftUI + 코디네이터 패턴, 검색 상태 관리, 대시보드/프로필 UI 리팩터링
