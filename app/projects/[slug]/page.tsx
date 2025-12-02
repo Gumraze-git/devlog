@@ -68,6 +68,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           </div>
         </dl>
 
+        {project.education?.length ? (
+          <section className="space-y-2 rounded-2xl border border-[var(--border)] p-4">
+            <h2 className="text-sm font-semibold text-[var(--text-soft)]">교육</h2>
+            <ul className="list-disc space-y-1.5 pl-5 text-sm text-[var(--foreground)]">
+              {project.education.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         <div className="space-y-3">
           {project.highlights.map((highlight, index) => (
             <p key={index} className="rounded-2xl bg-[var(--card-muted)] p-3 text-sm text-[var(--text-muted)]">

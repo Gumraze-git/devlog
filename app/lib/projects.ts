@@ -12,6 +12,7 @@ export type ProjectMeta = {
   stack: string[];
   highlights: string[];
   date?: string;
+  education?: string[];
   role?: string;
   repo?: string;
   thumbnail?: string;
@@ -42,6 +43,7 @@ export function getAllProjects(): Project[] {
         members: data.members ?? "",
         stack: data.stack ?? [],
         highlights: data.highlights ?? [],
+        education: data.education ?? [],
         date: data.date ?? "",
         role: data.role ?? "",
         repo: data.repo,
@@ -75,6 +77,7 @@ export function getProject(slug: string): Project | null {
     members: data.members ?? "",
     stack: data.stack ?? [],
     highlights: data.highlights ?? [],
+    education: data.education ?? [],
     date: data.date ?? "",
     role: data.role ?? "",
     repo: data.repo,

@@ -14,6 +14,8 @@ members: "총 5명 (모바일 3, 백엔드 2)"
 repo: "https://github.com/autoever-ob/OB-iOS"
 role: "iOS (Swift) 개발 / 모바일 UX·아키텍처 리드 / 프로젝트 팀장"
 published: true
+education:
+  - "현대오토에버 모빌리티 SW 스쿨 2기"
 ---
 
 ## 역할

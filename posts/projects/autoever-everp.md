@@ -20,6 +20,8 @@ members: "총 6명 (프론트 3, 백엔드 3)"
 role: "백엔드"
 repo: "https://github.com/AutoEver-4Ever"
 published: true
+education:
+  - "현대오토에버 모빌리티 SW 스쿨 2기"
 ---
 
 ## 역할
