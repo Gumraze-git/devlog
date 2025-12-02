@@ -30,7 +30,7 @@ published: true
 - 판매자-구매자 채팅 안정화(낙관적 렌더링, WebSocket 연결 보강)  
 - 프로필/내 매물 관리, 관심 매물 확인
 
-## 기술 포인트  
+## Contribution
 - Clean Architecture + MVVM 도입: UseCase/Repository 인터페이스 분리, DTO→Domain→ViewData 매퍼 정리  
 - VehicleAPIClient로 API 호출 공통화, ErrorMapper로 에러 매핑 일관성 확보  
 - Auth/Vehicle DI 컨테이너로 ViewModel 생성 시 의존성 주입 자동화  
