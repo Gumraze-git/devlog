@@ -1,7 +1,7 @@
 ---
 title: "중고 캠핑 자동차 모바일 애플리케이션"
 summary: "모바일 중고 캠핑 자동차 거래 앱 구현 프로젝트"
-date: "2025-10-15"
+date: "2025-09-25"
 thumbnail: "/devlog-placeholder.svg"
 stack:
   - Swift
