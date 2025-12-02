@@ -208,11 +208,17 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                     {selected.role?.trim() ? selected.role : "미기재"}
                   </span>
                 </div>
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">교육</span>
+                  <span className="font-semibold text-[var(--foreground)]">
+                    {selected.education?.length ? selected.education.join(", ") : "미기재"}
+                  </span>
+                </div>
                 {selected.repo && (
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">저장소</span>
-                  <Link
-                    href={selected.repo}
+                    <Link
+                      href={selected.repo}
                     className="inline-flex items-center gap-1 text-[var(--accent-strong)] underline underline-offset-2 hover:text-[var(--accent)]"
                     target="_blank"
                     rel="noreferrer"
@@ -221,25 +227,15 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                     {selected.repo}
                   </Link>
                 </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* 본문을 Markdown으로 렌더 */}
-            {selected.content && (
-              <div className="prose prose-sm prose-modal max-w-none border-t border-[var(--border)] pt-4" style={{ color: "#0f0f0f" }}>
-                <ReactMarkdown components={markdownComponents}>{selected.content}</ReactMarkdown>
-              </div>
-            )}
-            {selected.education?.length ? (
-              <div className="space-y-2 border-t border-[var(--border)] pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">교육</p>
-                <ul className="list-disc space-y-1.5 pl-5 text-sm text-[var(--foreground)]">
-                  {selected.education.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
+              {/* 본문을 Markdown으로 렌더 */}
+              {selected.content && (
+                <div className="prose prose-sm prose-modal max-w-none border-t border-[var(--border)] pt-4" style={{ color: "#0f0f0f" }}>
+                  <ReactMarkdown components={markdownComponents}>{selected.content}</ReactMarkdown>
+                </div>
+              )}
           </div>
         </div>
       </div>

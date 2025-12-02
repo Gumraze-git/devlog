@@ -56,6 +56,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             <dt className="font-semibold text-[var(--text-soft)]">역할</dt>
             <dd className="text-[var(--foreground)]">{project.role?.trim() ? project.role : "미기재"}</dd>
           </div>
+          <div className="flex justify-between">
+            <dt className="font-semibold text-[var(--text-soft)]">교육</dt>
+            <dd className="text-[var(--foreground)]">
+              {project.education?.length ? project.education.join(", ") : "미기재"}
+            </dd>
+          </div>
           <div>
             <dt className="font-semibold text-[var(--text-soft)]">기술 스택</dt>
             <dd className="mt-2 flex flex-wrap gap-2">
@@ -67,17 +73,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </dd>
           </div>
         </dl>
-
-        {project.education?.length ? (
-          <section className="space-y-2 rounded-2xl border border-[var(--border)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--text-soft)]">교육</h2>
-            <ul className="list-disc space-y-1.5 pl-5 text-sm text-[var(--foreground)]">
-              {project.education.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
 
         <div className="space-y-3">
           {project.highlights.map((highlight, index) => (
