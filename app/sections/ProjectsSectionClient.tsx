@@ -202,9 +202,15 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                   <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">기간</span>
                   <span className="font-semibold text-[var(--foreground)]">{selected.period}</span>
                 </div>
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">역할</span>
+                  <span className="font-semibold text-[var(--foreground)]">
+                    {selected.role?.trim() ? selected.role : "미기재"}
+                  </span>
+                </div>
                 {selected.repo && (
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">Repo</span>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">저장소</span>
                     <Link
                       href={selected.repo}
                       className="inline-flex items-center gap-1 text-[var(--accent-strong)] underline underline-offset-2 hover:text-[var(--accent)]"

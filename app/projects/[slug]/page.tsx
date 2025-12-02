@@ -52,6 +52,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             <dt className="font-semibold text-[var(--text-soft)]">인원</dt>
             <dd className="text-[var(--foreground)]">{project.members}</dd>
           </div>
+          <div className="flex justify-between">
+            <dt className="font-semibold text-[var(--text-soft)]">역할</dt>
+            <dd className="text-[var(--foreground)]">{project.role?.trim() ? project.role : "미기재"}</dd>
+          </div>
           <div>
             <dt className="font-semibold text-[var(--text-soft)]">기술 스택</dt>
             <dd className="mt-2 flex flex-wrap gap-2">
