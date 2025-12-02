@@ -1,7 +1,7 @@
 ---
 title: "대규모 이벤트 관리 플랫폼"
 summary: "수만 명 참가자가 등록·결제·체크인·세션 예약을 한 번에 처리하는 이벤트 운영 플랫폼을 구축했습니다."
-date: "2025-08-30"
+date: "2025-11-12"
 thumbnail: "/devlog-placeholder.svg"
 stack:
   - Next.js
@@ -40,13 +40,13 @@ published: true
 - UX 개선: 불필요 렌더 제거, 검색/필터 전환 시 지연 최소화, 메인 앱 검색 로직 개선으로 사용성 향상
 
 ## 백엔드
-- AUTH: 모바일 전용 로그인 제한, 로그아웃 시 세션 쿠키 무효화, iOS/AOS OAuth 클라이언트 등록, 배포 도메인 CORS 허용 추가
+- AUTH: OAuth 2.0 Authorization Code + PKCE로 iOS/AOS 통합 로그인, refresh token 로테이션/만료 처리, 모바일 전용 로그인 제한, 로그아웃 시 세션 쿠키 무효화, 배포 도메인 CORS 허용 추가
 - BUSINESS: 대시보드 주문/견적 조회 로직 개선, 제품 정보 조회 추가, 다중 ID 조회 API, 상태 변경 알림 연동, HRM 데이터 정리
-- GW: 생산/구매/재고/영업/HRM 엔드포인트 권한 검사 추가로 접근 제어 강화
+- GW: 생산/구매/재고/영업/HRM 엔드포인트 권한 검사 추가로 접근 제어 강화, Auth 발급 JWT 서명/만료 검증 및 스코프 기반 라우팅
 - SCM: BOM 트리 DTO 수정, 창고/주문 상태 검증, 입·출고 응답 보완으로 재고 프로세스 안정화
 
 ## MSA 구조
-- Gateway(WebFlux)에서 JWT 검증 후 도메인 서비스로 라우팅 (Auth/Business/SCM/Payment/Alarm 등)
+- Auth 서비스가 OAuth 인증/토큰 발급·갱신을 담당하고 Gateway(WebFlux)에서 JWT 서명 검증 후 도메인 서비스로 라우팅 (Auth/Business/SCM/Payment/Alarm 등)
 - 서비스별 Spring Boot 마이크로서비스 + 개별 PostgreSQL 인스턴스, Kafka 이벤트로 서비스 간 연계
 - 권한·세션은 Auth, 주문·견적·재고·생산·정산은 Business/SCM, 권한 필터링은 GW에서 1차 적용
 - SAGA 코레오그래피 방식으로 견적→주문→재고/생산→정산 이벤트를 처리해 분산 트랜잭션 보상
@@ -56,4 +56,4 @@ published: true
 
 ## Contribution
 - iOS: SwiftUI + 코디네이터 패턴, 검색 상태 관리, 대시보드/프로필 UI 리팩터링
-- 백엔드: Spring Boot 인증/세션, CORS·OAuth 클라이언트 관리, GW 권한 필터, SCM/Business DTO·검증·알림 로직 정리
+- 백엔드: Spring Boot OAuth 2.0 인증/세션, CORS·OAuth 클라이언트 관리, refresh 로테이션/블랙리스트 처리, GW 권한 필터, SCM/Business DTO·검증·알림 로직 정리
