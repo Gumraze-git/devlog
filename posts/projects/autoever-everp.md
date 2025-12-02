@@ -1,6 +1,6 @@
 ---
 title: "대규모 이벤트 관리 플랫폼"
-summary: "수만 명 참가자가 등록·결제·체크인·세션 예약을 한 번에 처리하는 이벤트 운영 플랫폼을 구축했습니다."
+summary: "엔터프라이즈 ERP를 MSA로 설계하고 웹·모바일·백엔드(인증/GW/SCM/Business)를 통합해 견적→주문→조달→생산→정산을 자동화한 프로젝트"
 date: "2025-11-12"
 thumbnail: "/devlog-placeholder.svg"
 stack:
