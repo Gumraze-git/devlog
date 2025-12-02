@@ -14,7 +14,7 @@ stack:
   - Kotlin
   - Kafka
   - TanStack Query
-  - GitHub Actions
+  - GitHub
 period: "2025.09.29 - 2025.11.12"
 members: "총 6명 (프론트 3, 백엔드 3)"
 role: "백엔드"
