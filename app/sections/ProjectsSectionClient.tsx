@@ -211,7 +211,9 @@ export default function ProjectsSectionClient({ projects }: ProjectsSectionClien
                 <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] pb-2">
                   <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)]">교육</span>
                   <span className="font-semibold text-[var(--foreground)]">
-                    {selected.education?.length ? selected.education.join(", ") : "미기재"}
+                    {Array.isArray(selected.education) && selected.education.length
+                      ? selected.education.join(", ")
+                      : "미기재"}
                   </span>
                 </div>
                 {selected.repo && (

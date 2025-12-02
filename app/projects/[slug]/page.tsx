@@ -59,7 +59,9 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           <div className="flex justify-between">
             <dt className="font-semibold text-[var(--text-soft)]">교육</dt>
             <dd className="text-[var(--foreground)]">
-              {project.education?.length ? project.education.join(", ") : "미기재"}
+              {Array.isArray(project.education) && project.education.length
+                ? project.education.join(", ")
+                : "미기재"}
             </dd>
           </div>
           <div>
