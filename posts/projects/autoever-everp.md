@@ -47,10 +47,10 @@ published: true
 
 ## MSA 구조
 - Gateway(WebFlux)에서 JWT 검증 후 도메인 서비스로 라우팅 (Auth/Business/SCM/Payment/Alarm 등)
-- 서비스별 Spring Boot 마이크로서비스 + 개별 PostgreSQL/Redis 인스턴스, Kafka 이벤트로 서비스 간 연계
+- 서비스별 Spring Boot 마이크로서비스 + 개별 PostgreSQL 인스턴스, Kafka 이벤트로 서비스 간 연계
 - 권한·세션은 Auth, 주문·견적·재고·생산·정산은 Business/SCM, 권한 필터링은 GW에서 1차 적용
 - SAGA 코레오그래피 방식으로 견적→주문→재고/생산→정산 이벤트를 처리해 분산 트랜잭션 보상
-- Docker Compose로 공통 인프라(Kafka, PostgreSQL, Redis)와 서비스 컨테이너를 일괄 기동, GitHub Actions로 CI
+- Docker Compose로 공통 인프라(Kafka, PostgreSQL)와 서비스 컨테이너를 일괄 기동, GitHub Actions로 CI
 
 ![MSA 구조 다이어그램](/assets/everp_msa_stru.png)
 
