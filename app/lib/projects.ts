@@ -11,6 +11,7 @@ export type ProjectMeta = {
   members: string;
   stack: string[];
   highlights: string[];
+  date?: string;
   role?: string;
   repo?: string;
   thumbnail?: string;
@@ -41,6 +42,7 @@ export function getAllProjects(): Project[] {
         members: data.members ?? "",
         stack: data.stack ?? [],
         highlights: data.highlights ?? [],
+        date: data.date ?? "",
         role: data.role ?? "",
         repo: data.repo,
         thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
@@ -48,7 +50,12 @@ export function getAllProjects(): Project[] {
         content,
       } as Project;
     })
-    .filter((p) => p.published);
+    .filter((p) => p.published)
+    .sort((a, b) => {
+      const aTime = a.date ? new Date(a.date).getTime() : 0;
+      const bTime = b.date ? new Date(b.date).getTime() : 0;
+      return bTime - aTime;
+    });
 
   return projects;
 }
@@ -68,6 +75,7 @@ export function getProject(slug: string): Project | null {
     members: data.members ?? "",
     stack: data.stack ?? [],
     highlights: data.highlights ?? [],
+    date: data.date ?? "",
     role: data.role ?? "",
     repo: data.repo,
     thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
