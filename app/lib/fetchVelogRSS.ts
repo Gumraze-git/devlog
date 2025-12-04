@@ -129,3 +129,48 @@ export async function fetchVelogOgImage(url: string): Promise<string | undefined
     return undefined;
   }
 }
+
+export type VelogOgMeta = {
+  image?: string;
+  description?: string;
+  tags?: string[];
+};
+
+export async function fetchVelogOgMeta(url: string): Promise<VelogOgMeta> {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return {};
+    const html = await res.text();
+
+    const ogImage =
+      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'>]+)["']/i)
+        ?? html.match(/<meta[^>]+content=["']([^"'>]+)["'][^>]+property=["']og:image["']/i)
+        ?? html.match(/<meta[^>]+name=["']og:image["'][^>]+content=["']([^"'>]+)["']/i);
+
+    const ogDescription =
+      html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"'>]+)["']/i)
+        ?? html.match(/<meta[^>]+content=["']([^"'>]+)["'][^>]+property=["']og:description["']/i)
+        ?? html.match(/<meta[^>]+name=["']og:description["'][^>]+content=["']([^"'>]+)["']/i);
+
+    const articleTags = Array.from(
+      html.matchAll(/<meta[^>]+property=["']article:tag["'][^>]+content=["']([^"'>]+)["']/gi),
+    ).map((m) => m[1]?.trim()).filter(Boolean);
+
+    const keywordTags = Array.from(
+      html.matchAll(/<meta[^>]+name=["']keywords["'][^>]+content=["']([^"'>]+)["']/gi),
+    )
+      .flatMap((m) => m[1]?.split(",") ?? [])
+      .map((t) => t?.trim())
+      .filter(Boolean);
+
+    const tags = Array.from(new Set([...articleTags, ...keywordTags]));
+
+    return {
+      image: normalizeUrl(ogImage ? ogImage[1] : undefined),
+      description: ogDescription ? ogDescription[1] : undefined,
+      tags: tags.length > 0 ? tags : undefined,
+    };
+  } catch {
+    return {};
+  }
+}

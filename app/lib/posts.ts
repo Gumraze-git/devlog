@@ -1,4 +1,4 @@
-import { fetchVelogOgImage, fetchVelogRSS, mapVelogToCard } from "./fetchVelogRSS";
+import { fetchVelogOgMeta, fetchVelogRSS, mapVelogToCard } from "./fetchVelogRSS";
 import { getDevlog, type Devlog, type DevlogMeta } from "./devlog";
 
 export type PostMeta = DevlogMeta & { externalLink?: string; source?: "local" | "velog" };
@@ -6,14 +6,15 @@ export type Post = Devlog & { externalLink?: string; source?: "local" | "velog" 
 
 export const getPost = getDevlog;
 
-const ogImageCache = new Map<string, Promise<string | undefined>>();
+const ogMetaCache = new Map<string, Promise<{ image?: string; description?: string }>>();
 
-async function getCachedOgImage(url: string): Promise<string | undefined> {
+async function getCachedOgMeta(url: string): Promise<{ image?: string; description?: string; tags?: string[] }> {
   if (!url) return undefined;
-  if (!ogImageCache.has(url)) {
-    ogImageCache.set(url, fetchVelogOgImage(url));
+  if (!ogMetaCache.has(url)) {
+    ogMetaCache.set(url, fetchVelogOgMeta(url));
   }
-  return ogImageCache.get(url);
+  const meta = await ogMetaCache.get(url);
+  return meta ?? {};
 }
 
 export async function getAllPostsWithVelog(opts?: { username?: string; includeVelog?: boolean }) {
@@ -28,15 +29,23 @@ export async function getAllPostsWithVelog(opts?: { username?: string; includeVe
     const velogPosts = await fetchVelogRSS(opts.username);
     const mapped: Post[] = await Promise.all(velogPosts.map(async (post, idx) => {
       const card = mapVelogToCard(post, idx);
-      const ogImage = await getCachedOgImage(card.link);
+      const ogMeta = await getCachedOgMeta(card.link);
+      const ogImage = ogMeta.image;
+      const ogDescription = ogMeta.description;
+      const ogTags = ogMeta.tags;
+      const description = ogDescription || card.description || "";
+      const tags = (ogTags && ogTags.length > 0)
+        ? ogTags
+        : (card.tags && card.tags.length > 0 ? card.tags : undefined);
+
       return {
         slug: `velog-${card.slug}`,
         title: card.title,
-        description: card.description,
+        description,
         date: card.date,
         // RSS 썸네일이 없더라도 항상 og:image를 시도해 우선 사용
         thumbnail: ogImage ?? card.thumbnail ?? card.contentImage ?? "/devlog-placeholder.svg",
-        tags: card.tags,
+        tags,
         views: 0,
         published: true,
         content: "",
