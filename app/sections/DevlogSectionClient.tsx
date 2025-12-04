@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 
 import SectionWatcher from "../components/layout/SectionWatcher";
@@ -41,12 +41,10 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
   );
 
   const totalPages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
-  useEffect(() => {
-    if (page > totalPages - 1) setPage(0);
-  }, [page, totalPages]);
+  const clampedPage = Math.min(page, totalPages - 1);
 
-  const visibleCards = cards.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
-  const canNext = page < totalPages - 1 && cards.length > PAGE_SIZE;
+  const visibleCards = cards.slice(clampedPage * PAGE_SIZE, clampedPage * PAGE_SIZE + PAGE_SIZE);
+  const canNext = clampedPage < totalPages - 1 && cards.length > PAGE_SIZE;
 
   return (
     <SectionWatcher id="devlog" className="scroll-mt-24 md:scroll-mt-32">
@@ -67,7 +65,7 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
                   type="button"
                   className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card-muted)]/85 text-sm font-semibold text-[var(--foreground)] backdrop-blur transition hover:border-[var(--accent)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-40 disabled:cursor-not-allowed"
                   onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-                  disabled={page === 0}
+                  disabled={clampedPage === 0}
                   aria-label="이전 Devlog 3개 보기"
                 >
                   &lt;

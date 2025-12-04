@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "velog.velcdn.com",
       },
+      {
+        protocol: "https",
+        hostname: "images.velog.io",
+      },
     ],
   },
 };

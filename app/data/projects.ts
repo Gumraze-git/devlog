@@ -6,6 +6,8 @@ export type Project = {
   members: string;
   stack: string[];
   highlights: string[];
+  education?: string[];
+  role?: string;
 };
 
 export const projects: Project[] = [];
