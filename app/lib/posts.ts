@@ -28,13 +28,14 @@ export async function getAllPostsWithVelog(opts?: { username?: string; includeVe
     const velogPosts = await fetchVelogRSS(opts.username);
     const mapped: Post[] = await Promise.all(velogPosts.map(async (post, idx) => {
       const card = mapVelogToCard(post, idx);
-      const ogImage = card.thumbnail ? null : await getCachedOgImage(card.link);
+      const ogImage = await getCachedOgImage(card.link);
       return {
         slug: `velog-${card.slug}`,
         title: card.title,
         description: card.description,
         date: card.date,
-        thumbnail: card.thumbnail ?? ogImage ?? card.contentImage ?? "/devlog-placeholder.svg",
+        // RSS 썸네일이 없더라도 항상 og:image를 시도해 우선 사용
+        thumbnail: ogImage ?? card.thumbnail ?? card.contentImage ?? "/devlog-placeholder.svg",
         tags: card.tags,
         views: 0,
         published: true,
