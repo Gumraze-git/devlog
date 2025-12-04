@@ -6,10 +6,11 @@ export type Post = Devlog & { externalLink?: string; source?: "local" | "velog" 
 
 export const getPost = getDevlog;
 
-const ogMetaCache = new Map<string, Promise<{ image?: string; description?: string }>>();
+type OgMeta = { image?: string; description?: string; tags?: string[] };
+const ogMetaCache = new Map<string, Promise<OgMeta>>();
 
-async function getCachedOgMeta(url: string): Promise<{ image?: string; description?: string; tags?: string[] }> {
-  if (!url) return undefined;
+async function getCachedOgMeta(url: string): Promise<OgMeta> {
+  if (!url) return {};
   if (!ogMetaCache.has(url)) {
     ogMetaCache.set(url, fetchVelogOgMeta(url));
   }
