@@ -53,7 +53,8 @@ export type VelogCardData = {
   title: string;
   description: string;
   date: string;
-  thumbnail?: string;
+  thumbnail?: string; // RSS 썸네일 우선
+  contentImage?: string; // 본문 내 첫 이미지 (OG 실패 시 fallback용)
   tags?: string[];
   link: string;
 };
@@ -108,7 +109,8 @@ export function mapVelogToCard(post: VelogPost, index = 0): VelogCardData {
     title: post.title || slug,
     description,
     date: post.pubDate ?? "",
-    thumbnail: normalizeUrl(post.thumbnail ?? thumbnailFromContent ?? undefined) ?? undefined,
+    thumbnail: normalizeUrl(post.thumbnail ?? undefined) ?? undefined,
+    contentImage: normalizeUrl(thumbnailFromContent ?? undefined) ?? undefined,
     tags,
     link: post.link,
   };
