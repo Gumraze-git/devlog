@@ -142,6 +142,57 @@ export async function fetchVelogOgMeta(url: string): Promise<VelogOgMeta> {
     if (!res.ok) return {};
     const html = await res.text();
 
+    // __NEXT_DATA__ 스크립트에서 post 메타/태그 추출
+    const nextDataMatch = html.match(/<script[^>]+id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+    let nextImage: string | undefined;
+    let nextDescription: string | undefined;
+    let nextTags: string[] | undefined;
+
+    if (nextDataMatch?.[1]) {
+      try {
+        const json = JSON.parse(nextDataMatch[1]);
+        const post =
+          json?.props?.pageProps?.post
+          ?? json?.props?.pageProps?.initialState?.post
+          ?? json?.props?.pageProps?.dehydratedState?.queries?.[0]?.state?.data;
+
+        if (post) {
+          nextImage = post.thumbnail ?? post.og_image ?? post.ogImage;
+          nextDescription = post.shortDescription ?? post.description ?? post.metaDescription;
+          const tagsFromJson: unknown = post.tags ?? post.tag;
+          if (Array.isArray(tagsFromJson)) {
+            nextTags = tagsFromJson.map((t) => (typeof t === "string" ? t.trim() : "")).filter(Boolean);
+          }
+        }
+      } catch {
+        // __NEXT_DATA__ 파싱 실패 시 무시하고 아래 메타 파싱으로 진행
+      }
+    }
+
+    // Velog는 __APOLLO_STATE__에 포스트 메타를 담으므로 추가 파싱
+    const apolloMatch = html.match(/__APOLLO_STATE__=({[\s\S]*?});<\/script>/);
+    if (apolloMatch?.[1]) {
+      try {
+        const apollo = JSON.parse(apolloMatch[1]);
+        const postEntry = Object.entries(apollo).find(([key, value]) => key.startsWith("Post:") && value && typeof value === "object");
+        const postFromApollo = postEntry?.[1] as Record<string, unknown> | undefined;
+        if (postFromApollo) {
+          nextImage = nextImage ?? (typeof postFromApollo.thumbnail === "string" ? postFromApollo.thumbnail : undefined);
+          nextDescription =
+            nextDescription
+            ?? (typeof postFromApollo.short_description === "string" ? postFromApollo.short_description : undefined)
+            ?? (typeof postFromApollo.description === "string" ? postFromApollo.description : undefined);
+          const tagsJson = (postFromApollo.tags as { json?: unknown } | undefined)?.json;
+          if (Array.isArray(tagsJson)) {
+            const parsed = tagsJson.map((t) => (typeof t === "string" ? t.trim() : "")).filter(Boolean);
+            nextTags = nextTags && nextTags.length > 0 ? nextTags : parsed;
+          }
+        }
+      } catch {
+        // __APOLLO_STATE__ 파싱 실패 시 무시
+      }
+    }
+
     const ogImage =
       html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'>]+)["']/i)
         ?? html.match(/<meta[^>]+content=["']([^"'>]+)["'][^>]+property=["']og:image["']/i)
@@ -163,11 +214,15 @@ export async function fetchVelogOgMeta(url: string): Promise<VelogOgMeta> {
       .map((t) => t?.trim())
       .filter(Boolean);
 
-    const tags = Array.from(new Set([...articleTags, ...keywordTags]));
+    const tags = Array.from(new Set([
+      ...(nextTags ?? []),
+      ...articleTags,
+      ...keywordTags,
+    ]));
 
     return {
-      image: normalizeUrl(ogImage ? ogImage[1] : undefined),
-      description: ogDescription ? ogDescription[1] : undefined,
+      image: normalizeUrl(nextImage ?? (ogImage ? ogImage[1] : undefined)),
+      description: nextDescription ?? (ogDescription ? ogDescription[1] : undefined),
       tags: tags.length > 0 ? tags : undefined,
     };
   } catch {

@@ -50,22 +50,24 @@ export default function OverlayCard(props: OverlayCardProps) {
         {props.description && (
           <p className="mt-1 text-white/80 text-xs md:text-sm font-medium line-clamp-2 drop-shadow">{props.description}</p>
         )}
-        {props.tags && props.tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {props.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white/90 backdrop-blur">
-                {tag}
-              </span>
-            ))}
-            {props.tags.length > 3 && (
-              <span className="rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-semibold text-white/70 backdrop-blur">
-                +{props.tags.length - 3}
-              </span>
+        <div className="mt-auto flex items-center justify-between gap-3 text-white/70 text-xs md:text-sm font-medium">
+          <div className="flex items-center gap-2">
+            <p>{props.date}</p>
+            {props.tags && props.tags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {props.tags.slice(0, 2).map((tag) => (
+                  <span key={tag} className="rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white/90 backdrop-blur">
+                    {tag}
+                  </span>
+                ))}
+                {props.tags.length > 2 && (
+                  <span className="rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-semibold text-white/70 backdrop-blur">
+                    +{props.tags.length - 2}
+                  </span>
+                )}
+              </div>
             )}
           </div>
-        )}
-        <div className="mt-auto flex items-center justify-between gap-3 text-white/70 text-xs md:text-sm font-medium">
-          <p>{props.date}</p>
           <div className="flex items-center gap-1 text-white">
             <p className="text-xs md:text-sm font-semibold">{props.ctaLabel ?? "자세히 보기"}</p>
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
