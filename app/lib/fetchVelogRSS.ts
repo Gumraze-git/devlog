@@ -34,12 +34,13 @@ export async function fetchVelogRSS(username: string): Promise<VelogPost[]> {
 
   return feed.items.map((item) => {
     const typed = item as VelogRssItem;
+
     return {
       title: typed.title ?? "",
       link: typed.link ?? "",
       pubDate: typed.pubDate ?? "",
       contentSnippet: typed.contentSnippet ?? "",
-      categories: typed.categories ?? [],
+      categories: typed.categories?.filter(Boolean),
       thumbnail: typed.thumbnail ?? undefined,
       content: typed["content:encoded"] ?? typed.content ?? "",
     };
@@ -96,6 +97,7 @@ export function mapVelogToCard(post: VelogPost, index = 0): VelogCardData {
   const fallbackSlug = slugify(post.title || `velog-${index}`);
   const slug = extractSlugFromLink(post.link) ?? fallbackSlug;
   const thumbnailFromContent = extractFirstImage(post.content ?? "");
+  const tags = post.categories && post.categories.length > 0 ? post.categories : undefined;
   const description =
     (post.contentSnippet && post.contentSnippet.trim().length > 0)
       ? post.contentSnippet
@@ -107,7 +109,7 @@ export function mapVelogToCard(post: VelogPost, index = 0): VelogCardData {
     description,
     date: post.pubDate ?? "",
     thumbnail: normalizeUrl(post.thumbnail ?? thumbnailFromContent ?? undefined) ?? undefined,
-    tags: post.categories,
+    tags,
     link: post.link,
   };
 }
