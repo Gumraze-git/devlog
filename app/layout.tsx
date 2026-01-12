@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AppLayout } from "./components/layout/AppLayout";
 
 export const metadata: Metadata = {
   title: "DKim Devlog",
   description: "기술 블로그 & 포트폴리오",
   metadataBase: new URL("https://your-domain.com"),
   icons: {
-    icon: "/icon.svg",
-    shortcut: "/favicon.ico",
+    icon: "/icon.png",
     apple: "/apple-icon.png",
   },
   openGraph: {
@@ -40,10 +40,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="font-sans bg-[var(--background)] text-[var(--foreground)]">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2">
-          Skip to content
-      </a>
-      {children}
+        <AppLayout>
+          {children}
+        </AppLayout>
       </body>
     </html>
   );
