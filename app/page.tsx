@@ -20,38 +20,53 @@ export default async function Home() {
 
   return (
     <div className="space-y-24 animate-in fade-in duration-500 pb-20">
-      {/* Hero Section */}
-      <section className="mt-8 sm:mt-16 space-y-8">
-        <div className="space-y-4">
-          <h2 className="text-[var(--foreground)] font-mono text-sm tracking-widest uppercase">
-            System Architect & Backend Developer
-          </h2>
-          <h1 className="text-5xl font-extrabold tracking-tight lg:text-7xl leading-[1.1]">
-            Engineering <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-gray-400">
-              Verifiable Systems
-            </span>
-          </h1>
+
+
+      {/* Featured / Recent Devlog */}
+      <section className="space-y-8">
+        <div className="flex items-end justify-between border-b border-[var(--border)] pb-4">
+          <h2 className="text-3xl font-bold tracking-tight">Latest Writings</h2>
+          <Link href="/devlog" className="group flex items-center text-sm font-medium text-[var(--text-muted)] hover:text-[var(--foreground)]">
+            Display all
+            <ArrowRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
 
-        <p className="max-w-[700px] text-xl text-[var(--text-muted)] leading-relaxed font-light">
-          I build robust backend services grounded in <strong>Test-Driven Development</strong>.<br className="hidden sm:inline" />
-          Passionately exploring <strong>Docker</strong> environments and infrastructure engineering to ensure reliable deployments.
-        </p>
-
-        <div className="flex flex-wrap gap-4 pt-4">
-          <Link
-            href="/projects"
-            className="inline-flex items-center justify-center h-12 rounded-full bg-[var(--foreground)] px-8 text-[var(--background)] font-medium transition-transform hover:scale-105"
-          >
-            View Projects
-          </Link>
-          <Link
-            href="/devlog"
-            className="inline-flex items-center justify-center h-12 rounded-full border border-[var(--border)] bg-transparent px-8 text-[var(--foreground)] font-medium hover:bg-[var(--card-subtle)] transition-colors"
-          >
-            Read Devlog
-          </Link>
+        <div className="flex flex-col">
+          {recentPosts.length > 0 ? (
+            recentPosts.map((post, index) => (
+              <Link
+                key={post.slug}
+                href={post.externalLink ?? `/devlog/${post.slug}`}
+                target={post.externalLink ? "_blank" : undefined}
+                className="group py-8 border-b border-[var(--border-muted)] flex flex-col md:flex-row gap-4 md:items-center justify-between hover:bg-[var(--card-subtle)]/50 transition-colors -mx-4 px-4 rounded-xl"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 text-xs font-mono text-[var(--text-soft)]">
+                    <span>{new Date(post.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    {post.tags && post.tags.slice(0, 2).map(tag => (
+                      <span key={tag} className="px-2 py-0.5 rounded-full bg-[var(--border)] text-[var(--text-muted)]">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 className="text-xl font-bold group-hover:text-[var(--accent-strong)] transition-colors">
+                    {post.title}
+                  </h3>
+                  <p className="max-w-2xl text-[var(--text-muted)] line-clamp-1">
+                    {post.description}
+                  </p>
+                </div>
+                <div className="md:opacity-0 group-hover:opacity-100 transition-opacity self-start md:self-center">
+                  <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform" />
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="py-12 text-center text-[var(--text-muted)]">
+              No recent posts found.
+            </div>
+          )}
         </div>
       </section>
 
@@ -183,54 +198,6 @@ export default async function Home() {
         </section>
       </div>
       */}
-
-      {/* Featured / Recent Devlog */}
-      <section className="space-y-8">
-        <div className="flex items-end justify-between border-b border-[var(--border)] pb-4">
-          <h2 className="text-3xl font-bold tracking-tight">Latest Writings</h2>
-          <Link href="/devlog" className="group flex items-center text-sm font-medium text-[var(--text-muted)] hover:text-[var(--foreground)]">
-            Display all
-            <ArrowRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-
-        <div className="flex flex-col">
-          {recentPosts.length > 0 ? (
-            recentPosts.map((post, index) => (
-              <Link
-                key={post.slug}
-                href={post.externalLink ?? `/devlog/${post.slug}`}
-                target={post.externalLink ? "_blank" : undefined}
-                className="group py-8 border-b border-[var(--border-muted)] flex flex-col md:flex-row gap-4 md:items-center justify-between hover:bg-[var(--card-subtle)]/50 transition-colors -mx-4 px-4 rounded-xl"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 text-xs font-mono text-[var(--text-soft)]">
-                    <span>{new Date(post.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                    {post.tags && post.tags.slice(0, 2).map(tag => (
-                      <span key={tag} className="px-2 py-0.5 rounded-full bg-[var(--border)] text-[var(--text-muted)]">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                  <h3 className="text-xl font-bold group-hover:text-[var(--accent-strong)] transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="max-w-2xl text-[var(--text-muted)] line-clamp-1">
-                    {post.description}
-                  </p>
-                </div>
-                <div className="md:opacity-0 group-hover:opacity-100 transition-opacity self-start md:self-center">
-                  <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform" />
-                </div>
-              </Link>
-            ))
-          ) : (
-            <div className="py-12 text-center text-[var(--text-muted)]">
-              No recent posts found.
-            </div>
-          )}
-        </div>
-      </section>
     </div>
   );
 }
