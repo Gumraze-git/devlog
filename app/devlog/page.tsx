@@ -19,7 +19,7 @@ export default async function DevlogListPage() {
       <header className="space-y-4 border-b border-[var(--border)] pb-8">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Devlog</h1>
         <p className="text-xl text-[var(--text-muted)] max-w-2xl leading-relaxed">
-          Thoughts on software engineering, distributed systems, and backend architecture.
+          경험을 지식으로 전환하는 공간입니다.
         </p>
       </header>
 

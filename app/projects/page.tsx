@@ -14,7 +14,7 @@ export default function ProjectsListPage() {
       <header className="space-y-4 border-b border-[var(--border)] pb-8">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Projects</h1>
         <p className="text-xl text-[var(--text-muted)] max-w-2xl leading-relaxed">
-          A collection of side projects, experiments, and open source contributions.
+          프로젝트 활동을 정리한 기록입니다.
         </p>
       </header>
 
