@@ -25,7 +25,7 @@ export default async function Home() {
       {/* Featured / Recent Devlog */}
       <section className="space-y-8">
         <div className="flex items-end justify-between border-b border-[var(--border)] pb-4">
-          <h2 className="text-3xl font-bold tracking-tight">Latest Writings</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Latest Devlog</h2>
           <Link href="/devlog" className="group flex items-center text-sm font-medium text-[var(--text-muted)] hover:text-[var(--foreground)]">
             Display all
             <ArrowRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
