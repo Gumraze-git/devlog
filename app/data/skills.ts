@@ -84,13 +84,14 @@ const extraTechIconMap: Record<string, TechIconMeta> = {
   "tailwind css": { key: "tailwind css", label: "Tailwind CSS", icon: baseTechIconMap["tailwind css"]?.icon ?? vercelBlob("tailwindcss-mark.d52e9897.svg") },
   typescript: { key: "typescript", label: "TypeScript", icon: baseTechIconMap["typescript"]?.icon ?? vercelBlob("ts-logo-512.svg") },
   "type script": { key: "type script", label: "TypeScript", icon: baseTechIconMap["typescript"]?.icon ?? vercelBlob("ts-logo-512.svg") },
-  junit: { key: "junit", label: "JUnit", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/junit-logo.svg" },
-  "github actions": { key: "github actions", label: "Github Actions", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/GitHub_Invertocat_Black.svg" },
-  docker: { key: "docker", label: "Docker", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/docker-mark-blue.svg" },
+  postgresql: { key: "postgresql", label: "PostgreSQL", icon: vercelBlob("elephant.png") },
+  junit: { key: "junit", label: "JUnit", icon: vercelBlob("junit-logo.svg") },
+  "github actions": { key: "github actions", label: "Github Actions", icon: vercelBlob("GitHub_Invertocat_Black.svg") },
+  docker: { key: "docker", label: "Docker", icon: vercelBlob("docker-mark-blue.svg") },
   kafka: { key: "kafka", label: "Kafka", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/apache_kafka_logo_icon_167866.svg" },
   oauth: { key: "oauth", label: "OAuth", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/Oauth_logo.png" },
-  fastapi: { key: "fastapi", label: "FastAPI", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/Fast%20API.svg" },
-  "aws ec2": { key: "aws ec2", label: "Amazon EC2", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/EC2.svg" },
+  fastapi: { key: "fastapi", label: "FastAPI", icon: vercelBlob("Fast%20API.svg") },
+  "aws ec2": { key: "aws ec2", label: "Amazon EC2", icon: vercelBlob("EC2.svg") },
 };
 
 export function getTechIconMeta(name: string): TechIconMeta | null {
