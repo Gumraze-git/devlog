@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppLayout } from "./components/layout/AppLayout";
+import { ThemeProvider } from "./components/providers/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "DKim Devlog",
@@ -38,11 +39,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className="font-sans bg-[var(--background)] text-[var(--foreground)]">
-        <AppLayout>
-          {children}
-        </AppLayout>
+        <ThemeProvider>
+          <AppLayout>
+            {children}
+          </AppLayout>
+        </ThemeProvider>
       </body>
     </html>
   );
