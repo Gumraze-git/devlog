@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Github, Mail, Twitter } from "lucide-react";
+import { Github, Mail } from "lucide-react";
+import { ThemeToggle } from "../ui/ThemeToggle";
 
 export function LeftSidebar() {
     return (
@@ -35,21 +37,35 @@ export function LeftSidebar() {
                 <a href="mailto:galaxydh4110@gmail.com" className="hover:text-[var(--foreground)] transition-colors">
                     <Mail size={18} />
                 </a>
+            <div className="flex items-center justify-between">
+                <div className="flex gap-3 text-[var(--text-muted)]">
+                    <a href="https://github.com/Gumraze-git" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--foreground)] transition-colors">
+                        <Github size={18} />
+                    </a>
+                    <a href="mailto:galaxydh4110@gmail.com" className="hover:text-[var(--foreground)] transition-colors">
+                        <Mail size={18} />
+                    </a>
+                </div>
             </div>
 
 
 
-            {/* Optional: Navigation or Tags */}
-            <div className="mt-auto">
-                <div className="text-xs font-semibold text-[var(--text-soft)] uppercase tracking-wider mb-3">
-                    Status
+            {/* Status & Theme Toggle */}
+            <div className="mt-auto flex items-end justify-between">
+                <div>
+                    <div className="text-xs font-semibold text-[var(--text-soft)] uppercase tracking-wider mb-3">
+                        Status
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
+                        Open to work
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-                    <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    Open to work
+                <div className="pb-1">
+                    <ThemeToggle />
                 </div>
             </div>
         </aside>
