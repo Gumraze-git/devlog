@@ -19,9 +19,9 @@ export default async function Home() {
   const featuredProjects = projects.slice(0, 3);
 
   return (
-    <div className="space-y-24 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-16 md:space-y-20 animate-in fade-in duration-500 pb-20">
 
-      <section className="relative py-12 md:py-16 border-b border-[var(--border-muted)]">
+      <section className="relative pt-12 md:pt-16 pb-0">
         <div className="relative flex flex-col lg:flex-row gap-8 lg:gap-16 items-start">
           <div className="lg:w-64 flex-shrink-0">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
