@@ -19,8 +19,35 @@ export default async function Home() {
   const featuredProjects = projects.slice(0, 3);
 
   return (
-    <div className="space-y-24 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-16 md:space-y-20 animate-in fade-in duration-500 pb-20">
 
+      <section className="relative pt-12 md:pt-16 pb-0">
+        <div className="relative flex flex-col lg:flex-row gap-8 lg:gap-16 items-start">
+          <div className="lg:w-64 flex-shrink-0">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
+              Dreaming <span className="text-[var(--accent)]">Developer</span>
+            </h1>
+          </div>
+
+          <div className="flex-1 space-y-6 md:space-y-8">
+            <p className="text-xl md:text-2xl text-[var(--foreground)] font-medium leading-[1.5] tracking-tight">
+              기술의 원리를 이해하고 기록하며 동료들과 지식을 나누는 과정을 통해,{"\n"}
+              개인의 성장을 넘어 팀의 발전에 기여하고자 합니다.
+            </p>
+
+            <div className="space-y-4 md:space-y-6 text-base md:text-lg text-[var(--text-muted)] leading-relaxed">
+              <p className="whitespace-pre-line">
+                특정 분야의 전문가이자 동료들이 믿고 찾는 문제 해결사,{"\n"}
+                그리고 긍정적인 영향력을 전하는 리더로 거듭나는 것이 저의 목표입니다.
+              </p>
+              <p className="text-[var(--foreground)] font-semibold italic flex items-center gap-3">
+                <span className="h-px w-6 bg-[var(--accent)]" />
+                개발 참 즐겁습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Featured / Recent Devlog */}
       <section className="space-y-8">

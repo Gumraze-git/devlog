@@ -72,9 +72,9 @@ const baseTechIconMap: Record<string, TechIconMeta> = skills.reduce((acc, item) 
 
 // Additional aliases / tools not listed in skills array but used in projects
 const extraTechIconMap: Record<string, TechIconMeta> = {
-  "spring boot": { key: "spring boot", label: "Spring Boot", icon: baseTechIconMap["spring"]?.icon ?? vercelBlob("Spring%20Framework_idtAgBcShw_2.png") },
+  "spring boot": { key: "spring boot", label: "Spring Boot", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/spring-boot.svg" },
   "aws ecs": { key: "aws ecs", label: "AWS ECS", icon: baseTechIconMap["aws"]?.icon ?? vercelBlob("AWS-Cloud-logo_32_Dark.svg") },
-  ec2: { key: "ec2", label: "Amazon EC2", icon: baseTechIconMap["aws"]?.icon ?? vercelBlob("AWS-Cloud-logo_32_Dark.svg") },
+  ec2: { key: "ec2", label: "Amazon EC2", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/EC2.svg" },
   redis: { key: "redis", label: "Redis", icon: null },
   firebase: { key: "firebase", label: "Firebase", icon: vercelBlob("firebase.svg") },
   "react native": { key: "react native", label: "React Native", icon: baseTechIconMap["react"]?.icon ?? vercelBlob("React_Logo_3.svg") },
@@ -84,6 +84,14 @@ const extraTechIconMap: Record<string, TechIconMeta> = {
   "tailwind css": { key: "tailwind css", label: "Tailwind CSS", icon: baseTechIconMap["tailwind css"]?.icon ?? vercelBlob("tailwindcss-mark.d52e9897.svg") },
   typescript: { key: "typescript", label: "TypeScript", icon: baseTechIconMap["typescript"]?.icon ?? vercelBlob("ts-logo-512.svg") },
   "type script": { key: "type script", label: "TypeScript", icon: baseTechIconMap["typescript"]?.icon ?? vercelBlob("ts-logo-512.svg") },
+  postgresql: { key: "postgresql", label: "PostgreSQL", icon: vercelBlob("elephant.png") },
+  junit: { key: "junit", label: "JUnit", icon: vercelBlob("junit-logo.svg") },
+  "github actions": { key: "github actions", label: "Github Actions", icon: vercelBlob("GitHub_Invertocat_Black.svg") },
+  docker: { key: "docker", label: "Docker", icon: vercelBlob("docker-mark-blue.svg") },
+  kafka: { key: "kafka", label: "Kafka", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/apache_kafka_logo_icon_167866.svg" },
+  oauth: { key: "oauth", label: "OAuth", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/Oauth_logo.png" },
+  fastapi: { key: "fastapi", label: "FastAPI", icon: vercelBlob("Fast%20API.svg") },
+  "aws ec2": { key: "aws ec2", label: "Amazon EC2", icon: vercelBlob("EC2.svg") },
 };
 
 export function getTechIconMeta(name: string): TechIconMeta | null {
