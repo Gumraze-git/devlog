@@ -42,18 +42,8 @@ export default function AboutPage() {
         <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-32">
 
             {/* Hero Section */}
-            <section className="grid md:grid-cols-[auto_1fr] gap-10 items-start">
-                <div className="flex flex-col items-center md:items-start gap-4">
-                    <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-2xl overflow-hidden border border-[var(--border)] grayscale shadow-sm">
-                        <img
-                            src="https://htmacgfeigx1pttr.public.blob.vercel-storage.com/image/me.png"
-                            alt="Daehwan Kim"
-                            className="object-cover w-full h-full scale-x-[-1]"
-                        />
-                    </div>
-                </div>
-
-                <div className="space-y-6">
+            <section className="grid md:grid-cols-[1fr_auto] gap-10 items-start">
+                <div className="space-y-6 order-2 md:order-1">
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1] whitespace-nowrap">
                         Dreaming <span className="text-[var(--accent)]">Developer</span>
                     </h1>
@@ -66,6 +56,16 @@ export default function AboutPage() {
                             복잡한 문제를 단순명료하게 정의하고 해결하는 문제 해결사,{"\n"}
                             그리고 팀과 서비스에 긍정적인 영향력을 전하는 리더로 성장하고 싶습니다.
                         </p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-center md:items-end gap-4 order-1 md:order-2 md:mt-4">
+                    <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-2xl overflow-hidden border border-[var(--border)] grayscale shadow-sm">
+                        <img
+                            src="https://htmacgfeigx1pttr.public.blob.vercel-storage.com/image/me.png"
+                            alt="Daehwan Kim"
+                            className="object-cover w-full h-full"
+                        />
                     </div>
                 </div>
             </section>
