@@ -23,14 +23,9 @@ export function TopNav() {
                 <Link href="/projects" className="hover:text-[var(--foreground)] transition-colors">
                     Projects
                 </Link>
-                <a
-                    href="/resume.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[var(--foreground)] transition-colors"
-                >
-                    Resume
-                </a>
+                <Link href="/about" className="hover:text-[var(--foreground)] transition-colors">
+                    About Me
+                </Link>
             </div>
         </nav>
     );
