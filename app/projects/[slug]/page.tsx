@@ -2,7 +2,7 @@ import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import MarkdownRenderer from "../../components/MarkdownRenderer";
 
 import { getProject } from "../../lib/projects";
 import { getTechIconMeta } from "../../data/skills";
@@ -160,9 +160,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
       {/* Project Detailed Description - Separate Section */}
       <section className="space-y-8 pt-16 border-t border-[var(--border)]">
         <h2 className="text-2xl font-bold tracking-tight uppercase border-b border-[var(--border)] pb-4">Details</h2>
-        <div className="prose prose-zinc dark:prose-invert max-w-none prose-headings:tracking-tighter prose-headings:font-bold prose-p:leading-relaxed prose-li:leading-relaxed text-[var(--text-muted)]">
-          <ReactMarkdown>{project.content}</ReactMarkdown>
-        </div>
+        <MarkdownRenderer content={project.content} />
       </section>
     </div>
   );
