@@ -134,7 +134,7 @@ export default function AboutPage() {
                             period: "2025.09 - 2025.11",
                             org: "현대오토에버 SW 스쿨 2기",
                             description: "전사적 자원관리 시스템 개발 프로젝트를 통해 ERP의 견적, 주문, 발주, 구매, 생산, 배송에 이르는 핵심 프로세스와 인사 및 고객사 관리까지 포함된 일련의 시스템을 개발하였습니다. 팀 리더로서 백엔드 아키텍처 설계를 주도하며 복잡한 비즈니스 로직을 MSA 구조 내에서 안정적으로 구현하는 경험을 쌓았습니다.",
-                            tech: "Spring Boot, OAuth, postgreSQL, Docker, Kafka, Swift",
+                            tech: "Spring Boot, OAuth, PostgreSQL, Docker, Kafka, Swift",
                             tasks: [
                                 "ERP 도메인 지식을 바탕으로 프로젝트 리딩을 수행하며, 서비스의 백엔드 아키텍처 설계 및 개발을 주도함",
                                 "OAuth 2.1 기반 인증 및 인가 서버 구축",
@@ -144,11 +144,24 @@ export default function AboutPage() {
                             ]
                         },
                         {
+                            title: "중고 캠핑 자동차 모바일 애플리케이션",
+                            period: "2025.09.15 - 09.25",
+                            org: "현대오토에버 SW 스쿨 2기",
+                            description: "중고 캠핑카 거래를 위한 모바일 전용 플랫폼을 구현한 프로젝트입니다. iOS 아키텍처 리드로서 Clean Architecture와 MVVM 패턴을 적용하여 코드의 가독성과 유지보수성을 높였습니다.",
+                            tech: "Swift",
+                            tasks: [
+                                "iOS 아키텍처 리드: Clean Architecture + MVVM 재구성, Domain/Data/Presentation 분리",
+                                "Vehicle 및 Auth 도메인 핵심 비즈니스 로직 구현",
+                                "매물 검색/필터 및 상세 정보 제공을 위한 UX 플로우 구축",
+                                "차량 및 프로필 이미지 업로드를 위한 미디어 처리 서비스 개발"
+                            ]
+                        },
+                        {
                             title: "영화 플랫폼 개발",
                             period: "2025.06 - 07",
                             org: "현대오토에버 SW 스쿨 2기",
                             description: "학습한 SOLID 원칙, RESTful API 개발, DB 구조 설계를 기반으로 기본적인 CRUD 기능을 연습하였습니다. 추가로 FastAPI에 AI 모델을 얹어 사용자의 댓글 감정 분석 결과를 기반으로 맞춤형 영화를 추천하는 기능을 구현한 프로젝트로, 데이터 처리와 AI 모델 연동의 흐름을 깊이 있게 학습하였습니다.",
-                            tech: "Spring Boot, FastApi, OAuth, MongoDB, MySQL",
+                            tech: "Spring Boot, FastAPI, OAuth, MongoDB, MySQL",
                             tasks: [
                                 "ERD 구조 모델 설계",
                                 "OAuth 2.1 표준을 준수하는 견고한 인가 서버 및 인증 시스템 구축",
@@ -157,7 +170,7 @@ export default function AboutPage() {
                                 "사용자 취향 기반 영화 추천 서비스 로직 설계 및 연동"
                             ]
                         }
-                    ].map((project, i) => (
+                    ].map((project, i, arr) => (
                         <div key={i} className="space-y-6">
                             <div className="grid md:grid-cols-[250px_1fr] gap-10">
                                 <div className="space-y-2">
@@ -193,7 +206,7 @@ export default function AboutPage() {
                                     </div>
                                 </div>
                             </div>
-                            {i < 2 && <div className="border-t border-[var(--border)]" />}
+                            {i < arr.length - 1 && <div className="border-t border-[var(--border)]" />}
                         </div>
                     ))}
                 </div>
@@ -263,7 +276,7 @@ export default function AboutPage() {
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
                     {[
-                        { period: "입사 초기", goal: "Precision Learner", desc: "주어진 업무를 정확히 이해하고 현대오토에버의 컨벤션과 문화에 완벽히 적응하는 단계" },
+                        { period: "입사 초기", goal: "Precision Learner", desc: "주니어 개발자로서 팀의 컨벤션과 개발 원칙을 준수하며 기본기를 탄탄하게 다져 신뢰받는 개발자로 성장하는 단계" },
                         { period: "3년 후", goal: "Knowledge Sharer", desc: "경험을 지식으로 전환하여 동료와 공유하고 성장을 돕는 핵심 개발자" },
                         { period: "5년 후", goal: "Domain Expert", desc: "습득한 기술 기술력을 공유하고 신뢰받는 기술적 의사결정을 내릴 수 있는 전문가" },
                         { period: "10년 후", goal: "Influential Leader", desc: "새로운 문제를 발견하고 도전 과제를 제안하며 팀과 함께 성장하는 리더" }
