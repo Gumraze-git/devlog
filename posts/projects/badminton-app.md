@@ -10,6 +10,10 @@ stack:
   - AWS EC2
   - Github Actions
   - Docker
+highlights:
+  - JUnit 테스트 기반의 견고한 비즈니스 로직 구현
+  - AWS 및 Docker를 활용한 운영 환경 기반의 개발 환경 구축
+  - Github Actions를 통한 자동화된 배포 프로세스(CI/CD) 정립
 period: "2026.01 - 진행중"
 members: "1명 (개인 프로젝트 / 현대오토에버 SW 스쿨 기반)"
 role: "Full Stack / DevOps"

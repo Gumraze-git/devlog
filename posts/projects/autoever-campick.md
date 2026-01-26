@@ -5,6 +5,10 @@ date: "2025-09-25"
 thumbnail: "/assets/campick.png"
 stack:
   - Swift
+highlights:
+  - Clean Architecture + MVVM 패턴을 적용한 견고한 iOS 앱 아키텍처 설계
+  - 매물 검색/필터 및 상세 조회를 위한 반응형 UX 플로우 구현
+  - 차량 및 프로필 이미지 업로드를 위한 안정적인 미디어 처리 시스템 구축
 period: "2025.09.15 ~ 2025.09.25"
 members: "총 5명 (모바일 3, 백엔드 2)"
 repo: "https://github.com/autoever-ob/OB-iOS"
