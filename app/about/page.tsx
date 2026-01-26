@@ -115,6 +115,7 @@ export default function AboutPage() {
                 <div className="space-y-8">
                     {[
                         {
+                            slug: "badminton-app",
                             title: "배드민턴 웹/앱 애플리케이션 개발",
                             period: "2026.01 - 진행중",
                             org: "",
@@ -130,6 +131,7 @@ export default function AboutPage() {
                             ]
                         },
                         {
+                            slug: "autoever-everp",
                             title: "ERP 시스템 개발",
                             period: "2025.09 - 2025.11",
                             org: "현대오토에버 SW 스쿨 2기",
@@ -144,6 +146,7 @@ export default function AboutPage() {
                             ]
                         },
                         {
+                            slug: "autoever-campick",
                             title: "중고 캠핑 자동차 모바일 애플리케이션",
                             period: "2025.09.15 - 09.25",
                             org: "현대오토에버 SW 스쿨 2기",
@@ -157,6 +160,7 @@ export default function AboutPage() {
                             ]
                         },
                         {
+                            slug: "movie-platform",
                             title: "영화 플랫폼 개발",
                             period: "2025.06 - 07",
                             org: "현대오토에버 SW 스쿨 2기",
