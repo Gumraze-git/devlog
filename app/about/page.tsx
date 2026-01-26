@@ -1,6 +1,7 @@
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function AboutPage() {
     const renderTechIcons = (techString: string) => {
@@ -178,7 +179,12 @@ export default function AboutPage() {
                         <div key={i} className="space-y-6">
                             <div className="grid md:grid-cols-[250px_1fr] gap-10">
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-bold text-[var(--foreground)]">{project.title}</h3>
+                                    <Link href={`/projects/${project.slug}`} className="group/title inline-flex items-center gap-2 max-w-full">
+                                        <h3 className="text-xl font-bold text-[var(--foreground)] group-hover/title:text-[var(--accent)] transition-colors leading-tight">
+                                            {project.title}
+                                        </h3>
+                                        <ArrowUpRight size={18} className="flex-shrink-0 text-[var(--text-soft)] group-hover/title:text-[var(--accent)] transition-transform group-hover/title:-translate-y-0.5 group-hover/title:translate-x-0.5" />
+                                    </Link>
                                     {project.org && (
                                         <p className="text-sm font-semibold text-[var(--accent-strong)]">{project.org}</p>
                                     )}
