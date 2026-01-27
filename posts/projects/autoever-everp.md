@@ -1,21 +1,21 @@
 ---
-title: "대규모 이벤트 관리 플랫폼"
-summary: "엔터프라이즈 ERP를 MSA로 설계하고 웹·모바일·백엔드(인증/GW/SCM/Business)를 통합해 견적→주문→조달→생산→정산을 자동화한 프로젝트"
+title: "ERP 시스템 개발"
+summary: "엔터프라이즈 ERP를 MSA로 설계하고 웹·모바일·백엔드(인증/GW/SCM/Business)를 통합해 견격→주문→조달→생산→정산을 자동화한 프로젝트"
 date: "2025-11-12"
 thumbnail: "/devlog-placeholder.svg"
 stack:
-  - Next.js
-  - TypeScript
-  - Tailwind CSS
   - Spring Boot
   - PostgreSQL
   - AWS ECS
   - Swift
   - Kotlin
   - Kafka
-  - TanStack Query
-  - GitHub
-period: "2025.09.29 - 2025.11.12"
+  - OAuth
+highlights:
+  - MSA(Microservices Architecture)를 기반으로 전사적 자원 관리 플랫폼 설계 및 구축
+  - OAuth 2.1 인증 서버 구축 및 Gateway를 통한 통합 권한 관리 구현
+  - Kafka를 활용한 서비스 간 비동기 메시지 파이프라인 및 SAGA 패턴 적용
+period: "2025.09 - 2025.11"
 members: "총 6명 (프론트 3, 백엔드 3)"
 role: "백엔드"
 repo: "https://github.com/AutoEver-4Ever"

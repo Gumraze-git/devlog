@@ -1,6 +1,7 @@
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function AboutPage() {
     const renderTechIcons = (techString: string) => {
@@ -54,7 +55,7 @@ export default function AboutPage() {
                         </p>
                         <p>
                             복잡한 문제를 단순명료하게 정의하고 해결하는 문제 해결사,{"\n"}
-                            그리고 팀과 서비스에 긍정적인 영향력을 전하는 리더로 성장하고 싶습니다.
+                            그리고 팀과 서비스에 긍정적인 영향력을 전하는 리더로 성장하고자 합니다.
                         </p>
                     </div>
                 </div>
@@ -115,6 +116,7 @@ export default function AboutPage() {
                 <div className="space-y-8">
                     {[
                         {
+                            slug: "badminton-app",
                             title: "배드민턴 웹/앱 애플리케이션 개발",
                             period: "2026.01 - 진행중",
                             org: "",
@@ -130,11 +132,12 @@ export default function AboutPage() {
                             ]
                         },
                         {
+                            slug: "autoever-everp",
                             title: "ERP 시스템 개발",
                             period: "2025.09 - 2025.11",
                             org: "현대오토에버 SW 스쿨 2기",
                             description: "전사적 자원관리 시스템 개발 프로젝트를 통해 ERP의 견적, 주문, 발주, 구매, 생산, 배송에 이르는 핵심 프로세스와 인사 및 고객사 관리까지 포함된 일련의 시스템을 개발하였습니다. 팀 리더로서 백엔드 아키텍처 설계를 주도하며 복잡한 비즈니스 로직을 MSA 구조 내에서 안정적으로 구현하는 경험을 쌓았습니다.",
-                            tech: "Spring Boot, OAuth, postgreSQL, Docker, Kafka, Swift",
+                            tech: "Spring Boot, OAuth, PostgreSQL, Docker, Kafka, Swift",
                             tasks: [
                                 "ERP 도메인 지식을 바탕으로 프로젝트 리딩을 수행하며, 서비스의 백엔드 아키텍처 설계 및 개발을 주도함",
                                 "OAuth 2.1 기반 인증 및 인가 서버 구축",
@@ -144,11 +147,26 @@ export default function AboutPage() {
                             ]
                         },
                         {
+                            slug: "autoever-campick",
+                            title: "중고 캠핑 자동차 모바일 애플리케이션",
+                            period: "2025.09.15 - 09.25",
+                            org: "현대오토에버 SW 스쿨 2기",
+                            description: "중고 캠핑카 거래를 위한 모바일 전용 플랫폼을 구현한 프로젝트입니다. iOS 아키텍처 리드로서 Clean Architecture와 MVVM 패턴을 적용하여 코드의 가독성과 유지보수성을 높였습니다.",
+                            tech: "Swift",
+                            tasks: [
+                                "iOS 아키텍처 리드: Clean Architecture + MVVM 재구성, Domain/Data/Presentation 분리",
+                                "Vehicle 및 Auth 도메인 핵심 비즈니스 로직 구현",
+                                "매물 검색/필터 및 상세 정보 제공을 위한 UX 플로우 구축",
+                                "차량 및 프로필 이미지 업로드를 위한 미디어 처리 서비스 개발"
+                            ]
+                        },
+                        {
+                            slug: "movie-platform",
                             title: "영화 플랫폼 개발",
                             period: "2025.06 - 07",
                             org: "현대오토에버 SW 스쿨 2기",
                             description: "학습한 SOLID 원칙, RESTful API 개발, DB 구조 설계를 기반으로 기본적인 CRUD 기능을 연습하였습니다. 추가로 FastAPI에 AI 모델을 얹어 사용자의 댓글 감정 분석 결과를 기반으로 맞춤형 영화를 추천하는 기능을 구현한 프로젝트로, 데이터 처리와 AI 모델 연동의 흐름을 깊이 있게 학습하였습니다.",
-                            tech: "Spring Boot, FastApi, OAuth, MongoDB, MySQL",
+                            tech: "Spring Boot, FastAPI, OAuth, MongoDB, MySQL",
                             tasks: [
                                 "ERD 구조 모델 설계",
                                 "OAuth 2.1 표준을 준수하는 견고한 인가 서버 및 인증 시스템 구축",
@@ -157,11 +175,16 @@ export default function AboutPage() {
                                 "사용자 취향 기반 영화 추천 서비스 로직 설계 및 연동"
                             ]
                         }
-                    ].map((project, i) => (
+                    ].map((project, i, arr) => (
                         <div key={i} className="space-y-6">
                             <div className="grid md:grid-cols-[250px_1fr] gap-10">
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-bold text-[var(--foreground)]">{project.title}</h3>
+                                    <Link href={`/projects/${project.slug}`} className="group/title inline-flex items-center gap-2 max-w-full">
+                                        <h3 className="text-xl font-bold text-[var(--foreground)] group-hover/title:text-[var(--accent)] transition-colors leading-tight">
+                                            {project.title}
+                                        </h3>
+                                        <ArrowUpRight size={18} className="flex-shrink-0 text-[var(--text-soft)] group-hover/title:text-[var(--accent)] transition-transform group-hover/title:-translate-y-0.5 group-hover/title:translate-x-0.5" />
+                                    </Link>
                                     {project.org && (
                                         <p className="text-sm font-semibold text-[var(--accent-strong)]">{project.org}</p>
                                     )}
@@ -193,7 +216,7 @@ export default function AboutPage() {
                                     </div>
                                 </div>
                             </div>
-                            {i < 2 && <div className="border-t border-[var(--border)]" />}
+                            {i < arr.length - 1 && <div className="border-t border-[var(--border)]" />}
                         </div>
                     ))}
                 </div>
@@ -263,7 +286,7 @@ export default function AboutPage() {
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
                     {[
-                        { period: "입사 초기", goal: "Precision Learner", desc: "주어진 업무를 정확히 이해하고 현대오토에버의 컨벤션과 문화에 완벽히 적응하는 단계" },
+                        { period: "입사 초기", goal: "Precision Learner", desc: "주니어 개발자로서 팀의 컨벤션과 개발 원칙을 준수하며 기본기를 탄탄하게 다져 신뢰받는 개발자로 성장하는 단계" },
                         { period: "3년 후", goal: "Knowledge Sharer", desc: "경험을 지식으로 전환하여 동료와 공유하고 성장을 돕는 핵심 개발자" },
                         { period: "5년 후", goal: "Domain Expert", desc: "습득한 기술 기술력을 공유하고 신뢰받는 기술적 의사결정을 내릴 수 있는 전문가" },
                         { period: "10년 후", goal: "Influential Leader", desc: "새로운 문제를 발견하고 도전 과제를 제안하며 팀과 함께 성장하는 리더" }
@@ -279,18 +302,15 @@ export default function AboutPage() {
                 <div className="pt-10 border-t border-[var(--border)]">
                     <div className="max-w-3xl space-y-8 text-base text-[var(--text-muted)] leading-[1.8]">
                         <div className="space-y-4">
-                            <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">좋아하는 일이 성장이 되고, 성장이 다시 열정이 되는 개발자</h3>
+                            <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">몰입과 기록을 통해 경험을 지식으로 전환하는 개발자</h3>
                             <p>
-                                배드민턴은 약 5년간 꾸준히 이어오고 있는 운동입니다. 저는 아침에 운동을 하고 나서 점심이나 저녁에 또 운동을 할 수 있는지 찾아볼 만큼 좋아합니다.
-                                배드민턴을 더 잘하기 위해 필요한 근력 운동도 병행해 왔습니다. 처음 시작했을 때와 비교하면 꾸준한 몰입을 통해서 스스로를 성장 시킬 수 있다는 것을 배웠습니다.
+                                저는 주어진 일에 몰입하며 원리를 파악하는 과정에서 성장의 동기를 얻습니다. 5년간 꾸준히 이어온 배드민턴을 통해 '몰입과 성장'의 가치를 배웠고, 이는 개발을 대하는 저의 태도가 되었습니다. 현대오토에버 SW스쿨 과정에서도 공식 문서를 통해 기술의 동작 원리를 파악하며 개발하는 과정을 거쳤으며, 이러한 경험은 문제를 간결하게 해결할 수 있는 기반이 되었습니다.
                             </p>
                             <p>
-                                개발 역시 제가 가장 좋아하는 것입니다. 현대오토에버 SW스쿨 과정에서 아침부터 밤까지 개발에 몰입했고, 공식문서를 읽고 원리를 파악하는 과정 자체가 즐거웠습니다.
-                                멘토님들과 지식과 경험을 나누는 열정적인 토론을 통해, 30년, 40년 뒤에는 그 열정을 환원하는 멘토가 되고자 하는 꿈을 가지게 되었습니다.
+                                저는 팀의 컨벤션과 개발 원칙을 준수하며, 기본기에 충실한 코드를 작성하는 것을 개발의 최우선 가치로 삼습니다. 단순히 기능을 구현하는 것을 넘어, 요구사항의 본질을 이해하며 유지보수가 용이하도록 견고한 코드를 작성하는 데 집중합니다. 이러한 원칙을 바탕으로 동료들이 믿고 협업할 수 있는 문제 해결사가 되고자 합니다.
                             </p>
                             <p>
-                                저는 많은 일을 빠르게 해내는 것보다, 하나의 업무라도 정확히 이해하고 수행하는 것이 저의 원칙입니다.
-                                지속적인 기록과 정리를 통해 경험을 지식으로 전환하고, 특정 분야의 전문가로서 동료들에게 신뢰받는 문제 해결사로 성장하겠습니다.
+                                또한, 매일의 기술적 경험을 기록하고 '지식'으로 전환하기 위해 노력합니다. 학습한 내용을 문서화하여 동료들과 공유하고 토론하는 과정에서 지식의 선순환과 성장을 경험했습니다. 앞으로도 꾸준한 학습을 통해 특정 분야의 전문가로 거듭나고, 제가 쌓은 지식을 공동체에 환원할 수 있는 리더로 성장하고자 합니다.
                             </p>
                         </div>
                     </div>
