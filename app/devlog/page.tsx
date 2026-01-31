@@ -70,12 +70,12 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
                       {post.tags.map(tag => (
                         <span
                           key={tag}
-                          className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border transition-all duration-300 backdrop-blur-md group-hover:scale-105 ${currentTag === tag
-                            ? "bg-[var(--accent-strong)]/90 text-white border-[var(--accent-strong)] shadow-[0_0_10px_rgba(59,130,246,0.3)]"
-                            : "bg-[var(--card-subtle)]/30 border-[var(--border)]/50 text-[var(--text-muted)] group-hover:bg-[var(--card-subtle)]/50 group-hover:border-[var(--accent)]/30"
+                          className={`px-2 py-0.5 rounded-md text-[11px] font-medium border transition-colors duration-200 ${currentTag === tag
+                            ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
+                            : "bg-transparent border-[var(--border)] text-[var(--text-muted)] group-hover:border-[var(--text-soft)] group-hover:text-[var(--foreground)]"
                             }`}
                         >
-                          #{tag}
+                          {tag}
                         </span>
                       ))}
                     </div>
@@ -89,7 +89,7 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
             ))
           ) : (
             <div className="py-20 text-center">
-              <p className="text-[var(--text-muted)]">No posts found with tag "#{currentTag}".</p>
+              <p className="text-[var(--text-muted)]">No posts found with tag "{currentTag}".</p>
             </div>
           )}
         </div>
