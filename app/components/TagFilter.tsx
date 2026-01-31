@@ -13,26 +13,42 @@ export default function TagFilter({ tags }: TagFilterProps) {
     const searchParams = useSearchParams();
     const currentTag = searchParams.get("tag");
 
+    const selectedTags = currentTag ? currentTag.split(",") : [];
+
     const createQueryString = useCallback(
-        (name: string, value: string) => {
+        (tag: string) => {
             const params = new URLSearchParams(searchParams.toString());
-            if (value === "all") {
-                params.delete(name);
+
+            if (tag === "all") {
+                params.delete("tag");
             } else {
-                params.set(name, value);
+                let newTags = [...selectedTags];
+                if (newTags.includes(tag)) {
+                    // Remove tag if already selected
+                    newTags = newTags.filter((t) => t !== tag);
+                } else {
+                    // Add tag if not selected
+                    newTags.push(tag);
+                }
+
+                if (newTags.length > 0) {
+                    params.set("tag", newTags.join(","));
+                } else {
+                    params.delete("tag");
+                }
             }
             return params.toString();
         },
-        [searchParams]
+        [searchParams, selectedTags]
     );
 
     const handleTagClick = (tag: string) => {
-        const query = createQueryString("tag", tag);
+        const query = createQueryString(tag);
         router.push(`/devlog${query ? `?${query}` : ""}`, { scroll: false });
     };
 
     return (
-        <div className="sticky top-14 z-20 -mx-4 px-4 py-3 bg-[var(--background)]/90 backdrop-blur-sm border-b border-[var(--border)] transition-all duration-200">
+        <div className="sticky top-14 z-20 py-2 bg-[var(--background)]/90 backdrop-blur-sm border-b border-[var(--border)] transition-all duration-200">
             <div className="max-w-screen-xl mx-auto flex items-center gap-3">
                 <div className="flex items-center gap-1.5 text-[var(--text-soft)] flex-shrink-0">
                     <Tag size={14} />
@@ -43,7 +59,7 @@ export default function TagFilter({ tags }: TagFilterProps) {
                     <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
                         <button
                             onClick={() => handleTagClick("all")}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${!currentTag
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${selectedTags.length === 0
                                 ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
                                 : "bg-transparent border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)] hover:text-[var(--foreground)]"
                                 }`}
@@ -54,7 +70,7 @@ export default function TagFilter({ tags }: TagFilterProps) {
                             <button
                                 key={tag}
                                 onClick={() => handleTagClick(tag)}
-                                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${currentTag === tag
+                                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${selectedTags.includes(tag)
                                     ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
                                     : "bg-transparent border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)] hover:text-[var(--foreground)]"
                                     }`}

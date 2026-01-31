@@ -17,17 +17,18 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
 
   const resolvedSearchParams = await searchParams;
   const currentTag = resolvedSearchParams.tag;
+  const selectedTags = currentTag ? currentTag.split(",") : [];
 
   // Extract unique tags
   const allTags = Array.from(new Set(posts.flatMap(post => post.tags || []))).sort();
 
-  // Filter posts if tag is selected
-  const filteredPosts = currentTag
-    ? posts.filter(post => post.tags?.includes(currentTag))
+  // Filter posts if tags are selected (OR logic)
+  const filteredPosts = selectedTags.length > 0
+    ? posts.filter(post => post.tags?.some(tag => selectedTags.includes(tag)))
     : posts;
 
   return (
-    <div className="space-y-12 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <header className="space-y-4 border-b border-[var(--border)] pb-8">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Devlog</h1>
         <p className="text-xl text-[var(--text-muted)] max-w-2xl leading-relaxed">
@@ -35,7 +36,7 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
         </p>
       </header>
 
-      <div className="space-y-8">
+      <div className="space-y-4">
         <Suspense fallback={<div className="h-10 w-full animate-pulse bg-[var(--card)] rounded-lg" />}>
           <TagFilter tags={allTags} />
         </Suspense>
@@ -96,7 +97,7 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
                       {post.tags.map(tag => (
                         <span
                           key={tag}
-                          className={`px-2 py-0.5 rounded-md text-[11px] font-medium border transition-colors duration-200 ${currentTag === tag
+                          className={`px-2 py-0.5 rounded-md text-[11px] font-medium border transition-colors duration-200 ${selectedTags.includes(tag)
                             ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
                             : "bg-transparent border-[var(--border)] text-[var(--text-muted)] group-hover:border-[var(--text-soft)] group-hover:text-[var(--foreground)]"
                             }`}
@@ -111,7 +112,7 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
             ))
           ) : (
             <div className="py-20 text-center">
-              <p className="text-[var(--text-muted)]">No posts found with tag "{currentTag}".</p>
+              <p className="text-[var(--text-muted)]">No posts found matching the selected tags.</p>
             </div>
           )}
         </div>
