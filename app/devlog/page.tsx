@@ -1,6 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getAllPostsWithVelog } from "../lib/posts";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Terminal } from "lucide-react";
 import TagFilter from "../components/TagFilter";
 import { Suspense } from "react";
 
@@ -46,9 +47,34 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
                 key={post.slug}
                 href={post.externalLink ?? `/devlog/${post.slug}`}
                 target={post.externalLink ? "_blank" : undefined}
-                className="group py-8 border-b border-[var(--border-muted)] flex flex-col md:flex-row gap-6 hover:bg-[var(--card-subtle)]/50 transition-colors -mx-4 px-4 rounded-xl"
+                className="group py-8 border-b border-[var(--border-muted)] flex flex-col md:flex-row gap-6 md:gap-8 hover:bg-[var(--card-subtle)]/50 transition-colors -mx-4 px-4 rounded-xl"
               >
-                <div className="flex-1 space-y-3">
+                {/* Thumbnail Section */}
+                <div className="w-full md:w-56 lg:w-72 aspect-video relative rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-[var(--card-subtle)] to-[var(--background)] border border-[var(--border-muted)]">
+                  {post.thumbnail ? (
+                    <Image
+                      src={post.thumbnail}
+                      alt={post.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 288px"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-soft)] opacity-40 gap-2">
+                      <Terminal size={32} strokeWidth={1.5} />
+                      <span className="text-[10px] uppercase tracking-tighter font-bold">No Image</span>
+                    </div>
+                  )}
+                  {/* Subtle link icon overlay on desktop hover */}
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="bg-white/80 backdrop-blur-sm p-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      <ArrowUpRight size={18} className="text-black" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="flex-1 space-y-3 min-w-0">
                   <div className="flex items-center gap-3 text-xs font-mono text-[var(--text-soft)] uppercase tracking-wider">
                     <time dateTime={post.date}>
                       {new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -61,7 +87,7 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
                     {post.title}
                   </h2>
 
-                  <p className="text-[var(--text-muted)] leading-relaxed line-clamp-2 md:line-clamp-none">
+                  <p className="text-[var(--text-muted)] leading-relaxed line-clamp-2 md:line-clamp-3">
                     {post.description}
                   </p>
 
@@ -80,10 +106,6 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
                       ))}
                     </div>
                   )}
-                </div>
-
-                <div className="self-start pt-1 text-[var(--text-soft)] group-hover:text-[var(--accent-strong)] transition-colors">
-                  <ArrowUpRight size={20} className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
                 </div>
               </Link>
             ))
