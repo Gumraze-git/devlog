@@ -56,12 +56,12 @@ export default function OverlayCard(props: OverlayCardProps) {
             {props.tags && props.tags.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5">
                 {props.tags.slice(0, 2).map((tag) => (
-                  <span key={tag} className="rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white/90 backdrop-blur">
-                    {tag}
+                  <span key={tag} className="rounded-full bg-white/10 border border-white/20 px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:bg-white/20">
+                    #{tag}
                   </span>
                 ))}
                 {props.tags.length > 2 && (
-                  <span className="rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-semibold text-white/70 backdrop-blur">
+                  <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
                     +{props.tags.length - 2}
                   </span>
                 )}

@@ -37,9 +37,9 @@ export default function TagFilter({ tags }: TagFilterProps) {
             <span className="text-sm font-medium text-[var(--text-soft)] mr-2">Categories:</span>
             <button
                 onClick={() => handleTagClick("all")}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${!currentTag
-                        ? "bg-[var(--accent-strong)] text-white border-[var(--accent-strong)]"
-                        : "bg-[var(--card)] border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)]"
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border backdrop-blur-md ${!currentTag
+                    ? "bg-[var(--accent-strong)]/90 text-white border-[var(--accent-strong)] shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-105"
+                    : "bg-[var(--card-subtle)]/30 border-[var(--border)]/50 text-[var(--text-muted)] hover:bg-[var(--card-subtle)]/60 hover:scale-105 hover:border-[var(--accent)]/50 hover:text-[var(--accent-strong)]"
                     }`}
             >
                 All
@@ -48,9 +48,9 @@ export default function TagFilter({ tags }: TagFilterProps) {
                 <button
                     key={tag}
                     onClick={() => handleTagClick(tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${currentTag === tag
-                            ? "bg-[var(--accent-strong)] text-white border-[var(--accent-strong)]"
-                            : "bg-[var(--card)] border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)]"
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border backdrop-blur-md ${currentTag === tag
+                        ? "bg-[var(--accent-strong)]/90 text-white border-[var(--accent-strong)] shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-105"
+                        : "bg-[var(--card-subtle)]/30 border-[var(--border)]/50 text-[var(--text-muted)] hover:bg-[var(--card-subtle)]/60 hover:scale-105 hover:border-[var(--accent)]/50 hover:text-[var(--accent-strong)]"
                         }`}
                 >
                     #{tag}

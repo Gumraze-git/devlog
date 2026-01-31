@@ -72,7 +72,7 @@ export default async function Home() {
                   <div className="flex items-center gap-3 text-xs font-mono text-[var(--text-soft)]">
                     <span>{new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     {post.tags && post.tags.slice(0, 2).map(tag => (
-                      <span key={tag} className="px-2 py-0.5 rounded-full bg-[var(--border)] text-[var(--text-muted)]">
+                      <span key={tag} className="px-2.5 py-0.5 rounded-full bg-[var(--card-subtle)]/30 border border-[var(--border)]/50 text-[var(--text-muted)] text-[10px] font-semibold backdrop-blur-md transition-all duration-300 group-hover:bg-[var(--card-subtle)]/50 group-hover:border-[var(--accent)]/30 group-hover:scale-105">
                         #{tag}
                       </span>
                     ))}
