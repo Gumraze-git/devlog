@@ -28,12 +28,11 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
     : posts;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-      <header className="space-y-4 border-b border-[var(--border)] pb-8">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Devlog</h1>
-        <p className="text-xl text-[var(--text-muted)] max-w-2xl leading-relaxed">
-          경험을 지식으로 전환하는 공간입니다.
-        </p>
+    <div className="space-y-1 animate-in fade-in duration-500 pb-20">
+      <header className="border-b border-[var(--border)] pb-12">
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+          Devlog<span className="text-[var(--text-muted)] font-medium text-2xl sm:text-3xl ml-3">: 경험을 지식으로</span>
+        </h1>
       </header>
 
       <div className="space-y-4">
