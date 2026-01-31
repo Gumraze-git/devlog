@@ -31,7 +31,7 @@ export default function DevlogDetailPage({ params }: { params: Promise<Params> }
           <div className="space-y-4">
             <div className="flex items-center gap-3 text-sm font-mono text-[var(--text-soft)] uppercase tracking-wider">
               <time dateTime={post.date}>
-                {new Date(post.date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
+                {new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}
               </time>
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{post.title}</h1>

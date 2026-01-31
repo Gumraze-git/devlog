@@ -70,7 +70,7 @@ export default async function Home() {
               >
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 text-xs font-mono text-[var(--text-soft)]">
-                    <span>{new Date(post.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <span>{new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     {post.tags && post.tags.slice(0, 2).map(tag => (
                       <span key={tag} className="px-2 py-0.5 rounded-full bg-[var(--border)] text-[var(--text-muted)]">
                         #{tag}
