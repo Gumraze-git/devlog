@@ -15,7 +15,7 @@ type DevlogSectionClientProps = {
 };
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("ko-KR").replace(/\s/g, "").replace(/\.$/, "");
+  return new Date(date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 export default function DevlogSectionClient({ posts }: DevlogSectionClientProps) {

@@ -31,7 +31,7 @@ export default function DevlogDetailPage({ params }: { params: Promise<Params> }
           <div className="space-y-4">
             <div className="flex items-center gap-3 text-sm font-mono text-[var(--text-soft)] uppercase tracking-wider">
               <time dateTime={post.date}>
-                {new Date(post.date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
+                {new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}
               </time>
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{post.title}</h1>
@@ -46,8 +46,8 @@ export default function DevlogDetailPage({ params }: { params: Promise<Params> }
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {post.tags.map(tag => (
-                <span key={tag} className="px-2 py-0.5 rounded text-xs font-medium bg-[var(--card-subtle)] border border-[var(--border-muted)] text-[var(--text-muted)]">
-                  #{tag}
+                <span key={tag} className="px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 backdrop-blur-md bg-[var(--card-subtle)]/30 border-[var(--border)]/50 text-[var(--text-muted)] hover:bg-[var(--card-subtle)]/50 hover:border-[var(--text-soft)] hover:text-[var(--foreground)]">
+                  {tag}
                 </span>
               ))}
             </div>
