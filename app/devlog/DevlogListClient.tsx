@@ -72,7 +72,7 @@ export default function DevlogListClient({
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <TagFilter tags={allTags} selectedTags={selectedTags} onToggle={handleToggle} />
 
       <div className="flex flex-col">
@@ -83,7 +83,7 @@ export default function DevlogListClient({
             return (
               <article
                 key={post.slug}
-                className="group relative py-6 border-b border-[var(--border-muted)] -mx-4 px-4"
+                className="group relative px-1 py-6 border-b border-[var(--border-muted)]"
               >
                 <Link
                   href={href}
@@ -94,13 +94,13 @@ export default function DevlogListClient({
                 />
 
                 <div className="relative z-10 pointer-events-none w-full flex flex-col sm:flex-row gap-5 md:gap-7">
-                  <div className="relative w-full sm:w-[14.5rem] md:w-[17.5rem] lg:w-[19.5rem] aspect-[21/9] overflow-hidden rounded-md bg-gradient-to-br from-[var(--card-subtle)] to-[var(--background)] shadow-sm flex-shrink-0">
+                  <div className="relative w-full sm:w-[14.5rem] md:w-[17.5rem] lg:w-[19.5rem] aspect-[21/9] overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] flex-shrink-0">
                     {post.thumbnail ? (
                       <Image
                         src={post.thumbnail}
                         alt={post.title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        className="object-cover"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 320px, 384px"
                       />
                     ) : (
@@ -117,6 +117,8 @@ export default function DevlogListClient({
                           <time dateTime={post.date}>
                             {new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}
                           </time>
+                          <span className="h-1 w-1 rounded-full bg-[var(--border)]" />
+                          <span>{post.source === "velog" ? "Velog" : "Local"}</span>
                         </div>
 
                         <h2 className="text-2xl font-bold group-hover:text-[var(--accent-strong)] transition-colors leading-tight">
@@ -150,7 +152,7 @@ export default function DevlogListClient({
                             })}
                           </div>
                         )}
-                    </div>
+                      </div>
                   </div>
                 </div>
               </article>
