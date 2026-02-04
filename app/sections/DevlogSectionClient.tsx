@@ -97,6 +97,7 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
                       date={item.meta ?? ""}
                       description={item.summary}
                       tags={item.tags}
+                      tagHrefBuilder={(tag) => `/devlog?tag=${encodeURIComponent(tag)}`}
                       thumbnail={item.thumbnail}
                       ariaLabel={`Velog ${item.title}`}
                       ctaLabel="자세히 보기"
@@ -111,6 +112,7 @@ export default function DevlogSectionClient({ posts }: DevlogSectionClientProps)
                       date={item.meta ?? ""}
                       description={item.summary}
                       tags={item.tags}
+                      tagHrefBuilder={(tag) => `/devlog?tag=${encodeURIComponent(tag)}`}
                       thumbnail={item.thumbnail}
                       ariaLabel={`Devlog ${item.title}`}
                       onSelect={() => {

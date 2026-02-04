@@ -81,9 +81,12 @@ export default function DevlogDetailPage({ params }: { params: Promise<Params> }
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {post.tags.map(tag => (
-                <span key={tag} className="px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 backdrop-blur-md bg-[var(--card-subtle)]/30 border-[var(--border)]/50 text-[var(--text-muted)] hover:bg-[var(--card-subtle)]/50 hover:border-[var(--text-soft)] hover:text-[var(--foreground)]">
-                  {tag}
-                </span>
+                <TagBadge
+                  key={tag}
+                  label={tag}
+                  size="sm"
+                  href={`/devlog?tag=${encodeURIComponent(tag)}`}
+                />
               ))}
             </div>
           )}

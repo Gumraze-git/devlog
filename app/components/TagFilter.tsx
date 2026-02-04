@@ -1,6 +1,7 @@
 "use client";
 
 import { Tag } from "lucide-react";
+import TagBadge from "./ui/TagBadge";
 
 interface TagFilterProps {
     tags: string[];
@@ -19,27 +20,28 @@ export default function TagFilter({ tags, selectedTags, onToggle }: TagFilterPro
 
                 <div className="relative flex-1 flex items-center overflow-hidden">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                        <button
+                        <TagBadge
+                            label="All"
+                            size="sm"
+                            active={selectedTags.length === 0}
+                            ariaPressed={selectedTags.length === 0}
                             onClick={() => onToggle("all")}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${selectedTags.length === 0
-                                ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
-                                : "bg-transparent border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)] hover:text-[var(--foreground)]"
-                                }`}
-                        >
-                            All
-                        </button>
-                        {tags.map((tag) => (
-                            <button
-                                key={tag}
-                                onClick={() => onToggle(tag)}
-                                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${selectedTags.includes(tag)
-                                    ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
-                                    : "bg-transparent border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)] hover:text-[var(--foreground)]"
-                                    }`}
-                            >
-                                {tag}
-                            </button>
-                        ))}
+                            className="flex-shrink-0"
+                        />
+                        {tags.map((tag) => {
+                            const isActive = selectedTags.includes(tag);
+                            return (
+                                <TagBadge
+                                    key={tag}
+                                    label={tag}
+                                    size="sm"
+                                    active={isActive}
+                                    ariaPressed={isActive}
+                                    onClick={() => onToggle(tag)}
+                                    className="flex-shrink-0"
+                                />
+                            );
+                        })}
                     </div>
 
                     <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-[var(--background)] to-transparent pointer-events-none" />
