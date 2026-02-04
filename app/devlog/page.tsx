@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { getAllPostsWithVelog } from "../lib/posts";
 import DevlogListClient from "./DevlogListClient";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Devlog",
+  description: "Velog 연동 개발 기록과 태그별 분류를 제공하는 Devlog 목록입니다.",
+};
 
 interface PageProps {
   searchParams: Promise<{ tag?: string }>;

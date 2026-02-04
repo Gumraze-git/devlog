@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getAllProjects } from "../lib/projects";
@@ -5,6 +6,11 @@ import { getTechIconMeta } from "../data/skills";
 import { ArrowUpRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Projects",
+  description: "프로젝트 경험과 기술 스택을 정리한 목록입니다.",
+};
 
 export default function ProjectsListPage() {
   const projects = getAllProjects();
