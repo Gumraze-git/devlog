@@ -6,9 +6,10 @@ import Link from "next/link";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 
 import { getProject } from "../../lib/projects";
-import { extractHeadings } from "../../lib/markdown";
+import { createCodeKey, extractCodeBlocks, extractHeadings } from "../../lib/markdown";
 import { getTechIconMeta } from "../../data/skills";
 import { getSiteUrl } from "../../lib/site";
+import { codeToHtml } from "shiki";
 
 type Params = {
   slug: string;
@@ -16,6 +17,36 @@ type Params = {
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
+
+const codeHtmlCache = new Map<string, string>();
+const shikiThemes = { light: "vitesse-light", dark: "vitesse-dark" } as const;
+
+async function highlightCode(code: string, lang: string) {
+  try {
+    return await codeToHtml(code, { lang, themes: shikiThemes });
+  } catch {
+    return await codeToHtml(code, { lang: "text", themes: shikiThemes });
+  }
+}
+
+async function buildCodeHtmlByKey(content: string): Promise<Record<string, string>> {
+  const blocks = extractCodeBlocks(content).filter((block) => block.lang !== "mermaid");
+  if (blocks.length === 0) return {};
+
+  const entries = await Promise.all(
+    blocks.map(async (block) => {
+      const lang = block.lang && block.lang.trim().length > 0 ? block.lang : "text";
+      const key = createCodeKey(lang, block.code);
+      const cached = codeHtmlCache.get(key);
+      if (cached) return [key, cached] as const;
+      const html = await highlightCode(block.code, lang);
+      codeHtmlCache.set(key, html);
+      return [key, html] as const;
+    })
+  );
+
+  return Object.fromEntries(entries);
+}
 
 export async function generateMetadata(
   { params }: { params: Promise<Params> },
@@ -55,7 +86,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   if (!project) return notFound();
   const headings = extractHeadings(project.content);
   const tocItems = headings.filter((heading) => heading.depth <= 3);
-  const codeHtmlByKey = {};
+  const codeHtmlByKey = use(buildCodeHtmlByKey(project.content));
 
   const renderTechIcons = (techs: string[]) => {
     return (
