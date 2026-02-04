@@ -116,6 +116,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         const match = /language-([\\w-]+)/.exec(className || "");
                         const lang = match ? match[1] : "text";
                         const code = String(children).replace(/\\n$/, "");
+                        const label = lang === "text" ? "TEXT" : lang.toUpperCase();
 
                         if (!inline && lang === "mermaid") {
                             return (
@@ -130,19 +131,43 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                             const highlighted = codeHtmlMap[key];
                             if (highlighted) {
                                 return (
-                                    <div
-                                        className="not-prose shiki-wrapper"
-                                        dangerouslySetInnerHTML={{ __html: highlighted }}
-                                    />
+                                    <div className="not-prose shiki-block">
+                                        <div className="shiki-header">
+                                            <span className="shiki-lang">{label}</span>
+                                            <button
+                                                type="button"
+                                                className="shiki-copy"
+                                                onClick={() => copyToClipboard(code, key)}
+                                            >
+                                                {copiedKey === key ? "Copied" : "Copy"}
+                                            </button>
+                                        </div>
+                                        <div
+                                            className="shiki-wrapper"
+                                            dangerouslySetInnerHTML={{ __html: highlighted }}
+                                        />
+                                    </div>
                                 );
                             }
 
                             return (
-                                <pre className="not-prose">
-                                    <code className={className} {...props}>
-                                        {children}
-                                    </code>
-                                </pre>
+                                <div className="not-prose shiki-block">
+                                    <div className="shiki-header">
+                                        <span className="shiki-lang">{label}</span>
+                                        <button
+                                            type="button"
+                                            className="shiki-copy"
+                                            onClick={() => copyToClipboard(code, key)}
+                                        >
+                                            {copiedKey === key ? "Copied" : "Copy"}
+                                        </button>
+                                    </div>
+                                    <pre className="shiki-fallback">
+                                        <code className={className} {...props}>
+                                            {children}
+                                        </code>
+                                    </pre>
+                                </div>
                             );
                         }
 
