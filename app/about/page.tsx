@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
 import { experienceItems } from "../data/experience";
-import { educationItems } from "../data/education";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,7 +10,10 @@ export const metadata: Metadata = {
     description: "개발자 소개, 경험, 프로젝트 요약 정보를 담은 페이지입니다.",
 };
 
-export default function AboutPage() {
+import { Suspense } from "react";
+import { Skeleton } from "../components/ui/Skeleton";
+
+function AboutContent() {
     const renderTechIcons = (techString: string) => {
         const techs = techString.split(",").map(t => t.trim());
         return (
@@ -48,22 +50,17 @@ export default function AboutPage() {
     };
 
     return (
-        <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-32">
-
+        <div className="space-y-16 animate-in fade-in duration-700 pb-32">
             {/* Hero Section */}
             <section className="grid md:grid-cols-[1fr_auto] gap-10 items-start">
                 <div className="space-y-6 order-2 md:order-1">
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1] whitespace-nowrap">
-                        Dreaming <span className="text-[var(--accent)]">Developer</span>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+                        Documentation - driven <span className="text-[var(--accent)]">Developer</span>
                     </h1>
                     <div className="space-y-4 text-lg md:text-xl text-[var(--foreground)] font-medium leading-[1.6]">
                         <p>
                             기술의 원리를 깊이 있게 이해하고 기록하며,{"\n"}
                             동료들과 지식을 나누는 과정을 통해 함께 성장하는 것을 즐깁니다.
-                        </p>
-                        <p>
-                            복잡한 문제를 단순명료하게 정의하고 해결하는 문제 해결사,{"\n"}
-                            그리고 팀과 서비스에 긍정적인 영향력을 전하는 리더로 성장하고자 합니다.
                         </p>
                     </div>
                 </div>
@@ -100,41 +97,9 @@ export default function AboutPage() {
                             </div>
 
                             <div className="space-y-6 pt-1">
-                                <p className="text-base text-[var(--text-muted)] leading-relaxed">
+                                <p className="text-base text-[var(--text-muted)] leading-relaxed whitespace-pre-line">
                                     {item.description}
                                 </p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* 1.5 Education */}
-            <section className="space-y-8">
-                <div className="border-b border-[var(--border)] pb-4">
-                    <h2 className="text-3xl font-bold tracking-tight uppercase">Education</h2>
-                </div>
-
-                <div className="space-y-12">
-                    {educationItems.map((item, index) => (
-                        <div key={index} className="grid md:grid-cols-[250px_1fr] gap-8">
-                            <div className="space-y-2">
-                                <h3 className="font-bold text-lg">{item.school}</h3>
-                                <p className="text-sm text-[var(--text-soft)]">{item.period}</p>
-                                <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line">
-                                    {item.major} {item.degree && `(${item.degree})`}
-                                </p>
-                            </div>
-
-                            <div className="space-y-6 pt-1">
-                                <p className="text-base text-[var(--text-muted)] leading-relaxed">
-                                    {item.faculty}
-                                </p>
-                                {item.gpa && (
-                                    <p className="text-sm text-[var(--text-soft)] font-mono">
-                                        GPA: {item.gpa}
-                                    </p>
-                                )}
                             </div>
                         </div>
                     ))}
@@ -350,7 +315,55 @@ export default function AboutPage() {
                     </div>
                 </div>
             </section>
+        </div>
+    );
+}
 
-        </div >
+function AboutSkeleton() {
+    return (
+        <div className="space-y-16 animate-in fade-in duration-700 pb-32">
+            {/* Hero Skeleton */}
+            <section className="grid md:grid-cols-[1fr_auto] gap-10 items-start">
+                <div className="space-y-6 order-2 md:order-1">
+                    <Skeleton className="h-12 w-3/4 md:h-16" />
+                    <div className="space-y-3">
+                        <Skeleton className="h-5 w-full" />
+                        <Skeleton className="h-5 w-4/5" />
+                    </div>
+                </div>
+                <Skeleton className="order-1 md:order-2 w-56 h-56 md:w-64 md:h-64 rounded-2xl" />
+            </section>
+
+            {/* Experience Skeleton */}
+            <section className="space-y-8">
+                <div className="border-b border-[var(--border)] pb-4">
+                    <Skeleton className="h-8 w-40" />
+                </div>
+                <div className="space-y-12">
+                    {[1, 2].map(i => (
+                        <div key={i} className="grid md:grid-cols-[250px_1fr] gap-8">
+                            <div className="space-y-2">
+                                <Skeleton className="h-6 w-32" />
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-4 w-40" />
+                            </div>
+                            <div className="space-y-4">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-2/3" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        </div>
+    );
+}
+
+export default function AboutPage() {
+    return (
+        <Suspense fallback={<AboutSkeleton />}>
+            <AboutContent />
+        </Suspense>
     );
 }
