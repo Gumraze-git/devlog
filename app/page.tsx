@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Terminal, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { getAllPostsWithVelog } from "./lib/posts";
 import { getAllProjects } from "./lib/projects";
 import { getTechIconMeta } from "./data/skills";
@@ -9,8 +9,12 @@ import { getTechIconMeta } from "./data/skills";
 
 async function getRecentPosts() {
   const username = process.env.VELOG_USERNAME ?? process.env.NEXT_PUBLIC_VELOG_USERNAME ?? "gumraze";
-  const posts = await getAllPostsWithVelog({ includeVelog: true, username });
-  return posts.slice(0, 3); // Get top 3 recent posts
+  return getAllPostsWithVelog({
+    includeVelog: true,
+    username,
+    max: 3,
+    includeOgMeta: false,
+  });
 }
 
 export default async function Home() {
@@ -61,7 +65,7 @@ export default async function Home() {
 
         <div className="flex flex-col">
           {recentPosts.length > 0 ? (
-            recentPosts.map((post, index) => (
+            recentPosts.map((post) => (
               <Link
                 key={post.slug}
                 href={post.externalLink ?? `/devlog/${post.slug}`}
