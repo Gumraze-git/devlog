@@ -26,7 +26,7 @@ export default async function DevlogListPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-1 animate-in fade-in duration-500 pb-20">
-      <header className="border-b border-[var(--border)] pb-12">
+      <header className="border-b border-[var(--border-muted)] pb-12 -mx-4 px-4">
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
           Devlog<span className="text-[var(--text-muted)] font-medium text-2xl sm:text-3xl ml-3">: 경험을 지식으로</span>
         </h1>

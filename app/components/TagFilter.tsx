@@ -11,7 +11,7 @@ interface TagFilterProps {
 
 export default function TagFilter({ tags, selectedTags, onToggle }: TagFilterProps) {
     return (
-        <div className="sticky top-14 z-20 py-2 bg-[var(--background)]/90 backdrop-blur-sm border-b border-[var(--border)] transition-all duration-200">
+        <div className="sticky top-14 z-20 -mx-4 px-4 py-2 bg-[var(--background)]/90 backdrop-blur-sm border-b border-[var(--border-muted)] transition-all duration-200">
             <div className="max-w-screen-xl mx-auto flex items-center gap-3">
                 <div className="flex items-center gap-1.5 text-[var(--text-soft)] flex-shrink-0">
                     <Tag size={14} />
