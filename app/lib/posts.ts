@@ -18,7 +18,12 @@ async function getCachedOgMeta(url: string): Promise<OgMeta> {
   return meta ?? {};
 }
 
-export async function getAllPostsWithVelog(opts?: { username?: string; includeVelog?: boolean }) {
+export async function getAllPostsWithVelog(opts?: {
+  username?: string;
+  includeVelog?: boolean;
+  max?: number;
+  includeOgMeta?: boolean;
+}) {
   // 로컬 포스트 사용하지 않음
   const base: Post[] = [];
 
@@ -26,36 +31,58 @@ export async function getAllPostsWithVelog(opts?: { username?: string; includeVe
     return base;
   }
 
+  const includeOgMeta = opts?.includeOgMeta ?? true;
+
   try {
     const velogPosts = await fetchVelogRSS(opts.username);
-    const mapped: Post[] = await Promise.all(velogPosts.map(async (post, idx) => {
+    const mappedBase: Post[] = velogPosts.map((post, idx) => {
       const card = mapVelogToCard(post, idx);
-      const ogMeta = await getCachedOgMeta(card.link);
-      const ogImage = ogMeta.image;
-      const ogDescription = ogMeta.description;
-      const ogTags = ogMeta.tags;
-      const description = ogDescription || card.description || "";
-      const tags = (ogTags && ogTags.length > 0)
-        ? ogTags
-        : (card.tags && card.tags.length > 0 ? card.tags : undefined);
-
       return {
         slug: `velog-${card.slug}`,
         title: card.title,
-        description,
+        description: card.description || "",
         date: card.date,
-        // RSS 썸네일이 없더라도 항상 og:image를 시도해 우선 사용
-        thumbnail: ogImage ?? card.thumbnail ?? card.contentImage ?? "/devlog-placeholder.svg",
-        tags,
+        thumbnail: card.thumbnail ?? card.contentImage ?? "/devlog-placeholder.svg",
+        tags: card.tags && card.tags.length > 0 ? card.tags : undefined,
         views: 0,
         published: true,
         content: "",
         externalLink: card.link,
         source: "velog",
       };
-    }));
+    });
 
-    return mapped.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    let mapped = mappedBase.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (opts?.max && opts.max > 0) {
+      mapped = mapped.slice(0, opts.max);
+    }
+
+    if (!includeOgMeta) {
+      return mapped;
+    }
+
+    const enriched: Post[] = await Promise.all(
+      mapped.map(async (post) => {
+        const ogMeta = await getCachedOgMeta(post.externalLink ?? "");
+        const ogImage = ogMeta.image;
+        const ogDescription = ogMeta.description;
+        const ogTags = ogMeta.tags;
+        const description = ogDescription || post.description || "";
+        const tags = (ogTags && ogTags.length > 0)
+          ? ogTags
+          : (post.tags && post.tags.length > 0 ? post.tags : undefined);
+
+        return {
+          ...post,
+          description,
+          tags,
+          // RSS 썸네일이 없더라도 항상 og:image를 시도해 우선 사용
+          thumbnail: ogImage ?? post.thumbnail ?? "/devlog-placeholder.svg",
+        };
+      })
+    );
+
+    return enriched;
   } catch {
     // Velog fetch 실패 시 빈 배열 반환
     return base;

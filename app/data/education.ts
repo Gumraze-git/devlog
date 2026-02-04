@@ -9,11 +9,10 @@ export type EducationItem = {
 
 export const educationItems: EducationItem[] = [
     {
-        school: "Korea University",
-        major: "Computer Science",
-        faculty: "College of Engineering",
-        degree: "Bachelor of Science",
-        period: "2015.03 - 2021.02",
-        gpa: "3.8/4.5",
+        school: "현대오토에버/DX캠퍼스",
+        major: "모빌리티 SW 스쿨 2기",
+        faculty: "Full Stack 과정",
+        period: "2025.04 - 2025.11",
+        degree: "수료",
     },
 ];

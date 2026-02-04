@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import { Github, Mail } from "lucide-react";
 import { ThemeToggle } from "../ui/ThemeToggle";

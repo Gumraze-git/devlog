@@ -1,9 +1,19 @@
-import { GraduationCap, ArrowUpRight } from "lucide-react";
+import type { Metadata } from "next";
+import { ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
+import { experienceItems } from "../data/experience";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function AboutPage() {
+export const metadata: Metadata = {
+    title: "About",
+    description: "개발자 소개, 경험, 프로젝트 요약 정보를 담은 페이지입니다.",
+};
+
+import { Suspense } from "react";
+import { Skeleton } from "../components/ui/Skeleton";
+
+function AboutContent() {
     const renderTechIcons = (techString: string) => {
         const techs = techString.split(",").map(t => t.trim());
         return (
@@ -40,32 +50,30 @@ export default function AboutPage() {
     };
 
     return (
-        <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-32">
-
+        <div className="space-y-16 animate-in fade-in duration-700 pb-32">
             {/* Hero Section */}
             <section className="grid md:grid-cols-[1fr_auto] gap-10 items-start">
                 <div className="space-y-6 order-2 md:order-1">
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1] whitespace-nowrap">
-                        Dreaming <span className="text-[var(--accent)]">Developer</span>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+                        Documentation - driven <span className="text-[var(--accent)]">Developer</span>
                     </h1>
                     <div className="space-y-4 text-lg md:text-xl text-[var(--foreground)] font-medium leading-[1.6]">
                         <p>
                             기술의 원리를 깊이 있게 이해하고 기록하며,{"\n"}
                             동료들과 지식을 나누는 과정을 통해 함께 성장하는 것을 즐깁니다.
                         </p>
-                        <p>
-                            복잡한 문제를 단순명료하게 정의하고 해결하는 문제 해결사,{"\n"}
-                            그리고 팀과 서비스에 긍정적인 영향력을 전하는 리더로 성장하고자 합니다.
-                        </p>
                     </div>
                 </div>
 
                 <div className="flex flex-col items-center md:items-end gap-4 order-1 md:order-2 md:mt-4">
                     <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-2xl overflow-hidden border border-[var(--border)] grayscale shadow-sm">
-                        <img
+                        <Image
                             src="https://htmacgfeigx1pttr.public.blob.vercel-storage.com/image/me.png"
                             alt="Daehwan Kim"
-                            className="object-cover w-full h-full"
+                            fill
+                            sizes="(max-width: 768px) 224px, 256px"
+                            className="object-cover"
+                            priority
                         />
                     </div>
                 </div>
@@ -77,33 +85,24 @@ export default function AboutPage() {
                     <h2 className="text-3xl font-bold tracking-tight uppercase">Experience</h2>
                 </div>
 
-                <div className="grid md:grid-cols-[250px_1fr] gap-8">
-                    <div className="space-y-2">
-                        <h3 className="font-bold text-lg">현대오토에버 SW 스쿨 2기</h3>
-                        <p className="text-sm text-[var(--text-soft)]">2025.04. - 2025.11.</p>
-                        <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line">
-                            풀스택 교육 과정 및{"\n"}백엔드 역할로 프로젝트 수행
-                        </p>
-                    </div>
+                <div className="space-y-12">
+                    {experienceItems.map((item) => (
+                        <div key={item.id} className="grid md:grid-cols-[250px_1fr] gap-8">
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-lg">{item.company}</h3>
+                                <p className="text-sm text-[var(--text-soft)]">{item.period}</p>
+                                <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line">
+                                    {item.position}
+                                </p>
+                            </div>
 
-                    <div className="space-y-6 pt-1">
-                        <p className="text-lg md:text-xl font-bold text-[var(--foreground)] leading-[1.4]">
-                            백엔드 개발의 기본기를 배우며,{"\n"}
-                            효과적인 협업 방식으로 프로젝트를 주도했습니다.
-                        </p>
-                        <ul className="text-base text-[var(--text-muted)] space-y-3 pl-1">
-                            {[
-                                { title: "ERD 설계", desc: "요구사항 분석을 통한 효율적인 데이터베이스 모델링 및 정규화 수행" },
-                                { title: "RESTful API 설계", desc: "효율적인 데이터 통신을 위한 확장성 있는 시스템 구조 설계" },
-                                { title: "프론트 엔드와 협업", desc: "효율적인 협업 프로세스와 원활한 커뮤니케이션을 통한 API 명세 최적화" }
-                            ].map((item, i) => (
-                                <li key={i} className="flex gap-3">
-                                    <span className="text-[var(--accent)] font-bold">•</span>
-                                    <span><strong>{item.title}</strong>: {item.desc}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                            <div className="space-y-6 pt-1">
+                                <p className="text-base text-[var(--text-muted)] leading-relaxed whitespace-pre-line">
+                                    {item.description}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
 
@@ -304,19 +303,67 @@ export default function AboutPage() {
                         <div className="space-y-4">
                             <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">몰입과 기록을 통해 경험을 지식으로 전환하는 개발자</h3>
                             <p>
-                                저는 주어진 일에 몰입하며 원리를 파악하는 과정에서 성장의 동기를 얻습니다. 5년간 꾸준히 이어온 배드민턴을 통해 '몰입과 성장'의 가치를 배웠고, 이는 개발을 대하는 저의 태도가 되었습니다. 현대오토에버 SW스쿨 과정에서도 공식 문서를 통해 기술의 동작 원리를 파악하며 개발하는 과정을 거쳤으며, 이러한 경험은 문제를 간결하게 해결할 수 있는 기반이 되었습니다.
+                                저는 주어진 일에 몰입하며 원리를 파악하는 과정에서 성장의 동기를 얻습니다. 5년간 꾸준히 이어온 배드민턴을 통해 &apos;몰입과 성장&apos;의 가치를 배웠고, 이는 개발을 대하는 저의 태도가 되었습니다. 현대오토에버 SW스쿨 과정에서도 공식 문서를 통해 기술의 동작 원리를 파악하며 개발하는 과정을 거쳤으며, 이러한 경험은 문제를 간결하게 해결할 수 있는 기반이 되었습니다.
                             </p>
                             <p>
                                 저는 팀의 컨벤션과 개발 원칙을 준수하며, 기본기에 충실한 코드를 작성하는 것을 개발의 최우선 가치로 삼습니다. 단순히 기능을 구현하는 것을 넘어, 요구사항의 본질을 이해하며 유지보수가 용이하도록 견고한 코드를 작성하는 데 집중합니다. 이러한 원칙을 바탕으로 동료들이 믿고 협업할 수 있는 문제 해결사가 되고자 합니다.
                             </p>
                             <p>
-                                또한, 매일의 기술적 경험을 기록하고 '지식'으로 전환하기 위해 노력합니다. 학습한 내용을 문서화하여 동료들과 공유하고 토론하는 과정에서 지식의 선순환과 성장을 경험했습니다. 앞으로도 꾸준한 학습을 통해 특정 분야의 전문가로 거듭나고, 제가 쌓은 지식을 공동체에 환원할 수 있는 리더로 성장하고자 합니다.
+                                또한, 매일의 기술적 경험을 기록하고 &apos;지식&apos;으로 전환하기 위해 노력합니다. 학습한 내용을 문서화하여 동료들과 공유하고 토론하는 과정에서 지식의 선순환과 성장을 경험했습니다. 앞으로도 꾸준한 학습을 통해 특정 분야의 전문가로 거듭나고, 제가 쌓은 지식을 공동체에 환원할 수 있는 리더로 성장하고자 합니다.
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
+        </div>
+    );
+}
 
-        </div >
+function AboutSkeleton() {
+    return (
+        <div className="space-y-16 animate-in fade-in duration-700 pb-32">
+            {/* Hero Skeleton */}
+            <section className="grid md:grid-cols-[1fr_auto] gap-10 items-start">
+                <div className="space-y-6 order-2 md:order-1">
+                    <Skeleton className="h-12 w-3/4 md:h-16" />
+                    <div className="space-y-3">
+                        <Skeleton className="h-5 w-full" />
+                        <Skeleton className="h-5 w-4/5" />
+                    </div>
+                </div>
+                <Skeleton className="order-1 md:order-2 w-56 h-56 md:w-64 md:h-64 rounded-2xl" />
+            </section>
+
+            {/* Experience Skeleton */}
+            <section className="space-y-8">
+                <div className="border-b border-[var(--border)] pb-4">
+                    <Skeleton className="h-8 w-40" />
+                </div>
+                <div className="space-y-12">
+                    {[1, 2].map(i => (
+                        <div key={i} className="grid md:grid-cols-[250px_1fr] gap-8">
+                            <div className="space-y-2">
+                                <Skeleton className="h-6 w-32" />
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-4 w-40" />
+                            </div>
+                            <div className="space-y-4">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-2/3" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        </div>
+    );
+}
+
+export default function AboutPage() {
+    return (
+        <Suspense fallback={<AboutSkeleton />}>
+            <AboutContent />
+        </Suspense>
     );
 }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { PropsWithChildren, ReactNode } from "react";
+import TagBadge from "./TagBadge";
 
 type ItemCard = {
   slug: string;
@@ -48,9 +49,7 @@ export default function ItemCardList({ items, onSelect, renderFooter, renderTitl
             {item.tags && item.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {item.tags.slice(0, 3).map((tag) => (
-                  <span key={tag} className="rounded-full bg-[var(--border-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--foreground)]">
-                    {tag}
-                  </span>
+                  <TagBadge key={tag} label={tag} size="xs" />
                 ))}
                 {item.tags.length > 3 && (
                   <span className="rounded-full bg-[var(--card-muted)] px-2 py-0.5 text-xs font-semibold text-[var(--text-soft)]">

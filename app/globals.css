@@ -117,3 +117,70 @@ html {
 .prose-modal code {
   font-size: 0.9em;
 }
+
+.shiki-block {
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.shiki-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-subtle);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--text-soft);
+}
+
+.shiki-lang {
+  font-weight: 600;
+}
+
+.shiki-copy {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  background: var(--card);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.shiki-copy:hover {
+  border-color: var(--accent);
+  color: var(--foreground);
+}
+
+.shiki-wrapper .shiki {
+  margin: 0;
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  font-family: var(--font-mono);
+}
+
+.shiki-wrapper .shiki code {
+  font-family: var(--font-mono);
+}
+
+.shiki-fallback {
+  margin: 0;
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  font-family: var(--font-mono);
+  background: var(--card);
+}

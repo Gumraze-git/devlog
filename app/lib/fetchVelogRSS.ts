@@ -138,7 +138,7 @@ export type VelogOgMeta = {
 
 export async function fetchVelogOgMeta(url: string): Promise<VelogOgMeta> {
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { next: { revalidate: 86400 } });
     if (!res.ok) return {};
     const html = await res.text();
 

@@ -9,16 +9,9 @@ export type ExperienceItem = {
 export const experienceItems: ExperienceItem[] = [
     {
         id: "1",
-        company: "Tech Company A",
-        position: "Backend Engineer",
-        period: "2023.01 - Present",
-        description: "Developed scalable microservices using Spring Boot and Kafka. Optimized database queries improving performance by 30%.",
-    },
-    {
-        id: "2",
-        company: "Startup B",
-        position: "Junior Developer",
-        period: "2021.06 - 2022.12",
-        description: "Built RESTful APIs with Node.js and Express. Managed CI/CD pipelines using GitHub Actions.",
+        company: "현대오토에버 SW 스쿨 2기",
+        position: "백엔드 개발자 (교육 과정)",
+        period: "2025.04 - 2025.11",
+        description: "풀스택 교육 과정을 수료하고, 팀 프로젝트에서 백엔드 리드 역할을 수행함.\nERD 기반 도메인 설계와 REST API 구조 설계를 담당했으며,\n프론트엔드와의 협업을 고려한 API 명세 및 개발 프로세스를 주도함.",
     },
 ];

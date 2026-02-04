@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ComponentPropsWithoutRef } from "react";
+import TagBadge from "./TagBadge";
 
 type BaseProps = {
   title: string;
@@ -10,6 +11,7 @@ type BaseProps = {
   description?: string;
   tags?: string[];
   ariaLabel?: string;
+  tagHrefBuilder?: (tag: string) => string;
 };
 
 type LinkCard = BaseProps & {
@@ -32,7 +34,7 @@ export default function OverlayCard(props: OverlayCardProps) {
   const isButton = props.as === "button";
   const aria = props.ariaLabel ?? `${props.title} ${props.date}`;
   const content = (
-    <>
+    <div className="relative z-10 h-full w-full pointer-events-none">
       <div className="relative h-full w-full">
         <Image
           src={props.thumbnail ?? "/devlog-placeholder.svg"}
@@ -45,7 +47,7 @@ export default function OverlayCard(props: OverlayCardProps) {
         <div className="overlay absolute inset-0 bg-black/45 transition-[backdrop-filter,background-color] group-hover:bg-black/55 group-hover:backdrop-blur-[2px]" />
       </div>
 
-      <div className="absolute inset-0 z-10 flex flex-col p-5 md:p-6">
+      <div className="absolute inset-0 flex flex-col p-5 md:p-6">
         <p className="text-white text-base md:text-lg font-bold line-clamp-2 drop-shadow">{props.title}</p>
         {props.description && (
           <p className="mt-1 text-white/80 text-xs md:text-sm font-medium line-clamp-2 drop-shadow">{props.description}</p>
@@ -56,9 +58,14 @@ export default function OverlayCard(props: OverlayCardProps) {
             {props.tags && props.tags.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5">
                 {props.tags.slice(0, 2).map((tag) => (
-                  <span key={tag} className="rounded-md bg-white/10 border border-white/20 px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur-md transition-all duration-200 group-hover:border-white/40">
-                    {tag}
-                  </span>
+                  <TagBadge
+                    key={tag}
+                    label={tag}
+                    size="xs"
+                    tone="overlay"
+                    href={props.tagHrefBuilder ? props.tagHrefBuilder(tag) : undefined}
+                    className={props.tagHrefBuilder ? "pointer-events-auto" : undefined}
+                  />
                 ))}
                 {props.tags.length > 2 && (
                   <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
@@ -77,23 +84,31 @@ export default function OverlayCard(props: OverlayCardProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 
   const className =
-    "group relative h-[13rem] md:h-[16rem] xl:h-[18rem] w-full overflow-hidden rounded-lg md:rounded-xl border border-black/20 bg-[var(--card)] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]";
-
-  if (isButton) {
-    return (
-      <button type="button" className={className} aria-label={aria} onClick={props.onSelect}>
-        {content}
-      </button>
-    );
-  }
+    "group relative h-[13rem] md:h-[16rem] xl:h-[18rem] w-full overflow-hidden rounded-lg md:rounded-xl border border-black/20 bg-[var(--card)] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg";
 
   return (
-    <Link href={props.href} target={props.target} rel={props.rel} className={className} aria-label={aria}>
+    <div className={className}>
+      {isButton ? (
+        <button
+          type="button"
+          aria-label={aria}
+          onClick={props.onSelect}
+          className="absolute inset-0 z-0 rounded-lg md:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+        />
+      ) : (
+        <Link
+          href={props.href}
+          target={props.target}
+          rel={props.rel}
+          aria-label={aria}
+          className="absolute inset-0 z-0 rounded-lg md:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+        />
+      )}
       {content}
-    </Link>
+    </div>
   );
 }
