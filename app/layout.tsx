@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "DKim Devlog",
