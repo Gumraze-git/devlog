@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
 import { getPost } from "../../lib/posts";
+import { getSiteUrl } from "../../lib/site";
+import TagBadge from "../../components/ui/TagBadge";
 
 type Params = {
   slug: string;
@@ -11,6 +14,38 @@ type Params = {
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
+
+export async function generateMetadata(
+  { params }: { params: Promise<Params> },
+): Promise<Metadata> {
+  const resolved = await params;
+  const post = getPost(resolved.slug);
+  if (!post) {
+    return {
+      title: "Devlog",
+    };
+  }
+
+  const siteUrl = getSiteUrl();
+  const canonicalPath = `/devlog/${post.slug}`;
+
+  return {
+    title: post.title,
+    description: post.description,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    keywords: post.tags,
+    openGraph: {
+      type: "article",
+      url: `${siteUrl}${canonicalPath}`,
+      title: post.title,
+      description: post.description,
+      images: post.thumbnail ? [{ url: post.thumbnail, alt: post.title }] : undefined,
+      publishedTime: post.date ? new Date(post.date).toISOString() : undefined,
+    },
+  };
+}
 
 export default function DevlogDetailPage({ params }: { params: Promise<Params> }) {
   const resolved = use(params);

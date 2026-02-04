@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -5,7 +6,9 @@ import Link from "next/link";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 
 import { getProject } from "../../lib/projects";
+import { extractHeadings } from "../../lib/markdown";
 import { getTechIconMeta } from "../../data/skills";
+import { getSiteUrl } from "../../lib/site";
 
 type Params = {
   slug: string;
@@ -14,6 +17,37 @@ type Params = {
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
+export async function generateMetadata(
+  { params }: { params: Promise<Params> },
+): Promise<Metadata> {
+  const resolved = await params;
+  const project = getProject(resolved.slug);
+  if (!project) {
+    return {
+      title: "Projects",
+    };
+  }
+
+  const siteUrl = getSiteUrl();
+  const canonicalPath = `/projects/${project.slug}`;
+
+  return {
+    title: project.title,
+    description: project.summary,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    keywords: project.stack,
+    openGraph: {
+      type: "article",
+      url: `${siteUrl}${canonicalPath}`,
+      title: project.title,
+      description: project.summary,
+      images: project.thumbnail ? [{ url: project.thumbnail, alt: project.title }] : undefined,
+      publishedTime: project.date ? new Date(project.date).toISOString() : undefined,
+    },
+  };
+}
 export default function ProjectDetailPage({ params }: { params: Promise<Params> }) {
   const resolved = use(params);
   const project = getProject(resolved.slug);
