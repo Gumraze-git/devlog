@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import mermaid from "mermaid";
 import { createCodeKey, createSlugger, stripInlineMarkdown } from "../lib/markdown";
@@ -29,6 +29,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     const containerRef = useRef<HTMLDivElement>(null);
     const slugger = createSlugger();
     const codeHtmlMap = codeHtmlByKey ?? {};
+    const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
     const getTextContent = (children: React.ReactNode): string => {
         if (typeof children === "string" || typeof children === "number") {
@@ -52,6 +53,28 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             mermaid.contentLoaded();
         }
     }, [content]);
+
+    const copyToClipboard = async (value: string, key: string) => {
+        try {
+            if (navigator?.clipboard?.writeText) {
+                await navigator.clipboard.writeText(value);
+            } else {
+                const textarea = document.createElement("textarea");
+                textarea.value = value;
+                textarea.style.position = "fixed";
+                textarea.style.left = "-9999px";
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                document.execCommand("copy");
+                textarea.remove();
+            }
+            setCopiedKey(key);
+            window.setTimeout(() => setCopiedKey(null), 1200);
+        } catch {
+            setCopiedKey(null);
+        }
+    };
 
     return (
         <div ref={containerRef} className="prose prose-lg prose-zinc dark:prose-invert max-w-none prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-relaxed prose-li:text-[var(--text-muted)] prose-li:leading-relaxed">
