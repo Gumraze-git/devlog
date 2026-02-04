@@ -117,3 +117,19 @@ html {
 .prose-modal code {
   font-size: 0.9em;
 }
+
+.shiki-wrapper {
+  margin: 1.5rem 0;
+}
+
+.shiki {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.95rem;
+}
+
+.shiki code {
+  font-family: var(--font-mono);
+}

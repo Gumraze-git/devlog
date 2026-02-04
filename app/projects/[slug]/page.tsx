@@ -48,10 +48,14 @@ export async function generateMetadata(
     },
   };
 }
+
 export default function ProjectDetailPage({ params }: { params: Promise<Params> }) {
   const resolved = use(params);
   const project = getProject(resolved.slug);
   if (!project) return notFound();
+  const headings = extractHeadings(project.content);
+  const tocItems = headings.filter((heading) => heading.depth <= 3);
+  const codeHtmlByKey = {};
 
   const renderTechIcons = (techs: string[]) => {
     return (
@@ -88,50 +92,48 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   };
 
   return (
-    <div className="w-full space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-32">
-      {/* Navigation & Header Section */}
-      <section className="space-y-8">
-        <Link
-          href="/about"
-          className="inline-flex items-center text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors uppercase tracking-widest"
-        >
-          ← Back to About Me
-        </Link>
+    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28">
+      <div className="grid md:grid-cols-[minmax(0,1fr)_260px] gap-10 lg:gap-14">
+        {/* Left column: Full page content */}
+        <div className="space-y-12 order-2 md:order-1">
+          {/* Navigation & Header Section */}
+          <section className="space-y-5">
+            <Link
+              href="/about"
+              className="inline-flex items-center text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors uppercase tracking-widest"
+            >
+              ← Back to About Me
+            </Link>
 
-        <div className="space-y-6">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-[1.1]">
-            {project.title}
-          </h1>
-          <p className="text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-3xl">
-            {project.summary}
-          </p>
-        </div>
-      </section>
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-[1.1]">
+                {project.title}
+              </h1>
+              <p className="text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-3xl">
+                {project.summary}
+              </p>
+            </div>
+          </section>
 
-      {/* Project Thumbnail / Wide Banner Style */}
-      {project.thumbnail && (
-        <div className="max-w-5xl mx-auto w-full px-4 md:px-0">
-          <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
-            <Image
-              src={project.thumbnail}
-              alt={project.title}
-              fill
-              sizes="(max-width: 1200px) 100vw, 1200px"
-              className="object-cover"
-              priority
-            />
-          </div>
-        </div>
-      )}
+          {/* Project Thumbnail / Wide Banner Style */}
+          {project.thumbnail && (
+            <div className="w-full">
+              <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
+                <Image
+                  src={project.thumbnail}
+                  alt={project.title}
+                  fill
+                  sizes="(max-width: 1200px) 100vw, 1200px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </div>
+          )}
 
-      {/* Main Content Layout */}
-      <div className="grid md:grid-cols-[1fr_250px] gap-12 lg:gap-20">
-
-        {/* Left column: Main body mirroring About page section structure */}
-        <div className="space-y-16 order-1">
           {/* Highlights Section */}
           {project.highlights && project.highlights.length > 0 && (
-            <section className="space-y-6">
+            <section className="space-y-4">
               <h2 className="text-2xl font-bold tracking-tight uppercase border-b border-[var(--border)] pb-4">Highlights</h2>
               <ul className="text-base text-[var(--text-muted)] space-y-4 pl-1">
                 {project.highlights.map((item, i) => (
@@ -144,17 +146,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </section>
           )}
 
-          {/* Tech Stack Section with Icons like About Me */}
-          <section className="space-y-6">
-            <h2 className="text-2xl font-bold tracking-tight uppercase border-b border-[var(--border)] pb-4">Tech Stack</h2>
-            {renderTechIcons(project.stack)}
+          {/* Project Detailed Description - Separate Section */}
+          <section className="space-y-6 pt-12 border-t border-[var(--border)]">
+            <h2 className="text-2xl font-bold tracking-tight uppercase border-b border-[var(--border)] pb-4">Details</h2>
+            <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
           </section>
-
         </div>
 
-        {/* Right column: Metadata summaries */}
-        <aside className="space-y-10 order-2 pt-2">
-          <div className="space-y-6">
+        {/* Right column: Metadata summaries + TOC */}
+        <aside className="space-y-8 order-1 md:order-2 md:sticky md:top-24 self-start">
+          <div className="space-y-5">
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest border-b border-[var(--border)] pb-2 mb-4">Period</h3>
               <p className="text-base font-mono text-[var(--text-soft)]">{project.period}</p>
@@ -174,6 +175,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
               </p>
             </div>
 
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest border-b border-[var(--border)] pb-2 mb-4">Tech Stack</h3>
+              {renderTechIcons(project.stack)}
+            </div>
+
             {project.repo && (
               <div className="space-y-2">
                 <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest border-b border-[var(--border)] pb-2 mb-4">Source</h3>
@@ -188,14 +194,50 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
               </div>
             )}
           </div>
+
+          {tocItems.length > 0 && (
+            <>
+              <div className="md:hidden">
+                <details className="rounded-xl border border-[var(--border)] bg-[var(--card-subtle)] p-4">
+                  <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
+                    Contents
+                  </summary>
+                  <nav aria-label="Table of contents" className="mt-4 space-y-2">
+                    {tocItems.map((item) => (
+                      <a
+                        key={item.slug}
+                        href={`#${item.slug}`}
+                        className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${
+                          item.depth === 3 ? "pl-4" : ""
+                        }`}
+                      >
+                        {item.text}
+                      </a>
+                    ))}
+                  </nav>
+                </details>
+              </div>
+
+              <nav aria-label="Table of contents" className="hidden md:block space-y-3">
+                <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest border-b border-[var(--border)] pb-2">Contents</h3>
+                <div className="space-y-1.5">
+                  {tocItems.map((item) => (
+                    <a
+                      key={item.slug}
+                      href={`#${item.slug}`}
+                      className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${
+                        item.depth === 3 ? "pl-4" : ""
+                      }`}
+                    >
+                      {item.text}
+                    </a>
+                  ))}
+                </div>
+              </nav>
+            </>
+          )}
         </aside>
       </div>
-
-      {/* Project Detailed Description - Separate Section */}
-      <section className="space-y-8 pt-16 border-t border-[var(--border)]">
-        <h2 className="text-2xl font-bold tracking-tight uppercase border-b border-[var(--border)] pb-4">Details</h2>
-        <MarkdownRenderer content={project.content} />
-      </section>
     </div>
   );
 }
