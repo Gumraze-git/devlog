@@ -94,7 +94,7 @@ export default function DevlogListClient({
                 />
 
                 <div className="relative z-10 pointer-events-none w-full flex flex-col sm:flex-row gap-5 md:gap-7">
-                  <div className="relative w-full sm:w-60 md:w-72 lg:w-80 aspect-[21/9] overflow-hidden rounded-md bg-gradient-to-br from-[var(--card-subtle)] to-[var(--background)] shadow-sm flex-shrink-0">
+                  <div className="relative w-full sm:w-[14.5rem] md:w-[17.5rem] lg:w-[19.5rem] aspect-[21/9] overflow-hidden rounded-md bg-gradient-to-br from-[var(--card-subtle)] to-[var(--background)] shadow-sm flex-shrink-0">
                     {post.thumbnail ? (
                       <Image
                         src={post.thumbnail}
@@ -114,12 +114,9 @@ export default function DevlogListClient({
                   <div className="flex-1 min-w-0">
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-xs font-mono text-[var(--text-soft)] uppercase tracking-wider">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-strong)]" />
                           <time dateTime={post.date}>
                             {new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}
                           </time>
-                          <span className="w-1 h-1 rounded-full bg-[var(--border)]" />
-                          <span>{post.source === "velog" ? "Velog" : "Local"}</span>
                         </div>
 
                         <h2 className="text-2xl font-bold group-hover:text-[var(--accent-strong)] transition-colors leading-tight">
