@@ -1,52 +1,14 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
 import { Tag } from "lucide-react";
 
 interface TagFilterProps {
     tags: string[];
+    selectedTags: string[];
+    onToggle: (tag: string) => void;
 }
 
-export default function TagFilter({ tags }: TagFilterProps) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const currentTag = searchParams.get("tag");
-
-    const selectedTags = currentTag ? currentTag.split(",") : [];
-
-    const createQueryString = useCallback(
-        (tag: string) => {
-            const params = new URLSearchParams(searchParams.toString());
-
-            if (tag === "all") {
-                params.delete("tag");
-            } else {
-                let newTags = [...selectedTags];
-                if (newTags.includes(tag)) {
-                    // Remove tag if already selected
-                    newTags = newTags.filter((t) => t !== tag);
-                } else {
-                    // Add tag if not selected
-                    newTags.push(tag);
-                }
-
-                if (newTags.length > 0) {
-                    params.set("tag", newTags.join(","));
-                } else {
-                    params.delete("tag");
-                }
-            }
-            return params.toString();
-        },
-        [searchParams, selectedTags]
-    );
-
-    const handleTagClick = (tag: string) => {
-        const query = createQueryString(tag);
-        router.push(`/devlog${query ? `?${query}` : ""}`, { scroll: false });
-    };
-
+export default function TagFilter({ tags, selectedTags, onToggle }: TagFilterProps) {
     return (
         <div className="sticky top-14 z-20 py-2 bg-[var(--background)]/90 backdrop-blur-sm border-b border-[var(--border)] transition-all duration-200">
             <div className="max-w-screen-xl mx-auto flex items-center gap-3">
@@ -58,7 +20,7 @@ export default function TagFilter({ tags }: TagFilterProps) {
                 <div className="relative flex-1 flex items-center overflow-hidden">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
                         <button
-                            onClick={() => handleTagClick("all")}
+                            onClick={() => onToggle("all")}
                             className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${selectedTags.length === 0
                                 ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
                                 : "bg-transparent border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)] hover:text-[var(--foreground)]"
@@ -69,7 +31,7 @@ export default function TagFilter({ tags }: TagFilterProps) {
                         {tags.map((tag) => (
                             <button
                                 key={tag}
-                                onClick={() => handleTagClick(tag)}
+                                onClick={() => onToggle(tag)}
                                 className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 border flex-shrink-0 ${selectedTags.includes(tag)
                                     ? "bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]"
                                     : "bg-transparent border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-soft)] hover:text-[var(--foreground)]"
