@@ -1,7 +1,13 @@
-import { GraduationCap, ArrowUpRight } from "lucide-react";
+import type { Metadata } from "next";
+import { ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+    title: "About",
+    description: "개발자 소개, 경험, 프로젝트 요약 정보를 담은 페이지입니다.",
+};
 
 export default function AboutPage() {
     const renderTechIcons = (techString: string) => {
@@ -62,10 +68,13 @@ export default function AboutPage() {
 
                 <div className="flex flex-col items-center md:items-end gap-4 order-1 md:order-2 md:mt-4">
                     <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-2xl overflow-hidden border border-[var(--border)] grayscale shadow-sm">
-                        <img
+                        <Image
                             src="https://htmacgfeigx1pttr.public.blob.vercel-storage.com/image/me.png"
                             alt="Daehwan Kim"
-                            className="object-cover w-full h-full"
+                            fill
+                            sizes="(max-width: 768px) 224px, 256px"
+                            className="object-cover"
+                            priority
                         />
                     </div>
                 </div>
@@ -304,13 +313,13 @@ export default function AboutPage() {
                         <div className="space-y-4">
                             <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">몰입과 기록을 통해 경험을 지식으로 전환하는 개발자</h3>
                             <p>
-                                저는 주어진 일에 몰입하며 원리를 파악하는 과정에서 성장의 동기를 얻습니다. 5년간 꾸준히 이어온 배드민턴을 통해 '몰입과 성장'의 가치를 배웠고, 이는 개발을 대하는 저의 태도가 되었습니다. 현대오토에버 SW스쿨 과정에서도 공식 문서를 통해 기술의 동작 원리를 파악하며 개발하는 과정을 거쳤으며, 이러한 경험은 문제를 간결하게 해결할 수 있는 기반이 되었습니다.
+                                저는 주어진 일에 몰입하며 원리를 파악하는 과정에서 성장의 동기를 얻습니다. 5년간 꾸준히 이어온 배드민턴을 통해 &apos;몰입과 성장&apos;의 가치를 배웠고, 이는 개발을 대하는 저의 태도가 되었습니다. 현대오토에버 SW스쿨 과정에서도 공식 문서를 통해 기술의 동작 원리를 파악하며 개발하는 과정을 거쳤으며, 이러한 경험은 문제를 간결하게 해결할 수 있는 기반이 되었습니다.
                             </p>
                             <p>
                                 저는 팀의 컨벤션과 개발 원칙을 준수하며, 기본기에 충실한 코드를 작성하는 것을 개발의 최우선 가치로 삼습니다. 단순히 기능을 구현하는 것을 넘어, 요구사항의 본질을 이해하며 유지보수가 용이하도록 견고한 코드를 작성하는 데 집중합니다. 이러한 원칙을 바탕으로 동료들이 믿고 협업할 수 있는 문제 해결사가 되고자 합니다.
                             </p>
                             <p>
-                                또한, 매일의 기술적 경험을 기록하고 '지식'으로 전환하기 위해 노력합니다. 학습한 내용을 문서화하여 동료들과 공유하고 토론하는 과정에서 지식의 선순환과 성장을 경험했습니다. 앞으로도 꾸준한 학습을 통해 특정 분야의 전문가로 거듭나고, 제가 쌓은 지식을 공동체에 환원할 수 있는 리더로 성장하고자 합니다.
+                                또한, 매일의 기술적 경험을 기록하고 &apos;지식&apos;으로 전환하기 위해 노력합니다. 학습한 내용을 문서화하여 동료들과 공유하고 토론하는 과정에서 지식의 선순환과 성장을 경험했습니다. 앞으로도 꾸준한 학습을 통해 특정 분야의 전문가로 거듭나고, 제가 쌓은 지식을 공동체에 환원할 수 있는 리더로 성장하고자 합니다.
                             </p>
                         </div>
                     </div>

@@ -1,7 +1,5 @@
 import { TopNav } from "./TopNav";
 import { LeftSidebar } from "./LeftSidebar";
-import { ThemeToggle } from "../ui/ThemeToggle";
-
 export function AppLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
