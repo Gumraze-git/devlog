@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
+import { experienceItems } from "../data/experience";
+import { educationItems } from "../data/education";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -86,33 +88,56 @@ export default function AboutPage() {
                     <h2 className="text-3xl font-bold tracking-tight uppercase">Experience</h2>
                 </div>
 
-                <div className="grid md:grid-cols-[250px_1fr] gap-8">
-                    <div className="space-y-2">
-                        <h3 className="font-bold text-lg">현대오토에버 SW 스쿨 2기</h3>
-                        <p className="text-sm text-[var(--text-soft)]">2025.04. - 2025.11.</p>
-                        <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line">
-                            풀스택 교육 과정 및{"\n"}백엔드 역할로 프로젝트 수행
-                        </p>
-                    </div>
+                <div className="space-y-12">
+                    {experienceItems.map((item) => (
+                        <div key={item.id} className="grid md:grid-cols-[250px_1fr] gap-8">
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-lg">{item.company}</h3>
+                                <p className="text-sm text-[var(--text-soft)]">{item.period}</p>
+                                <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line">
+                                    {item.position}
+                                </p>
+                            </div>
 
-                    <div className="space-y-6 pt-1">
-                        <p className="text-lg md:text-xl font-bold text-[var(--foreground)] leading-[1.4]">
-                            백엔드 개발의 기본기를 배우며,{"\n"}
-                            효과적인 협업 방식으로 프로젝트를 주도했습니다.
-                        </p>
-                        <ul className="text-base text-[var(--text-muted)] space-y-3 pl-1">
-                            {[
-                                { title: "ERD 설계", desc: "요구사항 분석을 통한 효율적인 데이터베이스 모델링 및 정규화 수행" },
-                                { title: "RESTful API 설계", desc: "효율적인 데이터 통신을 위한 확장성 있는 시스템 구조 설계" },
-                                { title: "프론트 엔드와 협업", desc: "효율적인 협업 프로세스와 원활한 커뮤니케이션을 통한 API 명세 최적화" }
-                            ].map((item, i) => (
-                                <li key={i} className="flex gap-3">
-                                    <span className="text-[var(--accent)] font-bold">•</span>
-                                    <span><strong>{item.title}</strong>: {item.desc}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                            <div className="space-y-6 pt-1">
+                                <p className="text-base text-[var(--text-muted)] leading-relaxed">
+                                    {item.description}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* 1.5 Education */}
+            <section className="space-y-8">
+                <div className="border-b border-[var(--border)] pb-4">
+                    <h2 className="text-3xl font-bold tracking-tight uppercase">Education</h2>
+                </div>
+
+                <div className="space-y-12">
+                    {educationItems.map((item, index) => (
+                        <div key={index} className="grid md:grid-cols-[250px_1fr] gap-8">
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-lg">{item.school}</h3>
+                                <p className="text-sm text-[var(--text-soft)]">{item.period}</p>
+                                <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line">
+                                    {item.major} {item.degree && `(${item.degree})`}
+                                </p>
+                            </div>
+
+                            <div className="space-y-6 pt-1">
+                                <p className="text-base text-[var(--text-muted)] leading-relaxed">
+                                    {item.faculty}
+                                </p>
+                                {item.gpa && (
+                                    <p className="text-sm text-[var(--text-soft)] font-mono">
+                                        GPA: {item.gpa}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
 
