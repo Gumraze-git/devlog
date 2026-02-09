@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { ExternalLink, Github } from "lucide-react";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import ProjectTocLinks from "../../components/ProjectTocLinks";
+import BackToPreviousLink from "./BackToPreviousLink";
 
 import { getProject } from "../../lib/projects";
 import { createCodeKey, extractCodeBlocks, extractHeadings } from "../../lib/markdown";
@@ -184,23 +184,26 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28">
       <section className="space-y-6 mb-12">
-        <Link
-          href="/about"
+        <BackToPreviousLink
+          fallbackHref="/projects"
           className="inline-flex items-center text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors uppercase tracking-widest"
         >
-          ← Back to About Me
-        </Link>
+          ← Back
+        </BackToPreviousLink>
 
-        <div className="space-y-4">
+        <div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-[1.05]">
             {project.title}
           </h1>
           {project.projectTitle && (
-            <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">
+            <p className="mt-4 text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">
               {project.projectTitle}
             </p>
           )}
-          <p className="text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-3xl">
+          <p
+            className={`text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-3xl ${project.projectTitle ? "mt-3" : "mt-4"
+              }`}
+          >
             {project.summary}
           </p>
         </div>
