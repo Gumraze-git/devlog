@@ -113,15 +113,40 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         children,
                         ...props
                     }: React.HTMLAttributes<HTMLElement> & { inline?: boolean }) {
-                        const match = /language-([\\w-]+)/.exec(className || "");
+                        const match = /language-([\w-]+)/.exec(className || "");
                         const lang = match ? match[1] : "text";
-                        const code = String(children).replace(/\\n$/, "");
+                        const code = String(children).replace(/\n$/, "");
                         const label = lang === "text" ? "TEXT" : lang.toUpperCase();
 
                         if (!inline && lang === "mermaid") {
                             return (
                                 <div className="mermaid my-8 flex justify-center bg-white dark:bg-[#0f172a] p-6 rounded-xl border border-[var(--border)] overflow-x-auto">
                                     {code}
+                                </div>
+                            );
+                        }
+
+                        if (!inline && lang === "steps") {
+                            const steps = code
+                                .split("\n")
+                                .filter((line) => /^\d+\./.test(line.trim()))
+                                .map((line) => line.replace(/^\d+\.\s*/, "").trim());
+
+                            return (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8 not-prose">
+                                    {steps.map((step, i) => (
+                                        <div
+                                            key={i}
+                                            className="group flex gap-4 p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] items-start shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-black/10 hover:border-[var(--accent)]"
+                                        >
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[var(--background)] border border-[var(--border)] text-[var(--accent)] flex items-center justify-center font-bold text-sm shadow-inner group-hover:bg-[var(--accent)] group-hover:text-white transition-colors duration-300">
+                                                {i + 1}
+                                            </div>
+                                            <div className="text-[var(--text-muted)] text-[15px] font-medium leading-relaxed pt-0.5 group-hover:text-[var(--foreground)] transition-colors duration-300">
+                                                {step}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             );
                         }
