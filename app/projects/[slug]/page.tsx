@@ -30,7 +30,14 @@ async function highlightCode(code: string, lang: string) {
 }
 
 async function buildCodeHtmlByKey(content: string): Promise<Record<string, string>> {
-  const blocks = extractCodeBlocks(content).filter((block) => block.lang !== "mermaid" && block.lang !== "steps");
+  const blocks = extractCodeBlocks(content).filter(
+    (block) =>
+      block.lang !== "mermaid" &&
+      block.lang !== "steps" &&
+      block.lang !== "step" &&
+      block.lang !== "reflections" &&
+      block.lang !== "reflection"
+  );
   if (blocks.length === 0) return {};
 
   const entries = await Promise.all(

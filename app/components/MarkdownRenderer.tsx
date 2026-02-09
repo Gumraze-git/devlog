@@ -126,7 +126,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                             );
                         }
 
-                        if (!inline && lang === "steps") {
+                        if (!inline && (lang === "steps" || lang === "step")) {
                             const steps = code
                                 .split("\n")
                                 .filter((line) => /^\d+\./.test(line.trim()))
@@ -137,17 +137,57 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                     {steps.map((step, i) => (
                                         <div
                                             key={i}
-                                            className="group flex gap-4 p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] items-start shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-black/10 hover:border-[var(--accent)]"
+                                            className="group flex gap-4 p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] items-center shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-black/5 hover:border-[var(--accent)]"
                                         >
                                             <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[var(--background)] border border-[var(--border)] text-[var(--accent)] flex items-center justify-center font-bold text-sm shadow-inner group-hover:bg-[var(--accent)] group-hover:text-white transition-colors duration-300">
                                                 {i + 1}
                                             </div>
-                                            <div className="text-[var(--text-muted)] text-[15px] font-medium leading-relaxed pt-0.5 group-hover:text-[var(--foreground)] transition-colors duration-300">
+                                            <div className="text-[var(--text-muted)] text-[15px] font-bold leading-relaxed group-hover:text-[var(--foreground)] transition-all duration-300">
                                                 {step}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
+                            );
+                        }
+
+                        if (!inline && (lang === "reflections" || lang === "reflection")) {
+                            const numberedItems = code
+                                .split("\n")
+                                .filter((line) => /^\d+\./.test(line.trim()))
+                                .map((line) => line.replace(/^\d+\.\s*/, "").trim())
+                                .filter(Boolean);
+
+                            const paragraphItems = code
+                                .split(/\n{2,}/)
+                                .map((block) => block.replace(/\n/g, " ").trim())
+                                .filter(Boolean);
+
+                            const reflections = numberedItems.length > 0 ? numberedItems : paragraphItems;
+
+                            return (
+                                <section className="my-8 not-prose rounded-3xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 md:p-6 shadow-sm">
+                                    <div className="mb-4 flex items-center gap-3">
+                                        <span className="inline-flex h-8 items-center rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-[11px] font-semibold uppercase tracking-widest text-[var(--accent)]">
+                                            Reflection
+                                        </span>
+                                        <div className="h-px flex-1 bg-[var(--border)]" />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        {reflections.map((item, i) => (
+                                            <article
+                                                key={i}
+                                                className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-4 md:px-5"
+                                            >
+                                                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-soft)]">
+                                                    Insight {i + 1}
+                                                </p>
+                                                <p className="text-[15px] leading-relaxed text-[var(--text-muted)]">{item}</p>
+                                            </article>
+                                        ))}
+                                    </div>
+                                </section>
                             );
                         }
 
