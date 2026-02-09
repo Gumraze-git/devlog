@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import mermaid from "mermaid";
-import { createCodeKey, createSlugger, stripInlineMarkdown } from "../lib/markdown";
+import { createCodeKey, slugify, stripInlineMarkdown } from "../lib/markdown";
 
 // Initialize mermaid with some nice default styling
 mermaid.initialize({
@@ -27,7 +27,6 @@ interface MarkdownRendererProps {
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlByKey }) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const slugger = createSlugger();
     const codeHtmlMap = codeHtmlByKey ?? {};
     const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -80,32 +79,59 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         <div ref={containerRef} className="prose prose-lg prose-zinc dark:prose-invert max-w-none prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-relaxed prose-li:text-[var(--text-muted)] prose-li:leading-relaxed">
             <ReactMarkdown
                 components={{
+                    pre: ({ children }) => <>{children}</>,
+                    h1({ children, ...props }) {
+                        const text = stripInlineMarkdown(getTextContent(children));
+                        const slug = slugify(text);
+                        return (
+                            <h1 id={slug} className="scroll-mt-24 !mt-12 !mb-6" {...props}>
+                                {children}
+                            </h1>
+                        );
+                    },
                     h2({ children, ...props }) {
                         const text = stripInlineMarkdown(getTextContent(children));
-                        const slug = slugger(text);
+                        const slug = slugify(text);
                         return (
-                            <h2 id={slug} className="scroll-mt-24" {...props}>
+                            <h2 id={slug} className="scroll-mt-24 !mt-8 !mb-4" {...props}>
                                 {children}
                             </h2>
                         );
                     },
                     h3({ children, ...props }) {
                         const text = stripInlineMarkdown(getTextContent(children));
-                        const slug = slugger(text);
+                        const slug = slugify(text);
                         return (
-                            <h3 id={slug} className="scroll-mt-24" {...props}>
+                            <h3 id={slug} className="scroll-mt-24 !mt-6 !mb-3" {...props}>
                                 {children}
                             </h3>
                         );
                     },
                     h4({ children, ...props }) {
                         const text = stripInlineMarkdown(getTextContent(children));
-                        const slug = slugger(text);
+                        const slug = slugify(text);
                         return (
-                            <h4 id={slug} className="scroll-mt-24" {...props}>
+                            <h4 id={slug} className="scroll-mt-24 !mt-4 !mb-2" {...props}>
                                 {children}
                             </h4>
                         );
+                    },
+                    p({ children, ...props }) {
+                        const text = getTextContent(children);
+                        if (typeof text === "string" && text.trim().startsWith("|")) {
+                            const content = text.trim().substring(1).trim();
+                            const slug = slugify(content);
+                            return (
+                                <h2
+                                    id={slug}
+                                    className="scroll-mt-24 !mt-8 !mb-4 border-l-4 border-zinc-800 dark:border-zinc-200 pl-4 font-bold text-2xl tracking-tighter text-[var(--foreground)]"
+                                    {...props}
+                                >
+                                    {content}
+                                </h2>
+                            );
+                        }
+                        return <p {...props}>{children}</p>;
                     },
                     code({
                         inline,
