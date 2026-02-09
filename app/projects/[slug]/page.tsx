@@ -3,6 +3,7 @@ import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { ExternalLink, Github } from "lucide-react";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 
 import { getProject } from "../../lib/projects";
@@ -143,6 +144,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-[1.05]">
             {project.title}
           </h1>
+          {project.projectTitle && (
+            <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">
+              {project.projectTitle}
+            </p>
+          )}
           <p className="text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-3xl">
             {project.summary}
           </p>
@@ -167,14 +173,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
       <div className="grid md:grid-cols-[minmax(0,1fr)_260px] gap-10 lg:gap-14">
         {/* Left column: Main content */}
         <div className="space-y-12">
-          {/* Project Detailed Description - Separate Section */}
-          <section className="space-y-6 pt-6 border-t border-[var(--border)]">
-            <div className="flex items-end justify-between border-b border-[var(--border)] pb-4">
-              <h2 className="text-2xl font-bold tracking-tight">Project Detail</h2>
-              <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Details</span>
-            </div>
-            <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
-          </section>
+          <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
         </div>
 
         {/* Right column: Metadata summaries + TOC */}
@@ -182,6 +181,13 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 space-y-5">
             <div className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Project Facts</div>
             <div className="space-y-4">
+              {project.projectTitle && (
+                <div className="space-y-1">
+                  <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Project Name</h3>
+                  <p className="text-sm font-semibold text-[var(--text-muted)]">{project.projectTitle}</p>
+                </div>
+              )}
+
               <div className="space-y-1">
                 <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Period</h3>
                 <p className="text-sm font-mono text-[var(--text-soft)]">{project.period}</p>
@@ -213,9 +219,19 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
                     href={project.repo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium text-[var(--accent)] hover:underline flex items-center gap-1.5"
+                    className="group flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-3.5 transition-colors hover:border-[var(--accent)] hover:bg-[var(--card-muted)]"
                   >
-                    View on GitHub
+                    <span className="flex items-center gap-3">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card-subtle)] text-[var(--foreground)]">
+                        <Github size={18} aria-hidden />
+                      </span>
+                      <span className="text-base font-semibold text-[var(--foreground)]">GitHub</span>
+                    </span>
+                    <ExternalLink
+                      size={18}
+                      aria-hidden
+                      className="text-[var(--text-soft)] transition-colors group-hover:text-[var(--foreground)]"
+                    />
                   </a>
                 </div>
               )}
@@ -234,9 +250,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
                       <a
                         key={item.slug}
                         href={`#${item.slug}`}
-                        className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${
-                          item.depth === 3 ? "pl-4" : ""
-                        }`}
+                        className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${item.depth === 2 ? "pl-3" : item.depth === 3 ? "pl-6" : ""
+                          }`}
                       >
                         {item.text}
                       </a>
@@ -252,9 +267,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
                     <a
                       key={item.slug}
                       href={`#${item.slug}`}
-                      className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${
-                        item.depth === 3 ? "pl-4" : ""
-                      }`}
+                      className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${item.depth === 2 ? "pl-3" : item.depth === 3 ? "pl-6" : ""
+                        }`}
                     >
                       {item.text}
                     </a>

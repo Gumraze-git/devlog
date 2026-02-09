@@ -6,6 +6,7 @@ import matter from "gray-matter";
 export type ProjectMeta = {
   slug: string;
   title: string;
+  projectTitle?: string;
   summary: string;
   period: string;
   members: string;
@@ -38,6 +39,7 @@ export function getAllProjects(): Project[] {
       return {
         slug,
         title: data.title ?? slug,
+        projectTitle: data.project_title ?? data.projectTitle ?? "",
         summary: data.summary ?? "",
         period: data.period ?? "",
         members: data.members ?? "",
@@ -46,7 +48,7 @@ export function getAllProjects(): Project[] {
         education: Array.isArray(data.education) ? data.education : data.education ? [data.education] : [],
         date: data.date ?? "",
         role: data.role ?? "",
-        repo: data.repo,
+        repo: data.repo ?? data.github_link ?? data.githubLink,
         thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
         published: data.published !== false,
         content,
@@ -72,6 +74,7 @@ export function getProject(slug: string): Project | null {
   return {
     slug,
     title: data.title ?? slug,
+    projectTitle: data.project_title ?? data.projectTitle ?? "",
     summary: data.summary ?? "",
     period: data.period ?? "",
     members: data.members ?? "",
@@ -80,7 +83,7 @@ export function getProject(slug: string): Project | null {
     education: Array.isArray(data.education) ? data.education : data.education ? [data.education] : [],
     date: data.date ?? "",
     role: data.role ?? "",
-    repo: data.repo,
+    repo: data.repo ?? data.github_link ?? data.githubLink,
     thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
     published: data.published !== false,
     content,
