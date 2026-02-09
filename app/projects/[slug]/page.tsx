@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Github } from "lucide-react";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
+import ProjectTocLinks from "../../components/ProjectTocLinks";
 
 import { getProject } from "../../lib/projects";
 import { createCodeKey, extractCodeBlocks, extractHeadings } from "../../lib/markdown";
@@ -227,10 +228,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
         </div>
 
         {/* Right column: Metadata summaries + TOC */}
-        <aside className="space-y-6 md:sticky md:top-24 self-start">
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 space-y-5">
-            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Project Facts</div>
-            <div className="space-y-4">
+        <aside className="space-y-6">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 space-y-4">
+            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Project Overview</div>
+            <div className="space-y-3">
               {project.projectTitle && (
                 <div className="space-y-1">
                   <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Project Name</h3>
@@ -257,7 +258,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Tech Stack</h3>
                 {renderTechIcons(project.stack)}
               </div>
@@ -295,36 +296,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
                   <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
                     Contents
                   </summary>
-                  <nav aria-label="Table of contents" className="mt-4 space-y-2">
-                    {tocItems.map((item) => (
-                      <a
-                        key={item.slug}
-                        href={`#${item.slug}`}
-                        className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${item.depth === 2 ? "pl-3" : item.depth === 3 ? "pl-6" : ""
-                          }`}
-                      >
-                        {item.text}
-                      </a>
-                    ))}
+                  <nav aria-label="Table of contents" className="mt-4">
+                    <ProjectTocLinks items={tocItems} className="space-y-2" />
                   </nav>
                 </details>
               </div>
 
-              <nav aria-label="Table of contents" className="hidden md:block rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 space-y-3">
-                <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest">Contents</h3>
-                <div className="space-y-1.5">
-                  {tocItems.map((item) => (
-                    <a
-                      key={item.slug}
-                      href={`#${item.slug}`}
-                      className={`block text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors ${item.depth === 2 ? "pl-3" : item.depth === 3 ? "pl-6" : ""
-                        }`}
-                    >
-                      {item.text}
-                    </a>
-                  ))}
-                </div>
-              </nav>
+              <div className="hidden md:block md:sticky md:top-24">
+                <nav aria-label="Table of contents" className="rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 space-y-3 md:max-h-[calc(100vh-7rem)] md:overflow-y-auto">
+                  <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest">Contents</h3>
+                  <ProjectTocLinks items={tocItems} />
+                </nav>
+              </div>
             </>
           )}
         </aside>

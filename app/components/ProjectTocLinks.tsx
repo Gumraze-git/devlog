@@ -1,0 +1,132 @@
+"use client";
+
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import type { HeadingItem } from "../lib/markdown";
+
+type ProjectTocLinksProps = {
+  items: HeadingItem[];
+  className?: string;
+};
+
+export default function ProjectTocLinks({ items, className = "space-y-1.5" }: ProjectTocLinksProps) {
+  const clickLockRef = useRef<{ slug: string; expiresAt: number } | null>(null);
+  const [activeSlug, setActiveSlug] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      if (hash) return hash;
+    }
+    return items[0]?.slug ?? "";
+  });
+
+  useEffect(() => {
+    if (items.length === 0) return;
+
+    let rafId = 0;
+    let ticking = false;
+    const offsetTop = 140;
+    const clickLockDurationMs = 800;
+    const setActive = (slug: string) => {
+      setActiveSlug((prev) => (prev === slug ? prev : slug));
+    };
+
+    const updateActiveSlug = () => {
+      const targets = items
+        .map((item) => ({ slug: item.slug, element: document.getElementById(item.slug) }))
+        .filter((entry): entry is { slug: string; element: HTMLElement } => Boolean(entry.element));
+
+      if (targets.length === 0) return;
+
+      const lock = clickLockRef.current;
+      if (lock && lock.expiresAt > window.performance.now()) {
+        setActive(lock.slug);
+        const lockedTarget = targets.find((target) => target.slug === lock.slug);
+        if (lockedTarget && lockedTarget.element.getBoundingClientRect().top - offsetTop <= 4) {
+          clickLockRef.current = null;
+        }
+        return;
+      }
+      clickLockRef.current = null;
+
+      let current = targets[0].slug;
+
+      for (const target of targets) {
+        if (target.element.getBoundingClientRect().top - offsetTop <= 0) {
+          current = target.slug;
+        } else {
+          break;
+        }
+      }
+
+      setActive(current);
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      rafId = window.requestAnimationFrame(() => {
+        updateActiveSlug();
+        ticking = false;
+      });
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    const handleHashChange = () => {
+      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      if (hash) {
+        clickLockRef.current = {
+          slug: hash,
+          expiresAt: window.performance.now() + clickLockDurationMs,
+        };
+      }
+      requestUpdate();
+    };
+    window.addEventListener("hashchange", handleHashChange);
+
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [items]);
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>, slug: string) => {
+    clickLockRef.current = {
+      slug,
+      expiresAt: window.performance.now() + 800,
+    };
+    setActiveSlug(slug);
+
+    const details = event.currentTarget.closest("details");
+    if (details instanceof HTMLDetailsElement) {
+      details.open = false;
+    }
+  };
+
+  return (
+    <div className={className}>
+      {items.map((item, index) => {
+        const isActive = activeSlug === item.slug;
+        const indentClass = item.depth === 2 ? "pl-3" : item.depth === 3 ? "pl-6" : "";
+
+        return (
+          <a
+            key={`${item.slug}-${index}`}
+            href={`#${item.slug}`}
+            aria-current={isActive ? "location" : undefined}
+            onClick={(event) => handleClick(event, item.slug)}
+            className={`block rounded-md text-sm transition-colors ${indentClass} ${
+              isActive
+                ? "font-semibold text-[var(--foreground)]"
+                : "text-[var(--text-muted)] hover:text-[var(--foreground)]"
+            }`}
+          >
+            <span>{item.text}</span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
