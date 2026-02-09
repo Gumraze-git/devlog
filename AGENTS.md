@@ -39,6 +39,7 @@ This file gives coding agents the project-specific context needed to work safely
 - Devlog list is built from Velog RSS in `app/lib/posts.ts` (`getAllPostsWithVelog`). Local devlog files are only used by the detail page and should live in `posts/devlog/` if you add them.
 - Projects and education content are parsed from `posts/projects/` and `posts/education/` via `app/lib/projects.ts` and `app/lib/education.ts` (front matter required).
 - Markdown rendering (including `mermaid`) uses `app/components/MarkdownRenderer.tsx`. Reuse this component for new markdown pages.
+- For project troubleshooting accordions, use `~~~troubleshooting` blocks with labeled sections: `제목:`, `문제:`, `원인:`, `해결:`, `결과:`. Each section can contain multiline markdown and fenced code blocks.
 - Remote images must be whitelisted in `next.config.ts` (`images.remotePatterns`).
 
 ## Frontend development guidelines
