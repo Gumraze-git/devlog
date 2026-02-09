@@ -86,7 +86,7 @@ export function extractHeadings(content: string): HeadingItem[] {
     headings.push({
       depth,
       text,
-      slug: slugify(text),
+      slug: slugger(text),
     });
   }
 

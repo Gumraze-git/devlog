@@ -21,6 +21,50 @@ export const dynamicParams = true;
 
 const codeHtmlCache = new Map<string, string>();
 const shikiThemes = { light: "vitesse-light", dark: "vitesse-dark" } as const;
+const troubleshootingLangs = new Set(["troubleshooting", "trouble", "troubleshoot"]);
+const customRenderedLangs = new Set([
+  "mermaid",
+  "steps",
+  "step",
+  "reflections",
+  "reflection",
+  ...troubleshootingLangs,
+]);
+
+function extractBacktickCodeBlocks(source: string): Array<{ lang: string; code: string }> {
+  const blocks: Array<{ lang: string; code: string }> = [];
+  const lines = source.split("\n");
+  let inFence = false;
+  let lang = "text";
+  let buffer: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const fenceMatch = /^```(.*)$/.exec(trimmed);
+
+    if (!inFence) {
+      if (!fenceMatch) continue;
+      inFence = true;
+      const info = fenceMatch[1].trim();
+      const token = info.split(/\s+/)[0] ?? "";
+      lang = token.replace(/^language-/, "") || "text";
+      buffer = [];
+      continue;
+    }
+
+    if (fenceMatch) {
+      blocks.push({ lang, code: buffer.join("\n").replace(/\n$/, "") });
+      inFence = false;
+      lang = "text";
+      buffer = [];
+      continue;
+    }
+
+    buffer.push(line);
+  }
+
+  return blocks;
+}
 
 async function highlightCode(code: string, lang: string) {
   try {
@@ -31,14 +75,20 @@ async function highlightCode(code: string, lang: string) {
 }
 
 async function buildCodeHtmlByKey(content: string): Promise<Record<string, string>> {
-  const blocks = extractCodeBlocks(content).filter(
-    (block) =>
-      block.lang !== "mermaid" &&
-      block.lang !== "steps" &&
-      block.lang !== "step" &&
-      block.lang !== "reflections" &&
-      block.lang !== "reflection"
-  );
+  const blocks = extractCodeBlocks(content).flatMap((block) => {
+    const normalizedLang = block.lang.trim().toLowerCase();
+
+    if (troubleshootingLangs.has(normalizedLang)) {
+      return extractBacktickCodeBlocks(block.code);
+    }
+
+    if (customRenderedLangs.has(normalizedLang)) {
+      return [];
+    }
+
+    return [block];
+  });
+
   if (blocks.length === 0) return {};
 
   const entries = await Promise.all(
