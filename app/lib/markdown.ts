@@ -22,7 +22,7 @@ export function stripInlineMarkdown(text: string): string {
     .trim();
 }
 
-function baseSlugify(value: string): string {
+export function slugify(value: string): string {
   const cleaned = value
     .toLowerCase()
     .replace(/['"`]/g, "")
@@ -38,7 +38,7 @@ export function createSlugger() {
   const counts = new Map<string, number>();
 
   return (value: string) => {
-    const base = baseSlugify(value);
+    const base = slugify(value);
     const current = counts.get(base) ?? 0;
     counts.set(base, current + 1);
     if (current === 0) return base;
@@ -75,7 +75,7 @@ export function extractHeadings(content: string): HeadingItem[] {
 
     if (inCodeBlock) continue;
 
-    const match = /^(#{2,4})\s+(.+)$/.exec(trimmed);
+    const match = /^(#{1,4})\s+(.+)$/.exec(trimmed);
     if (!match) continue;
 
     const depth = match[1].length;
@@ -86,7 +86,7 @@ export function extractHeadings(content: string): HeadingItem[] {
     headings.push({
       depth,
       text,
-      slug: slugger(text),
+      slug: slugify(text),
     });
   }
 
