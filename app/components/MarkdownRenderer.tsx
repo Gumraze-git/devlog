@@ -1,24 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import mermaid from "mermaid";
 import { createCodeKey, extractHeadingSlugByLine, slugify, stripInlineMarkdown } from "../lib/markdown";
-
-// Initialize mermaid with some nice default styling
-mermaid.initialize({
-    startOnLoad: true,
-    theme: "base",
-    themeVariables: {
-        primaryColor: "#3b82f6",
-        primaryTextColor: "#ffffff",
-        primaryBorderColor: "#1d4ed8",
-        lineColor: "#94a3b8",
-        secondaryColor: "#f1f5f9",
-        tertiaryColor: "#ffffff",
-    },
-    securityLevel: "loose",
-});
+import MermaidDiagram from "./MermaidDiagram";
 
 interface MarkdownRendererProps {
     content: string;
@@ -164,7 +149,6 @@ function buildTroubleSummary(sections: TroubleContent): string {
 }
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlByKey }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
     const codeHtmlMap = codeHtmlByKey ?? {};
     const [copiedKey, setCopiedKey] = useState<string | null>(null);
     const headingSlugByLine = useMemo(() => extractHeadingSlugByLine(content), [content]);
@@ -184,13 +168,6 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
 
         return "";
     };
-
-    useEffect(() => {
-        // Re-render mermaid diagrams whenever content changes
-        if (containerRef.current) {
-            mermaid.contentLoaded();
-        }
-    }, [content]);
 
     const copyToClipboard = async (value: string, key: string) => {
         try {
@@ -227,9 +204,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
 
         if (!inline && lang === "mermaid") {
             return (
-                <div className="mermaid my-8 flex justify-center bg-white dark:bg-[#0f172a] p-6 rounded-xl border border-[var(--border)] overflow-x-auto">
-                    {code}
-                </div>
+                <MermaidDiagram code={code} />
             );
         }
 
@@ -432,7 +407,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     };
 
     return (
-        <div ref={containerRef} className="prose prose-lg prose-zinc dark:prose-invert max-w-none prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-relaxed prose-li:text-[var(--text-muted)] prose-li:leading-relaxed">
+        <div className="prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-loose prose-li:text-[var(--text-muted)] prose-li:leading-loose">
             <ReactMarkdown
                 components={{
                     pre: ({ children }) => <>{children}</>,

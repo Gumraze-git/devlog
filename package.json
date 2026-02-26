@@ -21,6 +21,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-markdown": "^10.1.0",
+    "react-svg-pan-zoom": "^3.13.1",
     "rss-parser": "^3.13.0",
     "shiki": "^1.29.2",
     "typewriter-effect": "^2.22.0"

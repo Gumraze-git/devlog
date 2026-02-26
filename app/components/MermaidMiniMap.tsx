@@ -1,0 +1,134 @@
+import type { ReactNode } from "react";
+import type { ViewerValue } from "react-svg-pan-zoom";
+
+type MiniMapPosition = "left" | "right";
+
+interface MermaidMiniMapProps {
+  value: ViewerValue;
+  children?: ReactNode;
+  background?: string;
+  position?: MiniMapPosition;
+  width?: number;
+  height?: number;
+  svgMinX: number;
+  svgMinY: number;
+  svgWidth: number;
+  svgHeight: number;
+}
+
+type Point = {
+  x: number;
+  y: number;
+};
+
+type Rect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+function invertViewerPoint(value: ViewerValue, viewerX: number, viewerY: number): Point | null {
+  const { a, b, c, d, e, f } = value;
+  const determinant = a * d - b * c;
+  if (Math.abs(determinant) < 1e-9) return null;
+
+  const dx = viewerX - e;
+  const dy = viewerY - f;
+
+  return {
+    x: (d * dx - c * dy) / determinant,
+    y: (-b * dx + a * dy) / determinant,
+  };
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function computeViewportRect(
+  value: ViewerValue,
+  svgMinX: number,
+  svgMinY: number,
+  svgWidth: number,
+  svgHeight: number,
+): Rect | null {
+  const topLeft = invertViewerPoint(value, 0, 0);
+  const bottomRight = invertViewerPoint(value, value.viewerWidth, value.viewerHeight);
+  if (!topLeft || !bottomRight) return null;
+
+  const rawLeft = Math.min(topLeft.x, bottomRight.x);
+  const rawTop = Math.min(topLeft.y, bottomRight.y);
+  const rawRight = Math.max(topLeft.x, bottomRight.x);
+  const rawBottom = Math.max(topLeft.y, bottomRight.y);
+
+  const minX = svgMinX;
+  const minY = svgMinY;
+  const maxX = svgMinX + svgWidth;
+  const maxY = svgMinY + svgHeight;
+
+  const left = clamp(rawLeft, minX, maxX);
+  const top = clamp(rawTop, minY, maxY);
+  const right = clamp(rawRight, minX, maxX);
+  const bottom = clamp(rawBottom, minY, maxY);
+
+  const width = Math.max(0, right - left);
+  const height = Math.max(0, bottom - top);
+  if (width === 0 || height === 0) return null;
+
+  return { x: left, y: top, width, height };
+}
+
+export default function MermaidMiniMap({
+  value,
+  children,
+  background = "rgba(2, 6, 23, 0.78)",
+  position = "left",
+  width = 220,
+  height = 140,
+  svgMinX,
+  svgMinY,
+  svgWidth,
+  svgHeight,
+}: MermaidMiniMapProps) {
+  const zoomToFit = Math.min(width / svgWidth, height / svgHeight);
+  const offsetX = (width - svgWidth * zoomToFit) / 2 - svgMinX * zoomToFit;
+  const offsetY = (height - svgHeight * zoomToFit) / 2 - svgMinY * zoomToFit;
+
+  const viewportRect = computeViewportRect(value, svgMinX, svgMinY, svgWidth, svgHeight);
+
+  return (
+    <div
+      className={`mermaid-minimap mermaid-minimap--${position}`}
+      style={{
+        width,
+        height,
+        background,
+      }}
+      aria-hidden="true"
+    >
+      <svg width={width} height={height}>
+        <g transform={`translate(${offsetX} ${offsetY}) scale(${zoomToFit})`}>
+          <rect
+            x={svgMinX}
+            y={svgMinY}
+            width={svgWidth}
+            height={svgHeight}
+            fill="#ffffff"
+            opacity="0.92"
+          />
+          {children}
+          {viewportRect && (
+            <rect
+              className="mermaid-minimap__viewport"
+              x={viewportRect.x}
+              y={viewportRect.y}
+              width={viewportRect.width}
+              height={viewportRect.height}
+            />
+          )}
+        </g>
+      </svg>
+    </div>
+  );
+}
