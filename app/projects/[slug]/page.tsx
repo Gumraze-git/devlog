@@ -201,7 +201,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </p>
           )}
           <p
-            className={`text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-3xl ${project.projectTitle ? "mt-3" : "mt-4"
+            className={`text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-4xl ${project.projectTitle ? "mt-3" : "mt-4"
               }`}
           >
             {project.summary}
@@ -278,7 +278,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           {tocItems.length > 0 && (
             <>
               <div className="md:hidden">
-                <details className="rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-4">
+                <details className="p-4">
                   <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
                     Contents
                   </summary>
@@ -289,8 +289,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
               </div>
 
               <div className="hidden md:block md:sticky md:top-24">
-                <nav aria-label="Table of contents" className="rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 space-y-3 md:max-h-[calc(100vh-7rem)] md:overflow-y-auto">
-                  <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest">Contents</h3>
+                <nav aria-label="Table of contents" className="p-4 space-y-3 md:max-h-[calc(100vh-7rem)] md:overflow-y-auto">
+                  <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest pl-3 border-l-2 border-[var(--accent)]">Contents</h3>
                   <ProjectTocLinks items={tocItems} />
                 </nav>
               </div>
