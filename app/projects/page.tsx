@@ -32,18 +32,18 @@ function ProjectRow({ project }: { project: Project }) {
 
         <div className="space-y-3 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-soft)]">
+              {(project.period || "Ongoing").replace(/~/g, "-")}
+            </span>
             {project.role && (
               <>
+                <span className="text-[10px] text-[var(--border-muted)]">•</span>
                 <span className="flex items-center gap-1 text-xs font-medium text-[var(--text-muted)]">
                   <User className="h-3.5 w-3.5 text-[var(--text-soft)]" />
                   <span>{project.role}</span>
                 </span>
-                <span className="text-[10px] text-[var(--border-muted)]">•</span>
               </>
             )}
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-soft)]">
-              {(project.period || "Ongoing").replace(/~/g, "-")}
-            </span>
           </div>
 
           <h2 className="text-2xl font-bold leading-tight text-[var(--foreground)] transition-colors group-hover:text-[var(--accent-strong)]">
