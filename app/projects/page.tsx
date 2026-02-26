@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { User, Users } from "lucide-react";
 
 import { getAllProjects, type Project } from "../lib/projects";
 import { getTechIconMeta } from "../data/skills";
@@ -34,7 +35,7 @@ function renderTechStack(stack: string[]) {
               <span className="relative h-3.5 w-3.5">
                 <Image src={meta.icon} alt={meta.label} fill sizes="14px" className="object-contain" />
               </span>
-              <span className="text-[11px] font-medium text-[var(--text-muted)]">{meta.label}</span>
+              <span className="text-xs font-medium text-[var(--text-muted)]">{meta.label}</span>
             </span>
           );
         }
@@ -42,7 +43,7 @@ function renderTechStack(stack: string[]) {
         return (
           <span
             key={`${tech}-${index}`}
-            className="rounded-full border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-[11px] font-medium text-[var(--text-muted)]"
+            className="rounded-full border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-xs font-medium text-[var(--text-muted)]"
           >
             {tech}
           </span>
@@ -59,7 +60,7 @@ function ProjectRow({ project }: { project: Project }) {
     <Link
       href={`/projects/${project.slug}`}
       aria-label={`${project.title} 상세 페이지로 이동`}
-      className="group block border-b border-[var(--border-muted)] px-1 py-6"
+      className="group block border-b border-[var(--border-muted)] py-6 transition-all hover:bg-[var(--card-subtle)] hover:border-transparent sm:-mx-4 sm:rounded-2xl sm:px-4"
     >
       <div className="grid gap-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
         <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)]">
@@ -75,7 +76,7 @@ function ProjectRow({ project }: { project: Project }) {
         <div className="space-y-3 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-soft)]">
-              {project.period || "Ongoing"}
+              {(project.period || "Ongoing").replace(/~/g, "-")}
             </span>
             <span className="rounded-full border border-[var(--border)] bg-[var(--card)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
               {status}
@@ -90,9 +91,19 @@ function ProjectRow({ project }: { project: Project }) {
             {project.summary || "Click to view details."}
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--text-soft)]">
-            {project.role && <span>Role: {project.role}</span>}
-            {project.members && <span>Team: {project.members}</span>}
+          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--text-muted)]">
+            {project.role && (
+              <span className="flex items-center gap-1.5">
+                <User className="h-4 w-4 text-[var(--text-soft)]" />
+                <span>{project.role}</span>
+              </span>
+            )}
+            {project.members && (
+              <span className="flex items-center gap-1.5">
+                <Users className="h-4 w-4 text-[var(--text-soft)]" />
+                <span>{project.members}</span>
+              </span>
+            )}
           </div>
 
           {renderTechStack(project.stack)}
@@ -158,8 +169,8 @@ function ProjectsSkeleton() {
 export default function ProjectsListPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-      <header className="space-y-4 border-b border-[var(--border-muted)] pb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">Archive</p>
+      <header className="space-y-3 border-b border-[var(--border-muted)] pb-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">Archive</p>
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">Project</h1>
       </header>
 
