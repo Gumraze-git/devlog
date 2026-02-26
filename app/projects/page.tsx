@@ -32,6 +32,15 @@ function ProjectRow({ project }: { project: Project }) {
 
         <div className="space-y-3 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
+            {project.role && (
+              <>
+                <span className="flex items-center gap-1 text-xs font-medium text-[var(--text-muted)]">
+                  <User className="h-3.5 w-3.5 text-[var(--text-soft)]" />
+                  <span>{project.role}</span>
+                </span>
+                <span className="text-[10px] text-[var(--border-muted)]">•</span>
+              </>
+            )}
             <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-soft)]">
               {(project.period || "Ongoing").replace(/~/g, "-")}
             </span>
@@ -44,15 +53,6 @@ function ProjectRow({ project }: { project: Project }) {
           <p className="text-[var(--text-muted)] leading-relaxed line-clamp-2">
             {project.summary || "Click to view details."}
           </p>
-
-          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--text-muted)]">
-            {project.role && (
-              <span className="flex items-center gap-1.5">
-                <User className="h-4 w-4 text-[var(--text-soft)]" />
-                <span>{project.role}</span>
-              </span>
-            )}
-          </div>
         </div>
       </div>
     </Link>
