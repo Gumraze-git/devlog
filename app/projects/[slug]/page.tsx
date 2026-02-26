@@ -267,36 +267,46 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
         )}
       </section>
 
-      <div className="grid md:grid-cols-[minmax(0,1fr)_260px] gap-10 lg:gap-14">
-        {/* Left column: Main content */}
+      <div className="relative">
+        {/* Left column: Main content (Now single column) */}
         <div className="space-y-12">
           <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
         </div>
 
-        {/* Right column: TOC */}
-        <aside className="space-y-6">
+        {/* Right floating TOC (Hover to show on Desktop) */}
+        <aside className="md:hidden mt-12">
           {tocItems.length > 0 && (
-            <>
-              <div className="md:hidden">
-                <details className="p-4">
-                  <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
-                    Contents
-                  </summary>
-                  <nav aria-label="Table of contents" className="mt-4">
-                    <ProjectTocLinks items={tocItems} className="space-y-2" />
-                  </nav>
-                </details>
+            <details className="p-4 bg-[var(--card-subtle)] rounded-2xl border border-[var(--border)]">
+              <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
+                Contents
+              </summary>
+              <nav aria-label="Table of contents" className="mt-4">
+                <ProjectTocLinks items={tocItems} className="space-y-2" />
+              </nav>
+            </details>
+          )}
+        </aside>
+
+        {tocItems.length > 0 && (
+          <aside className="hidden md:block fixed top-1/2 right-0 -translate-y-1/2 z-50">
+            {/* The invisible trigger area to make hovering easier */}
+            <div className="group flex items-center justify-end w-64 translate-x-[calc(100%-1.5rem)] hover:translate-x-0 transition-transform duration-500 ease-out">
+
+              {/* Handle indicator */}
+              <div className="flex items-center justify-center w-6 h-16 bg-[var(--card)] border border-r-0 border-[var(--border)] rounded-l-xl shadow-sm cursor-pointer opacity-50 group-hover:opacity-100 transition-opacity">
+                <div className="w-1 h-6 bg-[var(--border)] rounded-full group-hover:bg-[var(--accent)] transition-colors" />
               </div>
 
-              <div className="hidden md:block md:sticky md:top-24">
-                <nav aria-label="Table of contents" className="p-4 space-y-3 md:max-h-[calc(100vh-7rem)] md:overflow-y-auto">
+              {/* TOC Panel */}
+              <div className="w-[calc(100%-1.5rem)] bg-[var(--card)]/90 backdrop-blur-md border border-[var(--border)] shadow-2xl rounded-l-2xl p-6">
+                <nav aria-label="Table of contents" className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
                   <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest pl-3 border-l-2 border-[var(--accent)]">Contents</h3>
                   <ProjectTocLinks items={tocItems} />
                 </nav>
               </div>
-            </>
-          )}
-        </aside>
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   );
