@@ -149,7 +149,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
 
   const renderTechIcons = (techs: string[]) => {
     return (
-      <div className="flex flex-wrap gap-5 mt-3 items-center">
+      <div className="flex flex-wrap gap-4 items-center">
         {techs.map((tech, index) => {
           const meta = getTechIconMeta(tech);
           if (meta?.icon) {
@@ -208,8 +208,51 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           </p>
         </div>
 
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 py-8 border-y border-[var(--border-muted)] !mt-10">
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Period</h3>
+            <p className="text-sm font-mono text-[var(--text-soft)]">{project.period}</p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Role</h3>
+            <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line leading-relaxed">
+              {project.role || "Backend Developer"}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Team</h3>
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+              {project.members}
+            </p>
+          </div>
+
+          {project.repo && (
+            <div className="space-y-2">
+              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Source</h3>
+              <a
+                href={project.repo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--foreground)] hover:text-[var(--accent)] transition-colors"
+                aria-label="GitHub Repository"
+              >
+                <Github size={16} aria-hidden />
+                GitHub
+                <ExternalLink size={14} className="opacity-50" />
+              </a>
+            </div>
+          )}
+
+          <div className="col-span-2 lg:col-span-4 space-y-4 pt-2">
+            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Tech Stack</h3>
+            {renderTechIcons(project.stack)}
+          </div>
+        </div>
+
         {project.thumbnail && (
-          <div className="w-full">
+          <div className="w-full !mt-12">
             <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
               <Image
                 src={project.thumbnail}
@@ -230,68 +273,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
         </div>
 
-        {/* Right column: Metadata summaries + TOC */}
+        {/* Right column: TOC */}
         <aside className="space-y-6">
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 space-y-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Project Overview</div>
-            <div className="space-y-3">
-              {project.projectTitle && (
-                <div className="space-y-1">
-                  <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Project Name</h3>
-                  <p className="text-sm font-semibold text-[var(--text-muted)]">{project.projectTitle}</p>
-                </div>
-              )}
-
-              <div className="space-y-1">
-                <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Period</h3>
-                <p className="text-sm font-mono text-[var(--text-soft)]">{project.period}</p>
-              </div>
-
-              <div className="space-y-1">
-                <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Role</h3>
-                <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line leading-relaxed">
-                  {project.role || "Backend Developer"}
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Team</h3>
-                <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                  {project.members}
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Tech Stack</h3>
-                {renderTechIcons(project.stack)}
-              </div>
-
-              {project.repo && (
-                <div className="space-y-1">
-                  <h3 className="text-[10px] font-semibold text-[var(--foreground)] uppercase tracking-widest">Source</h3>
-                  <a
-                    href={project.repo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-3.5 transition-colors hover:border-[var(--accent)] hover:bg-[var(--card-muted)]"
-                  >
-                    <span className="flex items-center gap-3">
-                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card-subtle)] text-[var(--foreground)]">
-                        <Github size={18} aria-hidden />
-                      </span>
-                      <span className="text-base font-semibold text-[var(--foreground)]">GitHub</span>
-                    </span>
-                    <ExternalLink
-                      size={18}
-                      aria-hidden
-                      className="text-[var(--text-soft)] transition-colors group-hover:text-[var(--foreground)]"
-                    />
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
-
           {tocItems.length > 0 && (
             <>
               <div className="md:hidden">
