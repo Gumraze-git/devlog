@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { User, Users } from "lucide-react";
+import { User } from "lucide-react";
 
 import { getAllProjects, type Project } from "../lib/projects";
-import { getTechIconMeta } from "../data/skills";
 
 export const dynamic = "force-dynamic";
 
@@ -13,49 +12,7 @@ export const metadata: Metadata = {
   description: "프로젝트 경험과 기술 스택을 정리한 목록입니다.",
 };
 
-function getStatus(period: string) {
-  return /진행중|ongoing/i.test(period ?? "") ? "IN PROGRESS" : "COMPLETED";
-}
-
-function renderTechStack(stack: string[]) {
-  if (!stack || stack.length === 0) return null;
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {stack.slice(0, 6).map((tech, index) => {
-        const meta = getTechIconMeta(tech);
-
-        if (meta?.icon) {
-          return (
-            <span
-              key={`${tech}-${index}`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] px-2 py-1"
-              title={meta.label}
-            >
-              <span className="relative h-3.5 w-3.5">
-                <Image src={meta.icon} alt={meta.label} fill sizes="14px" className="object-contain" />
-              </span>
-              <span className="text-xs font-medium text-[var(--text-muted)]">{meta.label}</span>
-            </span>
-          );
-        }
-
-        return (
-          <span
-            key={`${tech}-${index}`}
-            className="rounded-full border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-xs font-medium text-[var(--text-muted)]"
-          >
-            {tech}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
 function ProjectRow({ project }: { project: Project }) {
-  const status = getStatus(project.period);
-
   return (
     <Link
       href={`/projects/${project.slug}`}
@@ -78,9 +35,6 @@ function ProjectRow({ project }: { project: Project }) {
             <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-soft)]">
               {(project.period || "Ongoing").replace(/~/g, "-")}
             </span>
-            <span className="rounded-full border border-[var(--border)] bg-[var(--card)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-              {status}
-            </span>
           </div>
 
           <h2 className="text-2xl font-bold leading-tight text-[var(--foreground)] transition-colors group-hover:text-[var(--accent-strong)]">
@@ -98,15 +52,7 @@ function ProjectRow({ project }: { project: Project }) {
                 <span>{project.role}</span>
               </span>
             )}
-            {project.members && (
-              <span className="flex items-center gap-1.5">
-                <Users className="h-4 w-4 text-[var(--text-soft)]" />
-                <span>{project.members}</span>
-              </span>
-            )}
           </div>
-
-          {renderTechStack(project.stack)}
         </div>
       </div>
     </Link>
