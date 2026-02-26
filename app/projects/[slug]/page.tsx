@@ -183,130 +183,132 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
 
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28">
-      <section className="space-y-6 mb-12">
-        <BackToPreviousLink
-          fallbackHref="/projects"
-          className="inline-flex items-center text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors uppercase tracking-widest"
-        >
-          ← Back
-        </BackToPreviousLink>
-
-        <div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-[1.05]">
-            {project.title}
-          </h1>
-          {project.projectTitle && (
-            <p className="mt-4 text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">
-              {project.projectTitle}
-            </p>
-          )}
-          <p
-            className={`text-lg md:text-xl text-[var(--text-muted)] font-medium leading-relaxed max-w-4xl ${project.projectTitle ? "mt-3" : "mt-4"
-              }`}
+      <div className="max-w-4xl mx-auto w-full">
+        <section className="space-y-6 mb-12">
+          <BackToPreviousLink
+            fallbackHref="/projects"
+            className="inline-flex items-center text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors uppercase tracking-widest"
           >
-            {project.summary}
-          </p>
-        </div>
+            ← Back
+          </BackToPreviousLink>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 py-8 border-y border-[var(--border-muted)] !mt-10">
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Period</h3>
-            <p className="text-sm font-mono text-[var(--text-soft)]">{project.period}</p>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Role</h3>
-            <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line leading-relaxed">
-              {project.role || "Backend Developer"}
+          <div>
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tighter leading-[1.1]">
+              {project.title}
+            </h1>
+            {project.projectTitle && (
+              <p className="mt-4 text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">
+                {project.projectTitle}
+              </p>
+            )}
+            <p
+              className={`text-base md:text-lg text-[var(--text-muted)] font-medium leading-loose max-w-4xl ${project.projectTitle ? "mt-3" : "mt-4"
+                }`}
+            >
+              {project.summary}
             </p>
           </div>
 
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Team</h3>
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-              {project.members}
-            </p>
-          </div>
-
-          {project.repo && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 py-8 border-y border-[var(--border-muted)] !mt-10">
             <div className="space-y-2">
-              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Source</h3>
-              <a
-                href={project.repo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--foreground)] hover:text-[var(--accent)] transition-colors"
-                aria-label="GitHub Repository"
-              >
-                <Github size={16} aria-hidden />
-                GitHub
-                <ExternalLink size={14} className="opacity-50" />
-              </a>
+              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Period</h3>
+              <p className="text-sm font-mono text-[var(--text-soft)]">{project.period}</p>
             </div>
-          )}
 
-          <div className="col-span-2 lg:col-span-4 space-y-4 pt-2">
-            <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Tech Stack</h3>
-            {renderTechIcons(project.stack)}
-          </div>
-        </div>
-
-        {project.thumbnail && (
-          <div className="w-full !mt-12">
-            <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
-              <Image
-                src={project.thumbnail}
-                alt={project.title}
-                fill
-                sizes="(max-width: 1200px) 100vw, 1200px"
-                className="object-cover"
-                priority
-              />
+            <div className="space-y-2">
+              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Role</h3>
+              <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line leading-relaxed">
+                {project.role || "Backend Developer"}
+              </p>
             </div>
-          </div>
-        )}
-      </section>
 
-      <div className="relative">
-        {/* Left column: Main content (Now single column) */}
-        <div className="space-y-12">
-          <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
-        </div>
+            <div className="space-y-2">
+              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Team</h3>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                {project.members}
+              </p>
+            </div>
 
-        {/* Right floating TOC (Hover to show on Desktop) */}
-        <aside className="md:hidden mt-12">
-          {tocItems.length > 0 && (
-            <details className="p-4 bg-[var(--card-subtle)] rounded-2xl border border-[var(--border)]">
-              <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
-                Contents
-              </summary>
-              <nav aria-label="Table of contents" className="mt-4">
-                <ProjectTocLinks items={tocItems} className="space-y-2" />
-              </nav>
-            </details>
-          )}
-        </aside>
-
-        {tocItems.length > 0 && (
-          <aside className="hidden md:block fixed top-1/2 right-0 -translate-y-1/2 z-50">
-            {/* The invisible trigger area to make hovering easier */}
-            <div className="group flex items-center justify-end w-64 translate-x-[calc(100%-1.5rem)] hover:translate-x-0 transition-transform duration-500 ease-out">
-
-              {/* Handle indicator */}
-              <div className="flex items-center justify-center w-6 h-16 bg-[var(--card)] border border-r-0 border-[var(--border)] rounded-l-xl shadow-sm cursor-pointer opacity-50 group-hover:opacity-100 transition-opacity">
-                <div className="w-1 h-6 bg-[var(--border)] rounded-full group-hover:bg-[var(--accent)] transition-colors" />
+            {project.repo && (
+              <div className="space-y-2">
+                <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Source</h3>
+                <a
+                  href={project.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--foreground)] hover:text-[var(--accent)] transition-colors"
+                  aria-label="GitHub Repository"
+                >
+                  <Github size={16} aria-hidden />
+                  GitHub
+                  <ExternalLink size={14} className="opacity-50" />
+                </a>
               </div>
+            )}
 
-              {/* TOC Panel */}
-              <div className="w-[calc(100%-1.5rem)] bg-[var(--card)]/90 backdrop-blur-md border border-[var(--border)] shadow-2xl rounded-l-2xl p-6">
-                <nav aria-label="Table of contents" className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                  <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest pl-3 border-l-2 border-[var(--accent)]">Contents</h3>
-                  <ProjectTocLinks items={tocItems} />
+            <div className="col-span-2 lg:col-span-4 space-y-4 pt-2">
+              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Tech Stack</h3>
+              {renderTechIcons(project.stack)}
+            </div>
+          </div>
+
+          {project.thumbnail && (
+            <div className="w-full !mt-12">
+              <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
+                <Image
+                  src={project.thumbnail}
+                  alt={project.title}
+                  fill
+                  sizes="(max-width: 1200px) 100vw, 1200px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </div>
+          )}
+        </section>
+
+        <div className="relative">
+          {/* Left column: Main content (Now single column) */}
+          <div className="space-y-12">
+            <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
+          </div>
+
+          {/* Right floating TOC (Hover to show on Desktop) */}
+          <aside className="md:hidden mt-12">
+            {tocItems.length > 0 && (
+              <details className="p-4 bg-[var(--card-subtle)] rounded-2xl border border-[var(--border)]">
+                <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
+                  Contents
+                </summary>
+                <nav aria-label="Table of contents" className="mt-4">
+                  <ProjectTocLinks items={tocItems} className="space-y-2" />
                 </nav>
-              </div>
-            </div>
+              </details>
+            )}
           </aside>
-        )}
+
+          {tocItems.length > 0 && (
+            <aside className="hidden md:block fixed top-1/2 right-0 -translate-y-1/2 z-[100]">
+              {/* The invisible trigger area to make hovering easier */}
+              <div className="group flex items-center justify-end w-64 translate-x-[calc(100%-1.5rem)] hover:translate-x-0 transition-transform duration-500 ease-out">
+
+                {/* Handle indicator */}
+                <div className="flex items-center justify-center w-6 h-16 bg-[var(--card)] border border-r-0 border-[var(--border)] rounded-l-xl shadow-sm cursor-pointer opacity-50 group-hover:opacity-100 transition-opacity">
+                  <div className="w-1 h-6 bg-[var(--border)] rounded-full group-hover:bg-[var(--accent)] transition-colors" />
+                </div>
+
+                {/* TOC Panel */}
+                <div className="w-[calc(100%-1.5rem)] bg-[var(--card)]/90 backdrop-blur-md border border-[var(--border)] shadow-2xl rounded-l-2xl p-6">
+                  <nav aria-label="Table of contents" className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                    <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest pl-3 border-l-2 border-[var(--accent)]">Contents</h3>
+                    <ProjectTocLinks items={tocItems} />
+                  </nav>
+                </div>
+              </div>
+            </aside>
+          )}
+        </div>
       </div>
     </div>
   );
