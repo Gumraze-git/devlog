@@ -82,7 +82,6 @@ function computeViewportRect(
 export default function MermaidMiniMap({
   value,
   children,
-  background = "rgba(2, 6, 23, 0.78)",
   position = "left",
   width = 220,
   height = 140,
@@ -103,20 +102,11 @@ export default function MermaidMiniMap({
       style={{
         width,
         height,
-        background,
       }}
       aria-hidden="true"
     >
       <svg width={width} height={height}>
         <g transform={`translate(${offsetX} ${offsetY}) scale(${zoomToFit})`}>
-          <rect
-            x={svgMinX}
-            y={svgMinY}
-            width={svgWidth}
-            height={svgHeight}
-            fill="#ffffff"
-            opacity="0.92"
-          />
           {children}
           {viewportRect && (
             <rect

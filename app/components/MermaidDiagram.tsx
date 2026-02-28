@@ -51,6 +51,8 @@ function getThemeVariables(mode: MermaidThemeMode) {
       lineColor: "#94a3b8",
       secondaryColor: "#0f172a",
       tertiaryColor: "#020617",
+      edgeLabelBackground: "#1e293b",
+      mainBkg: "transparent",
     };
   }
 
@@ -61,6 +63,8 @@ function getThemeVariables(mode: MermaidThemeMode) {
     lineColor: "#94a3b8",
     secondaryColor: "#f1f5f9",
     tertiaryColor: "#ffffff",
+    edgeLabelBackground: "#ffffff",
+    mainBkg: "transparent",
   };
 }
 
@@ -72,6 +76,7 @@ function ensureMermaidInitialized(mode: MermaidThemeMode) {
     theme: "base",
     themeVariables: getThemeVariables(mode),
     securityLevel: "loose",
+    htmlLabels: false,
   });
 
   initializedTheme = mode;
@@ -254,6 +259,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
       return (
         <MermaidMiniMap
           {...props}
+          background="transparent"
           svgMinX={svgMeta.minX}
           svgMinY={svgMeta.minY}
           svgWidth={svgMeta.width}
@@ -283,7 +289,25 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
 
         if (cancelled) return;
 
-        const parsed = parseMermaidSvg(result.svg);
+        const themeVars = getThemeVariables(themeMode);
+        const injectedStyle = `<style>
+          .edgeLabel rect, .edge-thickness-normal rect, .edge-thickness-thick rect, .edge-thickness-invisible rect {
+            fill: ${themeVars.edgeLabelBackground} !important;
+            stroke: none !important;
+          }
+          .edgeLabel text, .edgeLabel tspan {
+            fill: ${themeVars.primaryTextColor} !important;
+            color: ${themeVars.primaryTextColor} !important;
+          }
+        </style>`;
+
+        let modifiedSvg = result.svg;
+        const svgTagEnd = modifiedSvg.indexOf(">");
+        if (svgTagEnd !== -1) {
+          modifiedSvg = modifiedSvg.slice(0, svgTagEnd + 1) + injectedStyle + modifiedSvg.slice(svgTagEnd + 1);
+        }
+
+        const parsed = parseMermaidSvg(modifiedSvg);
         if (!parsed) {
           setSvg("");
           setSvgMeta(null);
@@ -507,7 +531,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                       scaleFactorMax={40}
                       detectAutoPan={false}
                       toolbarProps={{ position: POSITION_NONE }}
-                      miniatureProps={{ position: "left", width: 220, height: 140, background: "rgba(2, 6, 23, 0.78)" }}
+                      miniatureProps={{ position: "left", width: 220, height: 140, background: "transparent" }}
                       customMiniature={customMiniature}
                       onZoom={handleViewerInteraction}
                       onPan={handleViewerInteraction}
@@ -519,8 +543,13 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                         viewBox={svgMeta.viewBox}
                         width={svgMeta.width}
                         height={svgMeta.height}
-                        dangerouslySetInnerHTML={{ __html: svgMeta.innerMarkup }}
-                      />
+                      >
+                        <image
+                          href={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`}
+                          width={svgMeta.width}
+                          height={svgMeta.height}
+                        />
+                      </svg>
                     </UncontrolledReactSVGPanZoom>
                   )}
                 </div>

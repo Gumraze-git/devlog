@@ -219,6 +219,18 @@ html {
   max-width: 100%;
 }
 
+/* Override Mermaid edge labels to ensure readability regardless of theme */
+.mermaid-diagram__svg .edgeLabel,
+.mermaid-modal__viewer .edgeLabel {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+}
+
+.mermaid-diagram__svg .edgeLabel span,
+.mermaid-modal__viewer .edgeLabel span {
+  color: var(--foreground) !important;
+}
+
 .mermaid-modal__svg svg {
   display: block;
   height: auto;
@@ -346,9 +358,10 @@ html {
   position: absolute;
   bottom: 12px;
   z-index: 20;
-  border: 1px solid rgba(148, 163, 184, 0.45);
+  border: 1px solid var(--border);
   border-radius: 0.75rem;
   overflow: hidden;
+  background: var(--card);
   box-shadow: 0 8px 24px rgba(2, 6, 23, 0.34);
 }
 
@@ -365,8 +378,9 @@ html {
 }
 
 .mermaid-minimap__viewport {
-  fill: transparent;
-  stroke: #ef4444;
+  fill: var(--accent);
+  fill-opacity: 0.15;
+  stroke: var(--accent);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
 }
