@@ -146,16 +146,26 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   const headings = extractHeadings(project.content);
   const tocItems = headings.filter((heading) => heading.depth <= 3);
   const codeHtmlByKey = use(buildCodeHtmlByKey(project.content));
+  const roleItems = (project.role ?? "")
+    .split(/\s*,\s*|\s\/\s/g)
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+  const sourceLinks =
+    project.sources && project.sources.length > 0
+      ? project.sources
+      : project.repo
+        ? [{ label: "GitHub", url: project.repo }]
+        : [];
 
   const renderTechIcons = (techs: string[]) => {
     return (
-      <div className="flex flex-wrap gap-4 items-center">
+      <div className="flex flex-wrap gap-x-5 gap-y-3 items-start">
         {techs.map((tech, index) => {
           const meta = getTechIconMeta(tech);
           if (meta?.icon) {
             return (
-              <div key={index} className="flex flex-col items-center gap-2 group">
-                <div className="relative w-8 h-8" title={meta.label}>
+              <div key={index} className="flex flex-col items-center gap-1.5 group min-w-14">
+                <div className="relative w-8 h-8 md:w-9 md:h-9" title={meta.label}>
                   <Image
                     src={meta.icon}
                     alt={meta.label}
@@ -163,16 +173,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
                     className="object-contain transition-transform group-hover:scale-110"
                   />
                 </div>
-                <span className="text-[9px] font-medium text-[var(--text-soft)] uppercase tracking-tighter">
+                <span className="text-[10px] font-medium text-[var(--text-soft)] uppercase tracking-tight text-center leading-tight">
                   {meta.label}
                 </span>
               </div>
             );
           }
           return (
-            <div key={index} className="flex flex-col items-center gap-2">
-              <div className="bg-[var(--card-subtle)] border border-[var(--border)] px-3 py-1 rounded-md">
-                <span className="text-[10px] font-semibold text-[var(--text-muted)]">{tech}</span>
+            <div key={index} className="flex flex-col items-center gap-1.5 min-w-14">
+              <div className="bg-[var(--card-subtle)] border border-[var(--border)] px-2.5 py-1 rounded-md">
+                <span className="text-[11px] font-semibold text-[var(--text-muted)] whitespace-nowrap">{tech}</span>
               </div>
             </div>
           );
@@ -209,51 +219,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 py-8 border-y border-[var(--border-muted)] !mt-10">
-            <div className="space-y-2">
-              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Period</h3>
-              <p className="text-sm font-mono text-[var(--text-soft)]">{project.period}</p>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Role</h3>
-              <p className="text-sm font-semibold text-[var(--accent-strong)] whitespace-pre-line leading-relaxed">
-                {project.role || "Backend Developer"}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Team</h3>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                {project.members}
-              </p>
-            </div>
-
-            {project.repo && (
-              <div className="space-y-2">
-                <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Source</h3>
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--foreground)] hover:text-[var(--accent)] transition-colors"
-                  aria-label="GitHub Repository"
-                >
-                  <Github size={16} aria-hidden />
-                  GitHub
-                  <ExternalLink size={14} className="opacity-50" />
-                </a>
-              </div>
-            )}
-
-            <div className="col-span-2 lg:col-span-4 space-y-4 pt-2">
-              <h3 className="text-[10px] font-bold text-[var(--foreground)] uppercase tracking-widest">Tech Stack</h3>
-              {renderTechIcons(project.stack)}
-            </div>
-          </div>
-
           {project.thumbnail && (
-            <div className="w-full !mt-12">
+            <div className="w-full !mt-8">
               <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
                 <Image
                   src={project.thumbnail}
@@ -266,6 +233,61 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
               </div>
             </div>
           )}
+
+          <div className="!mt-6 rounded-2xl border border-[var(--border-muted)] bg-[var(--card-subtle)]/40 p-5 md:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
+              <div className="space-y-1.5">
+                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">기간</h3>
+                <p className="text-sm md:text-base font-mono text-[var(--text-soft)]">{project.period}</p>
+              </div>
+
+              <div className="space-y-1.5">
+                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">역할</h3>
+                <ul className="space-y-1">
+                  {(roleItems.length > 0 ? roleItems : ["Backend Developer"]).map((roleItem) => (
+                    <li key={roleItem} className="flex items-start gap-2 text-sm md:text-base font-semibold text-[var(--accent-strong)] leading-relaxed">
+                      <span className="mt-[0.6em] h-1.5 w-1.5 rounded-full bg-[var(--accent)] shrink-0" />
+                      <span>{roleItem}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="space-y-1.5">
+                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">팀</h3>
+                <p className="text-sm md:text-base text-[var(--text-muted)] leading-relaxed">
+                  {project.members}
+                </p>
+              </div>
+
+              {sourceLinks.length > 0 && (
+                <div className="space-y-1.5">
+                  <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">소스</h3>
+                  <div className="space-y-1.5">
+                    {sourceLinks.map((source) => (
+                      <a
+                        key={`${source.label}-${source.url}`}
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm md:text-base font-semibold text-[var(--foreground)] hover:text-[var(--accent)] transition-colors"
+                        aria-label={source.label}
+                      >
+                        <Github size={16} aria-hidden />
+                        {source.label}
+                        <ExternalLink size={14} className="opacity-50" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="sm:col-span-2 lg:col-span-4 space-y-3 pt-1">
+                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">기술 스택</h3>
+                {renderTechIcons(project.stack)}
+              </div>
+            </div>
+          </div>
         </section>
 
         <div className="relative">
