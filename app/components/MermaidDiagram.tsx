@@ -199,6 +199,23 @@ function parseInlineStyle(styleText?: string): CSSProperties | undefined {
     : undefined;
 }
 
+function toSvgDataUri(svgMarkup: string): string {
+  if (typeof window === "undefined") {
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svgMarkup)}`;
+  }
+
+  try {
+    const bytes = new TextEncoder().encode(svgMarkup);
+    let binary = "";
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte);
+    }
+    return `data:image/svg+xml;base64,${window.btoa(binary)}`;
+  } catch {
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svgMarkup)}`;
+  }
+}
+
 export default function MermaidDiagram({ code, className, caption }: MermaidDiagramProps) {
   const { resolvedTheme } = useTheme();
 
@@ -234,6 +251,10 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
     : null;
   const modalError = effectiveError ?? emptyMarkupError;
   const modalSvgStyle = useMemo(() => parseInlineStyle(modalMeta?.style), [modalMeta?.style]);
+  const modalMiniMapDataUri = useMemo(
+    () => (modalMeta?.fullSvg ? toSvgDataUri(modalMeta.fullSvg) : ""),
+    [modalMeta?.fullSvg],
+  );
 
   const relativeScale = viewerScale.fitScale > 0
     ? viewerScale.currentScale / viewerScale.fitScale
@@ -318,7 +339,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   }, []);
 
   const customMiniature = useMemo(() => {
-    if (!modalMeta) return undefined;
+    if (!modalMeta || !modalMiniMapDataUri) return undefined;
 
     return function CustomMiniature(props: {
       value: ViewerValue;
@@ -332,6 +353,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
         <MermaidMiniMap
           {...props}
           background="transparent"
+          svgDataUri={modalMiniMapDataUri}
           svgMinX={modalMeta.minX}
           svgMinY={modalMeta.minY}
           svgWidth={modalMeta.width}
@@ -339,7 +361,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
         />
       );
     };
-  }, [modalMeta]);
+  }, [modalMeta, modalMiniMapDataUri]);
 
   useEffect(() => {
     const themeMode: MermaidThemeMode = resolvedTheme === "dark" ? "dark" : "light";

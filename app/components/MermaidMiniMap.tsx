@@ -1,11 +1,10 @@
-import type { ReactNode } from "react";
 import type { ViewerValue } from "react-svg-pan-zoom";
 
 type MiniMapPosition = "left" | "right";
 
 interface MermaidMiniMapProps {
   value: ViewerValue;
-  children?: ReactNode;
+  svgDataUri: string;
   background?: string;
   position?: MiniMapPosition;
   width?: number;
@@ -81,7 +80,8 @@ function computeViewportRect(
 
 export default function MermaidMiniMap({
   value,
-  children,
+  svgDataUri,
+  background = "transparent",
   position = "left",
   width = 220,
   height = 140,
@@ -102,12 +102,20 @@ export default function MermaidMiniMap({
       style={{
         width,
         height,
+        background,
       }}
       aria-hidden="true"
     >
       <svg width={width} height={height}>
         <g transform={`translate(${offsetX} ${offsetY}) scale(${zoomToFit})`}>
-          {children}
+          <image
+            href={svgDataUri}
+            x={svgMinX}
+            y={svgMinY}
+            width={svgWidth}
+            height={svgHeight}
+            preserveAspectRatio="xMidYMid meet"
+          />
           {viewportRect && (
             <rect
               className="mermaid-minimap__viewport"
