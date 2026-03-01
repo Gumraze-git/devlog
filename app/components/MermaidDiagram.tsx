@@ -321,6 +321,14 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
     fitToViewerAndSync();
   }, [fitToViewerAndSync]);
 
+  const handleOverlayClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.target !== event.currentTarget) return;
+      closeModal();
+    },
+    [closeModal],
+  );
+
   const handleViewerInteraction = useCallback((value: ViewerValue) => {
     if (typeof value.d !== "number") return;
 
@@ -550,7 +558,10 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
       </div>
 
       {isModalOpen && (
-        <div className="mermaid-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-3 py-4" onClick={closeModal}>
+        <div
+          className="mermaid-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-3 py-4"
+          onClick={handleOverlayClick}
+        >
           <div
             role="dialog"
             aria-modal="true"
