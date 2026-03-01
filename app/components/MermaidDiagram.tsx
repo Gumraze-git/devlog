@@ -542,8 +542,9 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                         viewBox={svgMeta.viewBox}
                         width={svgMeta.width}
                         height={svgMeta.height}
-                        dangerouslySetInnerHTML={{ __html: svgMeta.innerMarkup }}
-                      />
+                      >
+                        <g dangerouslySetInnerHTML={{ __html: svgMeta.innerMarkup }} />
+                      </svg>
                     </UncontrolledReactSVGPanZoom>
                   )}
                 </div>
