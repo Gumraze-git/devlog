@@ -162,6 +162,9 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
 
   const effectiveError = isCodeEmpty ? "비어 있는 Mermaid 코드입니다." : error;
   const isLoading = !effectiveError && svg.length === 0;
+  const hasRenderableInnerMarkup = Boolean(svgMeta?.innerMarkup?.trim());
+  const emptyMarkupError = svgMeta && !hasRenderableInnerMarkup ? "Mermaid SVG 콘텐츠가 비어 있습니다." : null;
+  const modalError = effectiveError ?? emptyMarkupError;
 
   const relativeScale = viewerScale.fitScale > 0
     ? viewerScale.currentScale / viewerScale.fitScale
@@ -421,10 +424,10 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
     };
   }, [isModalOpen]);
 
-  const renderFallback = (withBorder: boolean) => (
+  const renderFallback = (withBorder: boolean, message?: string | null) => (
     <div className={`mermaid-diagram__fallback ${withBorder ? "mermaid-diagram__fallback--bordered" : ""}`}>
       <p className="mermaid-diagram__fallback-title">Mermaid 다이어그램 렌더링에 실패했습니다.</p>
-      {effectiveError && <p className="mermaid-diagram__fallback-error">{effectiveError}</p>}
+      {(message ?? effectiveError) && <p className="mermaid-diagram__fallback-error">{message ?? effectiveError}</p>}
       <pre className="mermaid-diagram__fallback-code">
         <code>{normalizedCode}</code>
       </pre>
@@ -512,8 +515,8 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
             </div>
 
             <div className="mermaid-modal__viewport flex-1 overflow-hidden p-4 md:p-6">
-              {effectiveError && renderFallback(true)}
-              {!effectiveError && svgMeta && (
+              {modalError && renderFallback(true, modalError)}
+              {!modalError && svgMeta && (
                 <div ref={viewerHostRef} className="mermaid-modal__viewer-host">
                   {!isFitReady && (
                     <p className="mermaid-modal__loading text-sm text-[var(--text-soft)]">다이어그램 맞춤 배율 계산 중...</p>
