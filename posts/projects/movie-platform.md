@@ -37,162 +37,167 @@ education: "현대오토에버 SW 스쿨 2기"
 
 ## 2.1 백엔드 아키텍처 구조 (프로젝트 종료 시점)
 ```mermaid
-flowchart TB
- subgraph BController["Controller Layer"]
+%%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 24, 'diagramPadding': 8}} }%%
+flowchart LR
+
+  Client["Client"] --> FE["Frontend<br>(React / Vite)"]
+
+  subgraph Docker["Docker Compose Runtime"]
     direction TB
+
+    subgraph C_BE["Container 1: backend-spring"]
+      direction TB
+      BSwagger["Swagger UI<br>GET /api-doc"]
+
+      subgraph BController["Controller Layer"]
+        direction LR
         C_Auth["Auth & Member"]
         C_Movie["Movie Core"]
         C_Review["Review & Report"]
         C_Rec["Match & Recommend"]
-  end
- subgraph BService["Service Layer"]
-    direction TB
+      end
+
+      subgraph BService["Service Layer"]
+        direction LR
         S_Auth["Auth/Member Service"]
         S_Movie["Movie Service"]
         S_Review["Review/Report Service"]
         S_Rec["Recommendation Service"]
-  end
- subgraph BPersistence["Persistence Layer"]
-    direction TB
+      end
+
+      subgraph BPersistence["Persistence Layer"]
+        direction LR
         P_MemberRepo["Member Repo"]
         P_MovieRepo["Movie/Info Repo"]
         P_ReviewRepo["Review Repo"]
         P_RecRepo["Match/Rec Repo"]
-  end
- subgraph BIntegration["Integration Layer"]
-    direction TB
+      end
+
+      subgraph BIntegration["Integration Layer"]
+        direction LR
         I_AI["AI Client (RestClient)"]
         I_OAuth["OAuth Client"]
         I_Mail["Mail Sender"]
         I_MovieAPI["Movie Data Clients"]
-  end
- subgraph BOut["Data & External Out"]
-    direction TB
-        BPersistence
-        BIntegration
-  end
- subgraph BE["Backend (Spring Boot)"]
-    direction LR
-        BSwagger["Swagger UI<br>GET /api-doc"]
-        BController
-        BService
-        BOut
-  end
- subgraph AApi["API Layer"]
-    direction TB
-        A_R_Emotion["/emotion-predictions"]
-        A_R_Rec["/movie-recommendations"]
-  end
- subgraph AApp["Application Layer"]
-    direction TB
-        A_S_Emotion["Emotion Prediction Svc"]
-        A_S_Rec["Recommendation Svc"]
-  end
- subgraph AInfra["Infrastructure Layer"]
-    direction TB
-        A_I_Model["KoBert Predictor"]
-        A_I_Repo["Emotion Summary Repo"]
-  end
- subgraph AI["AI Server (FastAPI)"]
-    direction LR
-        AApi
-        AApp
-        AInfra
-  end
- subgraph Docker["Docker Compose Runtime"]
-    direction LR
-    subgraph C_BE["Container 1: backend-spring"]
-      direction TB
-        BE
+      end
     end
+
     subgraph C_AI["Container 2: backend-ai"]
       direction TB
-        AI
-        Model["KoBERT Model File<br>.safetensors"]
+      subgraph AApi["API Layer"]
+        direction LR
+        A_R_Emotion["/emotion-predictions"]
+        A_R_Rec["/movie-recommendations"]
+      end
+      subgraph AApp["Application Layer"]
+        direction LR
+        A_S_Emotion["Emotion Prediction Svc"]
+        A_S_Rec["Recommendation Svc"]
+      end
+      subgraph AInfra["Infrastructure Layer"]
+        direction LR
+        A_I_Repo["Emotion Summary Repo"]
+        A_I_Model["KoBERT Predictor"]
+      end
+      Model["KoBERT Model File<br>.safetensors"]
     end
+
     subgraph C_DB["Container 3: mysql-db"]
       direction TB
-        DB[("MySQL 8.0<br>(Multi-Schema)")]
+      DB[("MySQL 8.0<br>(Multi-Schema)")]
     end
   end
- subgraph EXT["External APIs"]
-    direction TB
-      ExtKakao["Kakao Auth API"]
-      ExtKOBIS["KOBIS API"]
-      ExtKMDb["KMDb API"]
-      ExtSMTP["SMTP Server"]
-  end
-    BController --> BService
-    S_Auth --> BPersistence & I_OAuth & I_Mail
-    S_Movie --> BPersistence & I_MovieAPI
-    S_Review --> BPersistence
-    S_Rec --> BPersistence & I_AI
-    AApi --> AApp
-    AApp --> AInfra
-    Client["Client"] --> FE["Frontend<br>(React / Vite)"]
-    FE -- REST API --> BController
-    Client -. Docs .-> BSwagger
-    BPersistence -- JDBC --> DB
-    I_AI -- HTTP POST --> AApi
-    I_OAuth -- OAuth2 / HTTP/S --> ExtKakao
-    I_Mail -- SMTP --> ExtSMTP
-    I_MovieAPI -- BoxOffice / HTTP/S --> ExtKOBIS
-    I_MovieAPI -- Metadata / HTTP/S --> ExtKMDb
-    A_I_Repo -- PyMySQL --> DB
-    A_I_Model -- Load --> Model
 
-     C_Auth:::be_comp
-     C_Movie:::be_comp
-     C_Review:::be_comp
-     C_Rec:::be_comp
-     S_Auth:::be_comp
-     S_Movie:::be_comp
-     S_Review:::be_comp
-     S_Rec:::be_comp
-     P_MemberRepo:::be_comp
-     P_MovieRepo:::be_comp
-     P_ReviewRepo:::be_comp
-     P_RecRepo:::be_comp
-     I_AI:::be_comp
-     I_OAuth:::be_comp
-     I_Mail:::be_comp
-     I_MovieAPI:::be_comp
-     BSwagger:::be_comp
-     A_R_Emotion:::ai_comp
-     A_R_Rec:::ai_comp
-     A_S_Emotion:::ai_comp
-     A_S_Rec:::ai_comp
-     A_I_Model:::ai_comp
-     A_I_Repo:::ai_comp
-     DB:::db
-     Model:::db
-     Client:::client
-     FE:::frontend
-     ExtKakao:::external
-     ExtKOBIS:::external
-     ExtKMDb:::external
-     ExtSMTP:::external
-    classDef client fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
-    classDef frontend fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
-    classDef be_comp fill:#fff9c4,stroke:#f9a825,stroke-width:1px,color:#000
-    classDef ai_comp fill:#e1bee7,stroke:#8e24aa,stroke-width:1px,color:#000
-    classDef db fill:#cfd8dc,stroke:#455a64,stroke-width:2px,color:#000
-    classDef external fill:#f8bbd0,stroke:#c2185b,stroke-width:2px,color:#000
-    style BPersistence fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
-    style BIntegration fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
-    style BController fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
-    style BService fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
-    style BOut fill:none,stroke:none
-    style AApi fill:none,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 2 2
-    style AApp fill:none,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 2 2
-    style AInfra fill:none,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 2 2
-    style BE fill:#fffde7,stroke:#fdd835,stroke-width:2px
-    style AI fill:#f3e5f5,stroke:#ab47bc,stroke-width:2px
-    style Docker fill:#fafafa,stroke:#64748b,stroke-width:2px,stroke-dasharray: 4 3
-    style C_BE fill:none,stroke:#f9a825,stroke-width:2px,stroke-dasharray: 4 3
-    style C_AI fill:none,stroke:#8e24aa,stroke-width:2px,stroke-dasharray: 4 3
-    style C_DB fill:none,stroke:#455a64,stroke-width:2px,stroke-dasharray: 4 3
-    style EXT fill:#fce4ec,stroke:#c2185b,stroke-width:2px,stroke-dasharray: 4 3
+  subgraph EXT["External APIs"]
+    direction LR
+    ExtKakao["Kakao Auth API"]
+    ExtKOBIS["KOBIS API"]
+    ExtKMDb["KMDb API"]
+    ExtSMTP["SMTP Server"]
+  end
+
+  FE -- REST --> C_Auth
+  Client -. Docs .-> BSwagger
+
+  C_Auth --> S_Auth
+  C_Movie --> S_Movie
+  C_Review --> S_Review
+  C_Rec --> S_Rec
+
+  S_Auth --> P_MemberRepo & I_OAuth & I_Mail
+  S_Movie --> P_MovieRepo & I_MovieAPI
+  S_Review --> P_ReviewRepo
+  S_Rec --> P_RecRepo & I_AI
+
+  I_AI -- HTTP POST --> A_R_Emotion
+  A_R_Emotion --> A_S_Emotion
+  A_R_Rec --> A_S_Rec
+  A_S_Emotion --> A_I_Repo & A_I_Model
+  A_S_Rec --> A_I_Repo
+
+  P_MemberRepo -- JDBC --> DB
+  P_MovieRepo -- JDBC --> DB
+  P_ReviewRepo -- JDBC --> DB
+  P_RecRepo -- JDBC --> DB
+  A_I_Repo -- PyMySQL --> DB
+  A_I_Model -- Load --> Model
+
+  I_OAuth -- OAuth2 --> ExtKakao
+  I_Mail -- SMTP --> ExtSMTP
+  I_MovieAPI -- BoxOffice --> ExtKOBIS
+  I_MovieAPI -- Metadata --> ExtKMDb
+
+  C_Auth:::be_comp
+  C_Movie:::be_comp
+  C_Review:::be_comp
+  C_Rec:::be_comp
+  S_Auth:::be_comp
+  S_Movie:::be_comp
+  S_Review:::be_comp
+  S_Rec:::be_comp
+  P_MemberRepo:::be_comp
+  P_MovieRepo:::be_comp
+  P_ReviewRepo:::be_comp
+  P_RecRepo:::be_comp
+  I_AI:::be_comp
+  I_OAuth:::be_comp
+  I_Mail:::be_comp
+  I_MovieAPI:::be_comp
+  BSwagger:::be_comp
+  A_R_Emotion:::ai_comp
+  A_R_Rec:::ai_comp
+  A_S_Emotion:::ai_comp
+  A_S_Rec:::ai_comp
+  A_I_Model:::ai_comp
+  A_I_Repo:::ai_comp
+  DB:::db
+  Model:::db
+  Client:::client
+  FE:::frontend
+  ExtKakao:::external
+  ExtKOBIS:::external
+  ExtKMDb:::external
+  ExtSMTP:::external
+
+  classDef client fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+  classDef frontend fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+  classDef be_comp fill:#fff9c4,stroke:#f9a825,stroke-width:1px,color:#000
+  classDef ai_comp fill:#e1bee7,stroke:#8e24aa,stroke-width:1px,color:#000
+  classDef db fill:#cfd8dc,stroke:#455a64,stroke-width:2px,color:#000
+  classDef external fill:#f8bbd0,stroke:#c2185b,stroke-width:2px,color:#000
+
+  style BPersistence fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
+  style BIntegration fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
+  style BController fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
+  style BService fill:none,stroke:#fbc02d,stroke-width:1px,stroke-dasharray: 2 2
+  style AApi fill:none,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 2 2
+  style AApp fill:none,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 2 2
+  style AInfra fill:none,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 2 2
+  style Docker fill:#fafafa,stroke:#64748b,stroke-width:2px,stroke-dasharray: 4 3
+  style C_BE fill:#fffde7,stroke:#f9a825,stroke-width:2px,stroke-dasharray: 4 3
+  style C_AI fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,stroke-dasharray: 4 3
+  style C_DB fill:none,stroke:#455a64,stroke-width:2px,stroke-dasharray: 4 3
+  style EXT fill:#fce4ec,stroke:#c2185b,stroke-width:2px,stroke-dasharray: 4 3
 ```
 
 ## 2.2 요청 흐름 (핵심 시나리오)
