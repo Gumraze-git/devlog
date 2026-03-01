@@ -40,8 +40,8 @@ type ViewerScaleState = {
 };
 
 const ZOOM_STEP_FACTOR = 1.2;
-const MIN_RELATIVE_SCALE = 0.2;
-const MAX_RELATIVE_SCALE = 8;
+const MIN_RELATIVE_SCALE = 0.5;
+const MAX_RELATIVE_SCALE = 1.5;
 const DEFAULT_VIEWER_SCALE: ViewerScaleState = { fitScale: 1, currentScale: 1 };
 
 let initializedTheme: MermaidThemeMode | null = null;
@@ -241,6 +241,12 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   const zoomPercent = Math.round(relativeScale * 100);
   const zoomOutDisabled = relativeScale <= MIN_RELATIVE_SCALE + 0.001;
   const zoomInDisabled = relativeScale >= MAX_RELATIVE_SCALE - 0.001;
+  const viewerScaleMin = isFitReady
+    ? Math.max(0.01, viewerScale.fitScale * MIN_RELATIVE_SCALE)
+    : 0.05;
+  const viewerScaleMax = isFitReady
+    ? Math.max(viewerScaleMin + 0.0001, viewerScale.fitScale * MAX_RELATIVE_SCALE)
+    : 40;
 
   const closeModal = useCallback(() => {
     pendingFitSyncRef.current = false;
@@ -576,8 +582,8 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                       defaultTool={TOOL_PAN}
                       scaleFactor={ZOOM_STEP_FACTOR}
                       scaleFactorOnWheel={1.06}
-                      scaleFactorMin={0.05}
-                      scaleFactorMax={40}
+                      scaleFactorMin={viewerScaleMin}
+                      scaleFactorMax={viewerScaleMax}
                       detectAutoPan={false}
                       toolbarProps={{ position: POSITION_NONE }}
                       miniatureProps={{ position: POSITION_NONE }}
