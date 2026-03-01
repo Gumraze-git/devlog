@@ -115,6 +115,34 @@ export default function MermaidMiniMap({
   const insetLocal = effectiveScale > 0 ? 1.5 / effectiveScale : 0;
 
   const viewportRect = computeViewportRect(value, svgMinX, svgMinY, svgWidth, svgHeight, insetLocal);
+  const viewportPixelInset = 2;
+  const viewportRectInPixels = (() => {
+    if (!viewportRect || effectiveScale <= 0) return null;
+
+    const rawX = offsetX + viewportRect.x * effectiveScale;
+    const rawY = offsetY + viewportRect.y * effectiveScale;
+    const rawWidth = viewportRect.width * effectiveScale;
+    const rawHeight = viewportRect.height * effectiveScale;
+
+    const maxPixelWidth = Math.max(0, width - viewportPixelInset * 2);
+    const maxPixelHeight = Math.max(0, height - viewportPixelInset * 2);
+
+    const clampedWidth = clamp(rawWidth, 0, maxPixelWidth);
+    const clampedHeight = clamp(rawHeight, 0, maxPixelHeight);
+    if (clampedWidth <= 0 || clampedHeight <= 0) return null;
+
+    const minX = viewportPixelInset;
+    const maxX = width - viewportPixelInset - clampedWidth;
+    const minY = viewportPixelInset;
+    const maxY = height - viewportPixelInset - clampedHeight;
+
+    return {
+      x: clamp(rawX, minX, maxX),
+      y: clamp(rawY, minY, maxY),
+      width: clampedWidth,
+      height: clampedHeight,
+    };
+  })();
 
   return (
     <div
@@ -136,16 +164,16 @@ export default function MermaidMiniMap({
             height={svgHeight}
             preserveAspectRatio="xMidYMid meet"
           />
-          {viewportRect && (
-            <rect
-              className="mermaid-minimap__viewport"
-              x={viewportRect.x}
-              y={viewportRect.y}
-              width={viewportRect.width}
-              height={viewportRect.height}
-            />
-          )}
         </g>
+        {viewportRectInPixels && (
+          <rect
+            className="mermaid-minimap__viewport"
+            x={viewportRectInPixels.x}
+            y={viewportRectInPixels.y}
+            width={viewportRectInPixels.width}
+            height={viewportRectInPixels.height}
+          />
+        )}
       </svg>
     </div>
   );
