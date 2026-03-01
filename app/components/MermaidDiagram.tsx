@@ -315,7 +315,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
           return;
         }
 
-        setSvg(result.svg);
+        setSvg(modifiedSvg);
         setSvgMeta(parsed);
         setError(null);
       } catch (renderError) {
