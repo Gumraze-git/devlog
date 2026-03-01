@@ -250,10 +250,10 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
     ? "Mermaid SVG 콘텐츠가 비어 있습니다."
     : null;
   const modalError = effectiveError ?? emptyMarkupError;
-  const modalSvgStyle = useMemo(() => parseInlineStyle(modalMeta?.style), [modalMeta?.style]);
+  const modalSvgStyle = useMemo(() => parseInlineStyle(modalMeta?.style), [modalMeta]);
   const modalMiniMapDataUri = useMemo(
     () => (modalMeta?.fullSvg ? toSvgDataUri(modalMeta.fullSvg) : ""),
-    [modalMeta?.fullSvg],
+    [modalMeta],
   );
 
   const relativeScale = viewerScale.fitScale > 0
