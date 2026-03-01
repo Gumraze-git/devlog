@@ -40,7 +40,7 @@ education: "현대오토에버 SW 스쿨 2기"
 %%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 24, 'diagramPadding': 8}} }%%
 flowchart LR
 
-  Client["Client"] --> FE["Frontend<br>(React / Vite)"]
+  Developer["Developer"] --> FE["Frontend<br>(React / Vite)"]
 
   subgraph Docker["Docker Compose Runtime"]
     direction TB
@@ -121,7 +121,7 @@ flowchart LR
   end
 
   FE -- REST --> C_Auth
-  Client -. Docs .-> BSwagger
+  Developer -. API Docs .-> BSwagger
 
   C_Auth --> S_Auth
   C_Movie --> S_Movie
@@ -178,14 +178,14 @@ flowchart LR
   SchemaBackend:::db
   SchemaAI:::db
   Model:::db
-  Client:::client
+  Developer:::developer
   FE:::frontend
   ExtKakao:::external
   ExtKOBIS:::external
   ExtKMDb:::external
   ExtSMTP:::external
 
-  classDef client fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+  classDef developer fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
   classDef frontend fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
   classDef be_comp fill:#fff9c4,stroke:#f9a825,stroke-width:1px,color:#000
   classDef ai_comp fill:#e1bee7,stroke:#8e24aa,stroke-width:1px,color:#000
