@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useTheme } from "next-themes";
 import mermaid from "mermaid";
 import { X } from "lucide-react";
@@ -176,11 +176,36 @@ function injectScopedEdgeLabelStyle(
   return svgMarkup.slice(0, svgTagEnd + 1) + injectedStyle + svgMarkup.slice(svgTagEnd + 1);
 }
 
+function parseInlineStyle(styleText?: string): CSSProperties | undefined {
+  if (!styleText) return undefined;
+
+  const styleObject: Record<string, string> = {};
+  const declarations = styleText.split(";").map((part) => part.trim()).filter(Boolean);
+
+  for (const declaration of declarations) {
+    const separatorIndex = declaration.indexOf(":");
+    if (separatorIndex <= 0) continue;
+
+    const rawProperty = declaration.slice(0, separatorIndex).trim();
+    const rawValue = declaration.slice(separatorIndex + 1).trim();
+    if (!rawProperty || !rawValue) continue;
+
+    const camelProperty = rawProperty.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
+    styleObject[camelProperty] = rawValue;
+  }
+
+  return Object.keys(styleObject).length > 0
+    ? (styleObject as CSSProperties)
+    : undefined;
+}
+
 export default function MermaidDiagram({ code, className, caption }: MermaidDiagramProps) {
   const { resolvedTheme } = useTheme();
 
-  const [svg, setSvg] = useState("");
-  const [svgMeta, setSvgMeta] = useState<MermaidSvgMeta | null>(null);
+  const [inlineSvg, setInlineSvg] = useState("");
+  const [inlineMeta, setInlineMeta] = useState<MermaidSvgMeta | null>(null);
+  const [modalSvg, setModalSvg] = useState("");
+  const [modalMeta, setModalMeta] = useState<MermaidSvgMeta | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -198,10 +223,17 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   const captionText = caption?.trim() || "Mermaid Diagram";
 
   const effectiveError = isCodeEmpty ? "비어 있는 Mermaid 코드입니다." : error;
-  const isLoading = !effectiveError && svg.length === 0;
-  const hasRenderableInnerMarkup = Boolean(svgMeta?.innerMarkup?.trim());
-  const emptyMarkupError = svgMeta && !hasRenderableInnerMarkup ? "Mermaid SVG 콘텐츠가 비어 있습니다." : null;
+  const hasRenderableInlineMarkup = Boolean(inlineMeta?.innerMarkup?.trim());
+  const inlineMarkupError = inlineMeta && !hasRenderableInlineMarkup ? "Mermaid SVG 콘텐츠가 비어 있습니다." : null;
+  const inlineError = effectiveError ?? inlineMarkupError;
+  const isLoading = !inlineError && inlineSvg.length === 0;
+  const hasRenderableInnerMarkup = Boolean(modalMeta?.innerMarkup?.trim());
+  const hasRenderableFullSvg = modalSvg.length > 0 && Boolean(modalMeta?.fullSvg?.trim());
+  const emptyMarkupError = modalMeta && (!hasRenderableInnerMarkup || !hasRenderableFullSvg)
+    ? "Mermaid SVG 콘텐츠가 비어 있습니다."
+    : null;
   const modalError = effectiveError ?? emptyMarkupError;
+  const modalSvgStyle = useMemo(() => parseInlineStyle(modalMeta?.style), [modalMeta?.style]);
 
   const relativeScale = viewerScale.fitScale > 0
     ? viewerScale.currentScale / viewerScale.fitScale
@@ -286,7 +318,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   }, []);
 
   const customMiniature = useMemo(() => {
-    if (!svgMeta) return undefined;
+    if (!modalMeta) return undefined;
 
     return function CustomMiniature(props: {
       value: ViewerValue;
@@ -300,62 +332,70 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
         <MermaidMiniMap
           {...props}
           background="transparent"
-          svgMinX={svgMeta.minX}
-          svgMinY={svgMeta.minY}
-          svgWidth={svgMeta.width}
-          svgHeight={svgMeta.height}
+          svgMinX={modalMeta.minX}
+          svgMinY={modalMeta.minY}
+          svgWidth={modalMeta.width}
+          svgHeight={modalMeta.height}
         />
       );
     };
-  }, [svgMeta]);
+  }, [modalMeta]);
 
   useEffect(() => {
     const themeMode: MermaidThemeMode = resolvedTheme === "dark" ? "dark" : "light";
     let cancelled = false;
 
+    const renderVariant = async (prefix: "inline" | "modal") => {
+      const renderId = `mermaid-${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+      const result = await mermaid.render(renderId, normalizedCode);
+
+      const initialParsed = parseMermaidSvg(result.svg);
+      if (!initialParsed) {
+        throw new Error("Mermaid SVG 파싱에 실패했습니다.");
+      }
+
+      const scopedRootId = initialParsed.rootId ?? renderId;
+      const modifiedSvg = injectScopedEdgeLabelStyle(result.svg, scopedRootId, getThemeVariables(themeMode));
+      const parsed = parseMermaidSvg(modifiedSvg);
+      if (!parsed) {
+        throw new Error("Mermaid SVG 파싱에 실패했습니다.");
+      }
+
+      return { svg: modifiedSvg, meta: parsed };
+    };
+
     const renderDiagram = async () => {
       if (isCodeEmpty) {
         if (cancelled) return;
-        setSvg("");
-        setSvgMeta(null);
+        setInlineSvg("");
+        setInlineMeta(null);
+        setModalSvg("");
+        setModalMeta(null);
         setError("비어 있는 Mermaid 코드입니다.");
         return;
       }
 
       try {
         ensureMermaidInitialized(themeMode);
-        const renderId = `mermaid-${Math.random().toString(36).slice(2, 10)}`;
-        const result = await mermaid.render(renderId, normalizedCode);
+        const [inlineResult, modalResult] = await Promise.all([
+          renderVariant("inline"),
+          renderVariant("modal"),
+        ]);
 
         if (cancelled) return;
 
-        const initialParsed = parseMermaidSvg(result.svg);
-        if (!initialParsed) {
-          setSvg("");
-          setSvgMeta(null);
-          setError("Mermaid SVG 파싱에 실패했습니다.");
-          return;
-        }
-
-        const scopedRootId = initialParsed.rootId ?? renderId;
-        const modifiedSvg = injectScopedEdgeLabelStyle(result.svg, scopedRootId, getThemeVariables(themeMode));
-
-        const parsed = parseMermaidSvg(modifiedSvg);
-        if (!parsed) {
-          setSvg("");
-          setSvgMeta(null);
-          setError("Mermaid SVG 파싱에 실패했습니다.");
-          return;
-        }
-
-        setSvg(modifiedSvg);
-        setSvgMeta(parsed);
+        setInlineSvg(inlineResult.svg);
+        setInlineMeta(inlineResult.meta);
+        setModalSvg(modalResult.svg);
+        setModalMeta(modalResult.meta);
         setError(null);
       } catch (renderError) {
         if (cancelled) return;
 
-        setSvg("");
-        setSvgMeta(null);
+        setInlineSvg("");
+        setInlineMeta(null);
+        setModalSvg("");
+        setModalMeta(null);
         setError(renderError instanceof Error ? renderError.message : "Mermaid 렌더링 중 오류가 발생했습니다.");
       }
     };
@@ -415,7 +455,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   }, [isModalOpen]);
 
   useEffect(() => {
-    if (!isModalOpen || !svgMeta) return;
+    if (!isModalOpen || !modalMeta) return;
     if (viewerSize.width <= 0 || viewerSize.height <= 0) return;
 
     let frameId = 0;
@@ -434,7 +474,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
       if (frameId) window.cancelAnimationFrame(frameId);
       if (fallbackFrameId) window.cancelAnimationFrame(fallbackFrameId);
     };
-  }, [fitToViewerAndSync, isModalOpen, svgMeta, viewerSize.height, viewerSize.width]);
+  }, [fitToViewerAndSync, isModalOpen, modalMeta, viewerSize.height, viewerSize.width]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -477,15 +517,15 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
         >
           <div className="mermaid-diagram__surface">
             {isLoading && <p className="mermaid-diagram__loading">Rendering Mermaid diagram...</p>}
-            {!isLoading && effectiveError && renderFallback(false)}
-            {!isLoading && !effectiveError && (
+            {!isLoading && inlineError && renderFallback(false, inlineError)}
+            {!isLoading && !inlineError && (
               <div
                 className="mermaid-diagram__svg"
-                dangerouslySetInnerHTML={{ __html: svg }}
+                dangerouslySetInnerHTML={{ __html: inlineSvg }}
               />
             )}
           </div>
-          {!effectiveError && (
+          {!inlineError && (
             <p className="mermaid-diagram__hint" aria-hidden>
               클릭하여 확대 보기
             </p>
@@ -546,7 +586,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
 
             <div className="mermaid-modal__viewport flex-1 overflow-hidden p-4 md:p-6">
               {modalError && renderFallback(true, modalError)}
-              {!modalError && svgMeta && (
+              {!modalError && modalMeta && (
                 <div ref={viewerHostRef} className="mermaid-modal__viewer-host">
                   {!isFitReady && (
                     <p className="mermaid-modal__loading text-sm text-[var(--text-soft)]">다이어그램 맞춤 배율 계산 중...</p>
@@ -572,11 +612,15 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                       className="mermaid-modal__viewer"
                     >
                       <svg
-                        viewBox={svgMeta.viewBox}
-                        width={svgMeta.width}
-                        height={svgMeta.height}
+                        id={modalMeta.rootId}
+                        className={modalMeta.className}
+                        style={modalSvgStyle}
+                        preserveAspectRatio={modalMeta.preserveAspectRatio}
+                        viewBox={modalMeta.viewBox}
+                        width={modalMeta.width}
+                        height={modalMeta.height}
                       >
-                        <g dangerouslySetInnerHTML={{ __html: svgMeta.innerMarkup }} />
+                        <g dangerouslySetInnerHTML={{ __html: modalMeta.innerMarkup }} />
                       </svg>
                     </UncontrolledReactSVGPanZoom>
                   )}
