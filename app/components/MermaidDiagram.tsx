@@ -543,13 +543,8 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                         viewBox={svgMeta.viewBox}
                         width={svgMeta.width}
                         height={svgMeta.height}
-                      >
-                        <image
-                          href={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`}
-                          width={svgMeta.width}
-                          height={svgMeta.height}
-                        />
-                      </svg>
+                        dangerouslySetInnerHTML={{ __html: svgMeta.innerMarkup }}
+                      />
                     </UncontrolledReactSVGPanZoom>
                   )}
                 </div>
