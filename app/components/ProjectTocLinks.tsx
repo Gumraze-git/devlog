@@ -10,13 +10,7 @@ type ProjectTocLinksProps = {
 
 export default function ProjectTocLinks({ items, className = "space-y-1.5" }: ProjectTocLinksProps) {
   const clickLockRef = useRef<{ slug: string; expiresAt: number } | null>(null);
-  const [activeSlug, setActiveSlug] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ""));
-      if (hash) return hash;
-    }
-    return items[0]?.slug ?? "";
-  });
+  const [activeSlug, setActiveSlug] = useState<string>(() => items[0]?.slug ?? "");
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -27,6 +21,13 @@ export default function ProjectTocLinks({ items, className = "space-y-1.5" }: Pr
     const clickLockDurationMs = 800;
     const setActive = (slug: string) => {
       setActiveSlug((prev) => (prev === slug ? prev : slug));
+    };
+    const readHashSlug = () => {
+      try {
+        return decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      } catch {
+        return "";
+      }
     };
 
     const updateActiveSlug = () => {
@@ -69,11 +70,22 @@ export default function ProjectTocLinks({ items, className = "space-y-1.5" }: Pr
       });
     };
 
+    const initialHash = readHashSlug();
+    if (initialHash && items.some((item) => item.slug === initialHash)) {
+      clickLockRef.current = {
+        slug: initialHash,
+        expiresAt: window.performance.now() + clickLockDurationMs,
+      };
+      setActive(initialHash);
+    } else {
+      setActive(items[0]?.slug ?? "");
+    }
+
     requestUpdate();
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
     const handleHashChange = () => {
-      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      const hash = readHashSlug();
       if (hash) {
         clickLockRef.current = {
           slug: hash,
