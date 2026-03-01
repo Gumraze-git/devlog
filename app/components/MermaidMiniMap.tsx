@@ -76,7 +76,12 @@ function computeViewportRect(
   const height = Math.max(0, bottom - top);
   if (width === 0 || height === 0) return null;
 
-  return { x: left, y: top, width, height };
+  return {
+    x: left - minX,
+    y: top - minY,
+    width,
+    height,
+  };
 }
 
 export default function MermaidMiniMap({
@@ -95,8 +100,8 @@ export default function MermaidMiniMap({
   const zoomToFit = Math.min(width / svgWidth, height / svgHeight);
   const safeMultiplier = Number.isFinite(scaleMultiplier) && scaleMultiplier > 0 ? scaleMultiplier : 1;
   const effectiveScale = zoomToFit * safeMultiplier;
-  const offsetX = (width - svgWidth * effectiveScale) / 2 - svgMinX * effectiveScale;
-  const offsetY = (height - svgHeight * effectiveScale) / 2 - svgMinY * effectiveScale;
+  const offsetX = (width - svgWidth * effectiveScale) / 2;
+  const offsetY = (height - svgHeight * effectiveScale) / 2;
 
   const viewportRect = computeViewportRect(value, svgMinX, svgMinY, svgWidth, svgHeight);
 
@@ -114,8 +119,8 @@ export default function MermaidMiniMap({
         <g transform={`translate(${offsetX} ${offsetY}) scale(${effectiveScale})`}>
           <image
             href={svgDataUri}
-            x={svgMinX}
-            y={svgMinY}
+            x={0}
+            y={0}
             width={svgWidth}
             height={svgHeight}
             preserveAspectRatio="xMidYMid meet"
