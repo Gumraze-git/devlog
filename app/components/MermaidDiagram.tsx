@@ -563,7 +563,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
             role="dialog"
             aria-modal="true"
             aria-labelledby="mermaid-modal-title"
-            className="mermaid-modal relative flex h-[96vh] w-[90vw] max-w-none flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
+            className="mermaid-modal relative flex h-[96vh] w-[88vw] max-w-none flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mermaid-modal__header flex items-center gap-3 border-b border-[var(--border)] bg-[var(--card-subtle)] px-4 py-3 md:px-5">
