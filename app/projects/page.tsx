@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { User } from "lucide-react";
 
 import { getAllProjects, type Project } from "../lib/projects";
 
@@ -35,15 +34,6 @@ function ProjectRow({ project }: { project: Project }) {
             <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-soft)]">
               {(project.period || "Ongoing").replace(/~/g, "-")}
             </span>
-            {project.role && (
-              <>
-                <span className="text-[10px] text-[var(--border-muted)]">•</span>
-                <span className="flex items-center gap-1 text-xs font-medium text-[var(--text-muted)]">
-                  <User className="h-3.5 w-3.5 text-[var(--text-soft)]" />
-                  <span>{project.role}</span>
-                </span>
-              </>
-            )}
           </div>
 
           <h2 className="text-2xl font-bold leading-tight text-[var(--foreground)] transition-colors group-hover:text-[var(--accent-strong)]">
