@@ -45,8 +45,31 @@ type PositionNode = {
         start?: {
             line?: number;
         };
+        end?: {
+            line?: number;
+        };
     };
 };
+
+type MarkdownCodeProps = React.HTMLAttributes<HTMLElement> & {
+    className?: string;
+    children?: React.ReactNode;
+    node?: PositionNode;
+};
+
+function isBlockCode(node: PositionNode | undefined, className: string | undefined, rawCode: string): boolean {
+    const startLine = node?.position?.start?.line;
+    const endLine = node?.position?.end?.line;
+    if (typeof startLine === "number" && typeof endLine === "number") {
+        return endLine > startLine;
+    }
+
+    if (/language-[\w-]+/.test(className || "")) {
+        return true;
+    }
+
+    return rawCode.includes("\n");
+}
 
 function trimEdgeEmptyLines(lines: string[]): string[] {
     const next = [...lines];
@@ -192,23 +215,25 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     };
 
     function renderCode({
-        inline,
         className,
         children,
+        node,
         ...props
-    }: React.HTMLAttributes<HTMLElement> & { inline?: boolean }) {
+    }: MarkdownCodeProps) {
         const match = /language-([\w-]+)/.exec(className || "");
         const lang = match ? match[1] : "text";
-        const code = String(children).replace(/\n$/, "");
+        const rawCode = String(children);
+        const code = rawCode.replace(/\n$/, "");
+        const isBlockCodeNode = isBlockCode(node, className, rawCode);
         const label = lang === "text" ? "TEXT" : lang.toUpperCase();
 
-        if (!inline && lang === "mermaid") {
+        if (isBlockCodeNode && lang === "mermaid") {
             return (
                 <MermaidDiagram code={code} />
             );
         }
 
-        if (!inline && (lang === "steps" || lang === "step")) {
+        if (isBlockCodeNode && (lang === "steps" || lang === "step")) {
             const steps = code
                 .split("\n")
                 .filter((line) => /^\d+\./.test(line.trim()))
@@ -233,7 +258,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             );
         }
 
-        if (!inline && (lang === "reflections" || lang === "reflection")) {
+        if (isBlockCodeNode && (lang === "reflections" || lang === "reflection")) {
             const numberedItems = code
                 .split("\n")
                 .filter((line) => /^\d+\./.test(line.trim()))
@@ -273,7 +298,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             );
         }
 
-        if (!inline && (lang === "troubleshooting" || lang === "trouble" || lang === "troubleshoot")) {
+        if (isBlockCodeNode && (lang === "troubleshooting" || lang === "trouble" || lang === "troubleshoot")) {
             const sections = parseTroubleshootingContent(code);
             const summary = buildTroubleSummary(sections);
             const activeRows = troubleRows.filter((row) => Boolean(sections[row.key]));
@@ -341,7 +366,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             );
         }
 
-        if (!inline) {
+        if (isBlockCodeNode) {
             const key = createCodeKey(lang, code);
             const highlighted = codeHtmlMap[key];
             if (highlighted) {

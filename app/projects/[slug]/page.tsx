@@ -160,15 +160,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
       : project.repo
         ? [{ label: "GitHub", url: project.repo }]
         : [];
+  const hasSourceLinks = sourceLinks.length > 0;
+  const overviewGridColsClass = hasSourceLinks ? "lg:grid-cols-3" : "lg:grid-cols-2";
+  const stackSectionSpanClass = hasSourceLinks ? "sm:col-span-2 lg:col-span-3" : "sm:col-span-2 lg:col-span-2";
 
   const renderTechIcons = (techs: string[]) => {
     return (
-      <div className="flex flex-wrap gap-x-5 gap-y-3 items-start">
+      <div className="flex flex-wrap gap-x-4 gap-y-2.5 items-start">
         {techs.map((tech, index) => {
           const meta = getTechIconMeta(tech);
           if (meta?.icon) {
             return (
-              <div key={index} className="flex flex-col items-center gap-1.5 group min-w-14">
+              <div key={index} className="flex flex-col items-center gap-1 group min-w-14">
                 <div className="relative w-8 h-8 md:w-9 md:h-9" title={meta.label}>
                   <Image
                     src={meta.icon}
@@ -184,7 +187,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             );
           }
           return (
-            <div key={index} className="flex flex-col items-center gap-1.5 min-w-14">
+            <div key={index} className="flex flex-col items-center gap-1 min-w-14">
               <div className="bg-[var(--card-subtle)] border border-[var(--border)] px-2.5 py-1 rounded-md">
                 <span className="text-[11px] font-semibold text-[var(--text-muted)] whitespace-nowrap">{tech}</span>
               </div>
@@ -238,49 +241,55 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </div>
           )}
 
-          <div className="!mt-6 rounded-2xl border border-[var(--border-muted)] bg-[var(--card-subtle)]/40 p-5 md:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
-              <div className="space-y-1.5">
-                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">기간</h3>
-                <p className="text-sm md:text-base font-mono text-[var(--text-soft)]">{project.period}</p>
+          <div className="!mt-4 rounded-2xl border border-[var(--border-muted)] bg-[var(--card-subtle)]/40 p-3 md:p-4">
+            <div className="mb-3 border-b border-[var(--border-muted)] pb-2">
+              <h2 className="text-base md:text-lg font-bold text-[var(--foreground)] tracking-tight">프로젝트 개요</h2>
+            </div>
+
+            <div className={`grid grid-cols-1 gap-x-5 gap-y-3 md:grid-cols-2 ${overviewGridColsClass}`}>
+              <div className="space-y-1 rounded-xl border border-[var(--border)] bg-[var(--card)]/80 p-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-soft)]">기간</h3>
+                <p className="text-sm md:text-base font-semibold font-mono text-[var(--foreground)]">{project.period}</p>
               </div>
 
-              <div className="space-y-1.5">
-                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">역할</h3>
-                <ul className="space-y-1">
+              <div className="space-y-1 rounded-xl border border-[var(--border)] bg-[var(--card)]/80 p-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-soft)]">역할</h3>
+                <div className="flex flex-wrap gap-1">
                   {displayedRoleItems.map((roleItem) => (
-                    <li key={roleItem} className="flex items-start gap-2 text-sm md:text-base font-semibold text-[var(--accent-strong)] leading-relaxed">
-                      <span className="mt-[0.6em] h-1.5 w-1.5 rounded-full bg-[var(--accent)] shrink-0" />
-                      <span>{roleItem}</span>
-                    </li>
+                    <span
+                      key={roleItem}
+                      className="inline-flex items-center rounded-full border border-[var(--accent)]/35 bg-[var(--accent)]/10 px-2 py-0.5 text-sm md:text-base font-semibold text-[var(--accent-strong)]"
+                    >
+                      {roleItem}
+                    </span>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {sourceLinks.length > 0 && (
-                <div className="space-y-1.5">
-                  <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">소스</h3>
-                  <div className="space-y-1.5">
+              {hasSourceLinks && (
+                <div className="space-y-1 rounded-xl border border-[var(--border-muted)] bg-[var(--card-subtle)]/70 p-3">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-soft)]">소스</h3>
+                  <div className="space-y-1">
                     {sourceLinks.map((source) => (
                       <a
                         key={`${source.label}-${source.url}`}
                         href={source.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm md:text-base font-semibold text-[var(--foreground)] hover:text-[var(--accent)] transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-sm md:text-base font-semibold text-[var(--foreground)] transition-colors hover:border-[var(--accent)]/45 hover:bg-[var(--card-subtle)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
                         aria-label={source.label}
                       >
-                        <Github size={16} aria-hidden />
+                        <Github size={14} aria-hidden />
                         {source.label}
-                        <ExternalLink size={14} className="opacity-50" />
+                        <ExternalLink size={12} className="opacity-50" />
                       </a>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="sm:col-span-2 lg:col-span-4 space-y-3 pt-1">
-                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">기술 스택</h3>
+              <div className={`${stackSectionSpanClass} space-y-1 rounded-xl border border-[var(--border)] bg-[var(--card)]/80 p-3`}>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-soft)]">기술 스택</h3>
                 {renderTechIcons(project.stack)}
               </div>
             </div>
