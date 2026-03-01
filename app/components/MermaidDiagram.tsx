@@ -43,6 +43,7 @@ type ViewerScaleState = {
 const ZOOM_STEP_FACTOR = 1.2;
 const MIN_RELATIVE_SCALE = 0.2;
 const MAX_RELATIVE_SCALE = 8;
+const MINIMAP_SCALE_MULTIPLIER = 1.7;
 const DEFAULT_VIEWER_SCALE: ViewerScaleState = { fitScale: 1, currentScale: 1 };
 
 let initializedTheme: MermaidThemeMode | null = null;
@@ -353,6 +354,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
         <MermaidMiniMap
           {...props}
           background="transparent"
+          scaleMultiplier={MINIMAP_SCALE_MULTIPLIER}
           svgDataUri={modalMiniMapDataUri}
           svgMinX={modalMeta.minX}
           svgMinY={modalMeta.minY}

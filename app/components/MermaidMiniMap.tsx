@@ -9,6 +9,7 @@ interface MermaidMiniMapProps {
   position?: MiniMapPosition;
   width?: number;
   height?: number;
+  scaleMultiplier?: number;
   svgMinX: number;
   svgMinY: number;
   svgWidth: number;
@@ -85,14 +86,16 @@ export default function MermaidMiniMap({
   position = "left",
   width = 220,
   height = 140,
+  scaleMultiplier = 1,
   svgMinX,
   svgMinY,
   svgWidth,
   svgHeight,
 }: MermaidMiniMapProps) {
   const zoomToFit = Math.min(width / svgWidth, height / svgHeight);
-  const offsetX = (width - svgWidth * zoomToFit) / 2 - svgMinX * zoomToFit;
-  const offsetY = (height - svgHeight * zoomToFit) / 2 - svgMinY * zoomToFit;
+  const effectiveScale = zoomToFit * Math.max(1, scaleMultiplier);
+  const offsetX = (width - svgWidth * effectiveScale) / 2 - svgMinX * effectiveScale;
+  const offsetY = (height - svgHeight * effectiveScale) / 2 - svgMinY * effectiveScale;
 
   const viewportRect = computeViewportRect(value, svgMinX, svgMinY, svgWidth, svgHeight);
 
@@ -107,7 +110,7 @@ export default function MermaidMiniMap({
       aria-hidden="true"
     >
       <svg width={width} height={height}>
-        <g transform={`translate(${offsetX} ${offsetY}) scale(${zoomToFit})`}>
+        <g transform={`translate(${offsetX} ${offsetY}) scale(${effectiveScale})`}>
           <image
             href={svgDataUri}
             x={svgMinX}
