@@ -253,13 +253,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
                 </ul>
               </div>
 
-              <div className="space-y-1.5">
-                <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">팀</h3>
-                <p className="text-sm md:text-base text-[var(--text-muted)] leading-relaxed">
-                  {project.members}
-                </p>
-              </div>
-
               {sourceLinks.length > 0 && (
                 <div className="space-y-1.5">
                   <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">소스</h3>
