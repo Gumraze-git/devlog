@@ -27,7 +27,12 @@ type MermaidSvgMeta = {
   width: number;
   height: number;
   viewBox: string;
+  rootId?: string;
+  className?: string;
+  style?: string;
+  preserveAspectRatio?: string;
   innerMarkup: string;
+  fullSvg: string;
 };
 
 type ViewerScaleState = {
@@ -135,8 +140,40 @@ function parseMermaidSvg(svgMarkup: string): MermaidSvgMeta | null {
     width,
     height,
     viewBox: `${minX} ${minY} ${width} ${height}`,
+    rootId: svgElement.getAttribute("id") ?? undefined,
+    className: svgElement.getAttribute("class") ?? undefined,
+    style: svgElement.getAttribute("style") ?? undefined,
+    preserveAspectRatio: svgElement.getAttribute("preserveAspectRatio") ?? undefined,
     innerMarkup: svgElement.innerHTML,
+    fullSvg: svgElement.outerHTML,
   };
+}
+
+function escapeCssId(value: string): string {
+  return value.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, "\\$1");
+}
+
+function injectScopedEdgeLabelStyle(
+  svgMarkup: string,
+  rootId: string,
+  themeVars: ReturnType<typeof getThemeVariables>,
+): string {
+  const escapedRootId = escapeCssId(rootId);
+  const scope = `#${escapedRootId}`;
+  const injectedStyle = `<style>
+    ${scope} .edgeLabel rect, ${scope} .edge-thickness-normal rect, ${scope} .edge-thickness-thick rect, ${scope} .edge-thickness-invisible rect {
+      fill: ${themeVars.edgeLabelBackground} !important;
+      stroke: none !important;
+    }
+    ${scope} .edgeLabel text, ${scope} .edgeLabel tspan {
+      fill: ${themeVars.primaryTextColor} !important;
+      color: ${themeVars.primaryTextColor} !important;
+    }
+  </style>`;
+
+  const svgTagEnd = svgMarkup.indexOf(">");
+  if (svgTagEnd === -1) return svgMarkup;
+  return svgMarkup.slice(0, svgTagEnd + 1) + injectedStyle + svgMarkup.slice(svgTagEnd + 1);
 }
 
 export default function MermaidDiagram({ code, className, caption }: MermaidDiagramProps) {
@@ -292,23 +329,16 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
 
         if (cancelled) return;
 
-        const themeVars = getThemeVariables(themeMode);
-        const injectedStyle = `<style>
-          .edgeLabel rect, .edge-thickness-normal rect, .edge-thickness-thick rect, .edge-thickness-invisible rect {
-            fill: ${themeVars.edgeLabelBackground} !important;
-            stroke: none !important;
-          }
-          .edgeLabel text, .edgeLabel tspan {
-            fill: ${themeVars.primaryTextColor} !important;
-            color: ${themeVars.primaryTextColor} !important;
-          }
-        </style>`;
-
-        let modifiedSvg = result.svg;
-        const svgTagEnd = modifiedSvg.indexOf(">");
-        if (svgTagEnd !== -1) {
-          modifiedSvg = modifiedSvg.slice(0, svgTagEnd + 1) + injectedStyle + modifiedSvg.slice(svgTagEnd + 1);
+        const initialParsed = parseMermaidSvg(result.svg);
+        if (!initialParsed) {
+          setSvg("");
+          setSvgMeta(null);
+          setError("Mermaid SVG 파싱에 실패했습니다.");
+          return;
         }
+
+        const scopedRootId = initialParsed.rootId ?? renderId;
+        const modifiedSvg = injectScopedEdgeLabelStyle(result.svg, scopedRootId, getThemeVariables(themeMode));
 
         const parsed = parseMermaidSvg(modifiedSvg);
         if (!parsed) {
