@@ -93,7 +93,8 @@ export default function MermaidMiniMap({
   svgHeight,
 }: MermaidMiniMapProps) {
   const zoomToFit = Math.min(width / svgWidth, height / svgHeight);
-  const effectiveScale = zoomToFit * Math.max(1, scaleMultiplier);
+  const safeMultiplier = Number.isFinite(scaleMultiplier) && scaleMultiplier > 0 ? scaleMultiplier : 1;
+  const effectiveScale = zoomToFit * safeMultiplier;
   const offsetX = (width - svgWidth * effectiveScale) / 2 - svgMinX * effectiveScale;
   const offsetY = (height - svgHeight * effectiveScale) / 2 - svgMinY * effectiveScale;
 
