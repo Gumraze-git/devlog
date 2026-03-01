@@ -62,39 +62,35 @@ function computeViewportRect(
   const rawTop = Math.min(topLeft.y, bottomRight.y);
   const rawRight = Math.max(topLeft.x, bottomRight.x);
   const rawBottom = Math.max(topLeft.y, bottomRight.y);
+  const localLeft = rawLeft - svgMinX;
+  const localTop = rawTop - svgMinY;
+  const localRight = rawRight - svgMinX;
+  const localBottom = rawBottom - svgMinY;
 
-  const minX = svgMinX;
-  const minY = svgMinY;
-  const maxX = svgMinX + svgWidth;
-  const maxY = svgMinY + svgHeight;
+  const safeInsetX = clamp(insetLocal, 0, Math.max(svgWidth / 2 - 0.0001, 0));
+  const safeInsetY = clamp(insetLocal, 0, Math.max(svgHeight / 2 - 0.0001, 0));
 
-  const left = clamp(rawLeft, minX, maxX);
-  const top = clamp(rawTop, minY, maxY);
-  const right = clamp(rawRight, minX, maxX);
-  const bottom = clamp(rawBottom, minY, maxY);
+  const maxBoxWidth = Math.max(0, svgWidth - safeInsetX * 2);
+  const maxBoxHeight = Math.max(0, svgHeight - safeInsetY * 2);
 
-  const localLeft = left - minX;
-  const localTop = top - minY;
-  const localRight = right - minX;
-  const localBottom = bottom - minY;
+  // Keep viewport size whenever possible; shrink only when it cannot fit minimap bounds.
+  const boxWidth = clamp(Math.max(0, localRight - localLeft), 0, maxBoxWidth);
+  const boxHeight = clamp(Math.max(0, localBottom - localTop), 0, maxBoxHeight);
+  if (boxWidth <= 0 || boxHeight <= 0) return null;
 
-  const safeInsetX = clamp(insetLocal, 0, svgWidth / 2);
-  const safeInsetY = clamp(insetLocal, 0, svgHeight / 2);
+  const minLeft = safeInsetX;
+  const maxLeft = safeInsetX + (maxBoxWidth - boxWidth);
+  const minTop = safeInsetY;
+  const maxTop = safeInsetY + (maxBoxHeight - boxHeight);
 
-  const clampedLeft = clamp(localLeft, safeInsetX, svgWidth - safeInsetX);
-  const clampedTop = clamp(localTop, safeInsetY, svgHeight - safeInsetY);
-  const clampedRight = clamp(localRight, safeInsetX, svgWidth - safeInsetX);
-  const clampedBottom = clamp(localBottom, safeInsetY, svgHeight - safeInsetY);
-
-  const width = Math.max(0, clampedRight - clampedLeft);
-  const height = Math.max(0, clampedBottom - clampedTop);
-  if (width === 0 || height === 0) return null;
+  const clampedLeft = clamp(localLeft, minLeft, maxLeft);
+  const clampedTop = clamp(localTop, minTop, maxTop);
 
   return {
     x: clampedLeft,
     y: clampedTop,
-    width,
-    height,
+    width: boxWidth,
+    height: boxHeight,
   };
 }
 
