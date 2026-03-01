@@ -146,10 +146,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   const headings = extractHeadings(project.content);
   const tocItems = headings.filter((heading) => heading.depth <= 3);
   const codeHtmlByKey = use(buildCodeHtmlByKey(project.content));
+  const allowedRoleItems = ["백엔드 개발", "데이터 모델링"] as const;
   const roleItems = (project.role ?? "")
     .split(/\s*,\s*|\s\/\s/g)
     .map((item) => item.trim())
-    .filter((item) => item.length > 0);
+    .filter((item): item is (typeof allowedRoleItems)[number] =>
+      (allowedRoleItems as readonly string[]).includes(item)
+    );
+  const displayedRoleItems = roleItems.length > 0 ? roleItems : [...allowedRoleItems];
   const sourceLinks =
     project.sources && project.sources.length > 0
       ? project.sources
@@ -244,7 +248,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
               <div className="space-y-1.5">
                 <h3 className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-widest">역할</h3>
                 <ul className="space-y-1">
-                  {(roleItems.length > 0 ? roleItems : ["Backend Developer"]).map((roleItem) => (
+                  {displayedRoleItems.map((roleItem) => (
                     <li key={roleItem} className="flex items-start gap-2 text-sm md:text-base font-semibold text-[var(--accent-strong)] leading-relaxed">
                       <span className="mt-[0.6em] h-1.5 w-1.5 rounded-full bg-[var(--accent)] shrink-0" />
                       <span>{roleItem}</span>
