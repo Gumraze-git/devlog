@@ -35,14 +35,13 @@ type MermaidSvgMeta = {
 };
 
 type ViewerScaleState = {
-  fitScale: number;
   currentScale: number;
 };
 
 const ZOOM_STEP_FACTOR = 1.2;
 const MIN_RELATIVE_SCALE = 0.5;
 const MAX_RELATIVE_SCALE = 1.5;
-const DEFAULT_VIEWER_SCALE: ViewerScaleState = { fitScale: 1, currentScale: 1 };
+const DEFAULT_VIEWER_SCALE: ViewerScaleState = { currentScale: 1 };
 
 let initializedTheme: MermaidThemeMode | null = null;
 
@@ -216,6 +215,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   const viewerRef = useRef<UncontrolledReactSVGPanZoomHandle | null>(null);
   const viewerHostRef = useRef<HTMLDivElement>(null);
   const pendingFitSyncRef = useRef(false);
+  const clampGuardRef = useRef(false);
 
   const normalizedCode = useMemo(() => code.trim(), [code]);
   const isCodeEmpty = normalizedCode.length === 0;
@@ -235,26 +235,37 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   const modalSvgStyle = useMemo(() => parseInlineStyle(modalMeta?.style), [modalMeta]);
   const viewerCanvasBackground = resolvedTheme === "dark" ? "#0f172a" : "#eef4ff";
 
-  const relativeScale = viewerScale.fitScale > 0
-    ? viewerScale.currentScale / viewerScale.fitScale
+  const computedFitScale = useMemo(() => {
+    if (!modalMeta) return 1;
+    if (viewerSize.width <= 0 || viewerSize.height <= 0) return 1;
+    if (modalMeta.width <= 0 || modalMeta.height <= 0) return 1;
+
+    const widthScale = viewerSize.width / modalMeta.width;
+    const heightScale = viewerSize.height / modalMeta.height;
+    const fitScale = Math.min(widthScale, heightScale);
+
+    return Number.isFinite(fitScale) && fitScale > 0 ? fitScale : 1;
+  }, [modalMeta, viewerSize.height, viewerSize.width]);
+
+  const absoluteMinScale = Math.max(0.0001, computedFitScale * MIN_RELATIVE_SCALE);
+  const absoluteMaxScale = Math.max(absoluteMinScale + 0.0001, computedFitScale * MAX_RELATIVE_SCALE);
+
+  const relativeScale = computedFitScale > 0
+    ? viewerScale.currentScale / computedFitScale
     : 1;
   const zoomPercent = Math.round(relativeScale * 100);
   const zoomOutDisabled = relativeScale <= MIN_RELATIVE_SCALE + 0.001;
   const zoomInDisabled = relativeScale >= MAX_RELATIVE_SCALE - 0.001;
-  const viewerScaleMin = isFitReady
-    ? Math.max(0.01, viewerScale.fitScale * MIN_RELATIVE_SCALE)
-    : 0.05;
-  const viewerScaleMax = isFitReady
-    ? Math.max(viewerScaleMin + 0.0001, viewerScale.fitScale * MAX_RELATIVE_SCALE)
-    : 40;
 
   const closeModal = useCallback(() => {
+    clampGuardRef.current = false;
     pendingFitSyncRef.current = false;
     setIsFitReady(false);
     setIsModalOpen(false);
   }, []);
 
   const openModal = useCallback(() => {
+    clampGuardRef.current = false;
     pendingFitSyncRef.current = false;
     setIsFitReady(false);
     setViewerScale(DEFAULT_VIEWER_SCALE);
@@ -313,15 +324,38 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
   const handleViewerInteraction = useCallback((value: ViewerValue) => {
     if (typeof value.d !== "number") return;
 
+    if (clampGuardRef.current) {
+      clampGuardRef.current = false;
+
+      setViewerScale({ currentScale: value.d });
+      if (pendingFitSyncRef.current) {
+        pendingFitSyncRef.current = false;
+        setIsFitReady(true);
+      }
+      return;
+    }
+
+    const clampedScale = Math.min(absoluteMaxScale, Math.max(absoluteMinScale, value.d));
+
+    if (Math.abs(clampedScale - value.d) > 0.0005) {
+      const viewer = viewerRef.current;
+      if (viewer && value.d > 0) {
+        clampGuardRef.current = true;
+        viewer.zoomOnViewerCenter(clampedScale / value.d);
+      }
+      setViewerScale({ currentScale: clampedScale });
+      return;
+    }
+
     if (pendingFitSyncRef.current) {
       pendingFitSyncRef.current = false;
-      setViewerScale({ fitScale: value.d, currentScale: value.d });
+      setViewerScale({ currentScale: value.d });
       setIsFitReady(true);
       return;
     }
 
-    setViewerScale((prev) => ({ ...prev, currentScale: value.d }));
-  }, []);
+    setViewerScale({ currentScale: value.d });
+  }, [absoluteMaxScale, absoluteMinScale]);
 
   useEffect(() => {
     const themeMode: MermaidThemeMode = resolvedTheme === "dark" ? "dark" : "light";
@@ -582,8 +616,8 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                       defaultTool={TOOL_PAN}
                       scaleFactor={ZOOM_STEP_FACTOR}
                       scaleFactorOnWheel={1.06}
-                      scaleFactorMin={viewerScaleMin}
-                      scaleFactorMax={viewerScaleMax}
+                      scaleFactorMin={absoluteMinScale}
+                      scaleFactorMax={absoluteMaxScale}
                       detectAutoPan={false}
                       toolbarProps={{ position: POSITION_NONE }}
                       miniatureProps={{ position: POSITION_NONE }}

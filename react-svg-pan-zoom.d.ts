@@ -62,6 +62,7 @@ declare module "react-svg-pan-zoom" {
       width?: number;
       height?: number;
     }>;
+    background?: string;
     onZoom?: (value: ViewerValue) => void;
     onPan?: (value: ViewerValue) => void;
     className?: string;
