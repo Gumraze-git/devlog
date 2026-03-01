@@ -104,7 +104,11 @@ flowchart LR
 
     subgraph C_DB["Container 3: mysql-db"]
       direction TB
-      DB[("MySQL 8.0<br>(Multi-Schema)")]
+      MySQLSrv[("MySQL 8.0 Server")]
+      SchemaBackend["Schema: insidemovie_backend"]
+      SchemaAI["Schema: insidemovie_ai"]
+      MySQLSrv --- SchemaBackend
+      MySQLSrv --- SchemaAI
     end
   end
 
@@ -135,11 +139,11 @@ flowchart LR
   A_S_Emotion --> A_I_Repo & A_I_Model
   A_S_Rec --> A_I_Repo
 
-  P_MemberRepo -- JDBC --> DB
-  P_MovieRepo -- JDBC --> DB
-  P_ReviewRepo -- JDBC --> DB
-  P_RecRepo -- JDBC --> DB
-  A_I_Repo -- PyMySQL --> DB
+  P_MemberRepo -- JDBC --> SchemaBackend
+  P_MovieRepo -- JDBC --> SchemaBackend
+  P_ReviewRepo -- JDBC --> SchemaBackend
+  P_RecRepo -- JDBC --> SchemaBackend
+  A_I_Repo -- PyMySQL --> SchemaAI
   A_I_Model -- Load --> Model
 
   I_OAuth -- OAuth2 --> ExtKakao
@@ -170,7 +174,9 @@ flowchart LR
   A_S_Rec:::ai_comp
   A_I_Model:::ai_comp
   A_I_Repo:::ai_comp
-  DB:::db
+  MySQLSrv:::db
+  SchemaBackend:::db
+  SchemaAI:::db
   Model:::db
   Client:::client
   FE:::frontend
@@ -202,6 +208,19 @@ flowchart LR
 
 ## 2.2 요청 흐름 (핵심 시나리오)
 `리뷰 작성 -> ReviewService -> /api/v1/emotion-predictions -> Emotion 저장 -> 요약 재계산`
+
+## 2.3 Multi-Schema 실제 구성 (Insidemovie-monorepo 기준)
+- MySQL 초기화 SQL에서 두 스키마를 생성합니다.
+  - `insidemovie_backend`
+  - `insidemovie_ai`
+- Backend(Spring Boot)는 `insidemovie_backend`를 사용합니다.
+  - `application-prod.yml`: `${BACKEND_DB_NAME:insidemovie_backend}`
+- AI(FastAPI)는 `insidemovie_ai`를 사용합니다.
+  - `docker-compose.yml`: `DATABASE_URL=.../insidemovie_ai`
+- 확인한 근거 파일:
+  - `docker/mysql/initdb/01-create-databases.sql`
+  - `docker-compose.yml`
+  - `apps/backend/src/main/resources/application-prod.yml`
 
 - - -
 # 3. 핵심 트러블슈팅 Top3 (프로젝트 기간 중)
