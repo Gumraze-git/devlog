@@ -11,7 +11,6 @@ import {
   type UncontrolledReactSVGPanZoomHandle,
   type ViewerValue,
 } from "react-svg-pan-zoom";
-import MermaidMiniMap from "./MermaidMiniMap";
 
 export interface MermaidDiagramProps {
   code: string;
@@ -43,7 +42,6 @@ type ViewerScaleState = {
 const ZOOM_STEP_FACTOR = 1.2;
 const MIN_RELATIVE_SCALE = 0.2;
 const MAX_RELATIVE_SCALE = 8;
-const MINIMAP_SCALE_MULTIPLIER = 0.7;
 const DEFAULT_VIEWER_SCALE: ViewerScaleState = { fitScale: 1, currentScale: 1 };
 
 let initializedTheme: MermaidThemeMode | null = null;
@@ -200,23 +198,6 @@ function parseInlineStyle(styleText?: string): CSSProperties | undefined {
     : undefined;
 }
 
-function toSvgDataUri(svgMarkup: string): string {
-  if (typeof window === "undefined") {
-    return `data:image/svg+xml;utf8,${encodeURIComponent(svgMarkup)}`;
-  }
-
-  try {
-    const bytes = new TextEncoder().encode(svgMarkup);
-    let binary = "";
-    for (const byte of bytes) {
-      binary += String.fromCharCode(byte);
-    }
-    return `data:image/svg+xml;base64,${window.btoa(binary)}`;
-  } catch {
-    return `data:image/svg+xml;utf8,${encodeURIComponent(svgMarkup)}`;
-  }
-}
-
 export default function MermaidDiagram({ code, className, caption }: MermaidDiagramProps) {
   const { resolvedTheme } = useTheme();
 
@@ -252,10 +233,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
     : null;
   const modalError = effectiveError ?? emptyMarkupError;
   const modalSvgStyle = useMemo(() => parseInlineStyle(modalMeta?.style), [modalMeta]);
-  const modalMiniMapDataUri = useMemo(
-    () => (modalMeta?.fullSvg ? toSvgDataUri(modalMeta.fullSvg) : ""),
-    [modalMeta],
-  );
+  const viewerCanvasBackground = resolvedTheme === "dark" ? "#0f172a" : "#eef4ff";
 
   const relativeScale = viewerScale.fitScale > 0
     ? viewerScale.currentScale / viewerScale.fitScale
@@ -338,32 +316,6 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
 
     setViewerScale((prev) => ({ ...prev, currentScale: value.d }));
   }, []);
-
-  const customMiniature = useMemo(() => {
-    if (!modalMeta || !modalMiniMapDataUri) return undefined;
-
-    return function CustomMiniature(props: {
-      value: ViewerValue;
-      children?: React.ReactNode;
-      background?: string;
-      position?: "left" | "right";
-      width?: number;
-      height?: number;
-    }) {
-      return (
-        <MermaidMiniMap
-          {...props}
-          background="transparent"
-          scaleMultiplier={MINIMAP_SCALE_MULTIPLIER}
-          svgDataUri={modalMiniMapDataUri}
-          svgMinX={modalMeta.minX}
-          svgMinY={modalMeta.minY}
-          svgWidth={modalMeta.width}
-          svgHeight={modalMeta.height}
-        />
-      );
-    };
-  }, [modalMeta, modalMiniMapDataUri]);
 
   useEffect(() => {
     const themeMode: MermaidThemeMode = resolvedTheme === "dark" ? "dark" : "light";
@@ -563,7 +515,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
             role="dialog"
             aria-modal="true"
             aria-labelledby="mermaid-modal-title"
-            className="mermaid-modal relative flex h-[96vh] w-[88vw] max-w-none flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
+            className="mermaid-modal relative flex h-[96vh] w-[80vw] max-w-none flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mermaid-modal__header flex items-center gap-3 border-b border-[var(--border)] bg-[var(--card-subtle)] px-4 py-3 md:px-5">
@@ -628,10 +580,10 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                       scaleFactorMax={40}
                       detectAutoPan={false}
                       toolbarProps={{ position: POSITION_NONE }}
-                      miniatureProps={{ position: "left", width: 220, height: 140, background: "transparent" }}
-                      customMiniature={customMiniature}
+                      miniatureProps={{ position: POSITION_NONE }}
                       onZoom={handleViewerInteraction}
                       onPan={handleViewerInteraction}
+                      background={viewerCanvasBackground}
                       SVGBackground="transparent"
                       className="mermaid-modal__viewer"
                     >
