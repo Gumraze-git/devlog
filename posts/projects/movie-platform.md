@@ -113,7 +113,7 @@ flowchart LR
   end
 
   subgraph EXT["External APIs"]
-    direction LR
+    direction TB
     ExtKakao["Kakao Auth API"]
     ExtKOBIS["KOBIS API"]
     ExtKMDb["KMDb API"]
