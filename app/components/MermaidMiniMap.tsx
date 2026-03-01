@@ -52,6 +52,7 @@ function computeViewportRect(
   svgMinY: number,
   svgWidth: number,
   svgHeight: number,
+  insetLocal: number,
 ): Rect | null {
   const topLeft = invertViewerPoint(value, 0, 0);
   const bottomRight = invertViewerPoint(value, value.viewerWidth, value.viewerHeight);
@@ -72,13 +73,26 @@ function computeViewportRect(
   const right = clamp(rawRight, minX, maxX);
   const bottom = clamp(rawBottom, minY, maxY);
 
-  const width = Math.max(0, right - left);
-  const height = Math.max(0, bottom - top);
+  const localLeft = left - minX;
+  const localTop = top - minY;
+  const localRight = right - minX;
+  const localBottom = bottom - minY;
+
+  const safeInsetX = clamp(insetLocal, 0, svgWidth / 2);
+  const safeInsetY = clamp(insetLocal, 0, svgHeight / 2);
+
+  const clampedLeft = clamp(localLeft, safeInsetX, svgWidth - safeInsetX);
+  const clampedTop = clamp(localTop, safeInsetY, svgHeight - safeInsetY);
+  const clampedRight = clamp(localRight, safeInsetX, svgWidth - safeInsetX);
+  const clampedBottom = clamp(localBottom, safeInsetY, svgHeight - safeInsetY);
+
+  const width = Math.max(0, clampedRight - clampedLeft);
+  const height = Math.max(0, clampedBottom - clampedTop);
   if (width === 0 || height === 0) return null;
 
   return {
-    x: left - minX,
-    y: top - minY,
+    x: clampedLeft,
+    y: clampedTop,
     width,
     height,
   };
@@ -102,8 +116,9 @@ export default function MermaidMiniMap({
   const effectiveScale = zoomToFit * safeMultiplier;
   const offsetX = (width - svgWidth * effectiveScale) / 2;
   const offsetY = (height - svgHeight * effectiveScale) / 2;
+  const insetLocal = effectiveScale > 0 ? 1.5 / effectiveScale : 0;
 
-  const viewportRect = computeViewportRect(value, svgMinX, svgMinY, svgWidth, svgHeight);
+  const viewportRect = computeViewportRect(value, svgMinX, svgMinY, svgWidth, svgHeight, insetLocal);
 
   return (
     <div
