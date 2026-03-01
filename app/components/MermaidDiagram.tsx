@@ -634,15 +634,17 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                       className="mermaid-modal__viewer"
                     >
                       <svg
-                        id={modalMeta.rootId}
-                        className={modalMeta.className}
-                        style={modalSvgStyle}
-                        preserveAspectRatio={modalMeta.preserveAspectRatio}
                         viewBox={modalMeta.viewBox}
                         width={modalMeta.width}
                         height={modalMeta.height}
+                        preserveAspectRatio={modalMeta.preserveAspectRatio}
                       >
-                        <g dangerouslySetInnerHTML={{ __html: modalMeta.innerMarkup }} />
+                        <g
+                          id={modalMeta.rootId}
+                          className={modalMeta.className}
+                          style={modalSvgStyle}
+                          dangerouslySetInnerHTML={{ __html: modalMeta.innerMarkup }}
+                        />
                       </svg>
                     </UncontrolledReactSVGPanZoom>
                   )}
