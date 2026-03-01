@@ -537,7 +537,6 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
                       onPan={handleViewerInteraction}
                       SVGBackground="transparent"
                       className="mermaid-modal__viewer"
-                      style={{ opacity: isFitReady ? 1 : 0 }}
                     >
                       <svg
                         viewBox={svgMeta.viewBox}
