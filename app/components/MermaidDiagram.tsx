@@ -50,6 +50,8 @@ function getThemeVariables(mode: MermaidThemeMode) {
     return {
       primaryColor: "#1e293b",
       primaryTextColor: "#e2e8f0",
+      textColor: "#e2e8f0",
+      nodeTextColor: "#e2e8f0",
       primaryBorderColor: "#60a5fa",
       lineColor: "#94a3b8",
       secondaryColor: "#0f172a",
@@ -60,14 +62,16 @@ function getThemeVariables(mode: MermaidThemeMode) {
   }
 
   return {
-    primaryColor: "#3b82f6",
-    primaryTextColor: "#ffffff",
-    primaryBorderColor: "#1d4ed8",
-    lineColor: "#94a3b8",
+    primaryColor: "#eef4ff",
+    primaryTextColor: "#0f172a",
+    textColor: "#0f172a",
+    nodeTextColor: "#0f172a",
+    primaryBorderColor: "#2563eb",
+    lineColor: "#64748b",
     secondaryColor: "#f1f5f9",
     tertiaryColor: "#ffffff",
     edgeLabelBackground: "#ffffff",
-    mainBkg: "transparent",
+    mainBkg: "#eef4ff",
   };
 }
 
@@ -158,14 +162,16 @@ function injectScopedEdgeLabelStyle(
 ): string {
   const escapedRootId = escapeCssId(rootId);
   const scope = `#${escapedRootId}`;
+  const edgeLabelTextColor = themeVars.nodeTextColor ?? themeVars.textColor ?? themeVars.primaryTextColor;
+
   const injectedStyle = `<style>
     ${scope} .edgeLabel rect, ${scope} .edge-thickness-normal rect, ${scope} .edge-thickness-thick rect, ${scope} .edge-thickness-invisible rect {
       fill: ${themeVars.edgeLabelBackground} !important;
       stroke: none !important;
     }
     ${scope} .edgeLabel text, ${scope} .edgeLabel tspan {
-      fill: ${themeVars.primaryTextColor} !important;
-      color: ${themeVars.primaryTextColor} !important;
+      fill: ${edgeLabelTextColor} !important;
+      color: ${edgeLabelTextColor} !important;
     }
   </style>`;
 
