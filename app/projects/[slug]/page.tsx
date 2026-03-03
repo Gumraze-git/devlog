@@ -296,44 +296,43 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
           </div>
         </section>
 
+        {tocItems.length > 0 && (
+          <aside className="md:hidden mb-8">
+            <details className="group rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-4 shadow-sm">
+              <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] [&::-webkit-details-marker]:hidden">
+                목차
+                <span className="text-xs text-[var(--text-soft)] transition-transform duration-200 group-open:rotate-180">▼</span>
+              </summary>
+              <nav aria-label="Table of contents" className="mt-4">
+                <ProjectTocLinks items={tocItems} className="space-y-2" />
+              </nav>
+            </details>
+          </aside>
+        )}
+
         <div className="relative">
           {/* Left column: Main content (Now single column) */}
           <div className="space-y-12">
             <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
           </div>
 
-          {/* Right floating TOC (Hover to show on Desktop) */}
-          <aside className="md:hidden mt-12">
-            {tocItems.length > 0 && (
-              <details className="p-4 bg-[var(--card-subtle)] rounded-2xl border border-[var(--border)]">
-                <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
-                  Contents
-                </summary>
-                <nav aria-label="Table of contents" className="mt-4">
-                  <ProjectTocLinks items={tocItems} className="space-y-2" />
-                </nav>
-              </details>
-            )}
-          </aside>
-
           {tocItems.length > 0 && (
             <aside className="hidden md:block fixed top-1/2 right-0 -translate-y-1/2 z-[100]">
-              {/* The invisible trigger area to make hovering easier */}
-              <div className="group flex items-center justify-end w-64 translate-x-[calc(100%-1.5rem)] hover:translate-x-0 transition-transform duration-500 ease-out">
-
-                {/* Handle indicator */}
-                <div className="flex items-center justify-center w-6 h-16 bg-[var(--card)] border border-r-0 border-[var(--border)] rounded-l-xl shadow-sm cursor-pointer opacity-50 group-hover:opacity-100 transition-opacity">
-                  <div className="w-1 h-6 bg-[var(--border)] rounded-full group-hover:bg-[var(--accent)] transition-colors" />
+              <details className="group flex items-center justify-end">
+                <div className="hidden w-64 shrink-0 group-open:block">
+                  <div className="w-64 rounded-l-2xl border border-[var(--border)] bg-[var(--card)]/95 p-6 shadow-2xl backdrop-blur-md">
+                    <nav aria-label="Table of contents" className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                      <h3 className="border-l-2 border-[var(--accent)] pl-3 text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">목차</h3>
+                      <ProjectTocLinks items={tocItems} />
+                    </nav>
+                  </div>
                 </div>
 
-                {/* TOC Panel */}
-                <div className="w-[calc(100%-1.5rem)] bg-[var(--card)]/90 backdrop-blur-md border border-[var(--border)] shadow-2xl rounded-l-2xl p-6">
-                  <nav aria-label="Table of contents" className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                    <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-widest pl-3 border-l-2 border-[var(--accent)]">Contents</h3>
-                    <ProjectTocLinks items={tocItems} />
-                  </nav>
-                </div>
-              </div>
+                <summary className="flex h-16 cursor-pointer list-none items-center gap-2 rounded-l-xl border border-r-0 border-[var(--border)] bg-[var(--card)] px-3 text-[var(--text-muted)] shadow-sm transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] [&::-webkit-details-marker]:hidden">
+                  <span className="h-6 w-1 rounded-full bg-[var(--border)] transition-colors group-open:bg-[var(--accent)]" />
+                  <span className="text-xs font-bold uppercase tracking-[0.18em]">목차</span>
+                </summary>
+              </details>
             </aside>
           )}
         </div>
