@@ -121,7 +121,7 @@ export default function ProjectTocLinks({ items, className = "space-y-1.5" }: Pr
     <div className={className}>
       {items.map((item, index) => {
         const isActive = activeSlug === item.slug;
-        const indentClass = item.depth === 2 ? "pl-3" : item.depth === 3 ? "pl-6" : "";
+        const indentClass = item.depth === 2 ? "ml-3" : item.depth === 3 ? "ml-6" : "";
 
         return (
           <a
@@ -129,13 +129,19 @@ export default function ProjectTocLinks({ items, className = "space-y-1.5" }: Pr
             href={`#${item.slug}`}
             aria-current={isActive ? "location" : undefined}
             onClick={(event) => handleClick(event, item.slug)}
-            className={`block rounded-md text-sm transition-colors ${indentClass} ${
+            className={`group relative flex w-full items-start gap-2 rounded-lg border px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] ${
               isActive
-                ? "font-semibold text-[var(--foreground)]"
-                : "text-[var(--text-muted)] hover:text-[var(--foreground)]"
+                ? "border-[var(--accent)]/40 bg-[color-mix(in_srgb,var(--accent)_10%,var(--card))] font-semibold text-[var(--foreground)]"
+                : "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--card-subtle)]/70 hover:text-[var(--foreground)]"
             }`}
           >
-            <span>{item.text}</span>
+            <span
+              aria-hidden
+              className={`mt-1 h-4 w-1 shrink-0 rounded-full transition-colors ${
+                isActive ? "bg-[var(--accent)]" : "bg-transparent group-hover:bg-[var(--border)]"
+              }`}
+            />
+            <span className={`block leading-relaxed ${indentClass}`}>{item.text}</span>
           </a>
         );
       })}

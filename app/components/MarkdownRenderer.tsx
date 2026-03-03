@@ -411,8 +411,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             );
         }
 
+        const inlineCodeClassName = ["md-inline-code", className].filter(Boolean).join(" ");
         return (
-            <code className={className} {...props}>
+            <code className={inlineCodeClassName} {...props}>
                 {children}
             </code>
         );
@@ -432,7 +433,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     };
 
     return (
-        <div className="prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-loose prose-li:text-[var(--text-muted)] prose-li:leading-loose">
+        <div className="markdown-prose prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-loose prose-li:text-[var(--text-muted)] prose-li:leading-loose">
             <ReactMarkdown
                 components={{
                     pre: ({ children }) => <>{children}</>,
@@ -472,14 +473,12 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         const text = getTextContent(children);
                         if (typeof text === "string" && text.trim().startsWith("|")) {
                             const content = text.trim().substring(1).trim();
-                            const slug = slugify(content);
                             return (
-                                <h2
-                                    id={slug}
-                                    className="scroll-mt-24 !mt-8 !mb-4 border-l-4 border-zinc-800 dark:border-zinc-200 pl-4 font-bold text-2xl tracking-tighter text-[var(--foreground)]"
+                                <p
+                                    className="!my-4 rounded-lg border border-[var(--border)] bg-[var(--card-subtle)] px-4 py-2 text-sm font-semibold tracking-wide text-[var(--foreground)]"
                                 >
                                     {content}
-                                </h2>
+                                </p>
                             );
                         }
                         return <p>{children}</p>;
