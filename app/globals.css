@@ -151,6 +151,23 @@ html {
   word-break: break-all;
 }
 
+.markdown-prose a.md-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  vertical-align: baseline;
+}
+
+.markdown-prose a .md-link__icon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.markdown-prose a.md-link--code .md-link__icon,
+.markdown-prose a.md-link--commit .md-link__icon {
+  opacity: 1;
+}
+
 .markdown-prose a:visited {
   color: var(--accent-strong);
 }

@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { Code2, GitCommitHorizontal } from "lucide-react";
 import { createCodeKey, extractHeadingSlugByLine, slugify, stripInlineMarkdown } from "../lib/markdown";
 import MermaidDiagram from "./MermaidDiagram";
 
@@ -56,6 +57,35 @@ type MarkdownCodeProps = React.HTMLAttributes<HTMLElement> & {
     children?: React.ReactNode;
     node?: PositionNode;
 };
+
+type LinkKind = "default" | "code" | "commit";
+
+type MarkdownAnchorProps = React.ComponentPropsWithoutRef<"a"> & {
+    node?: unknown;
+};
+
+function isExternalHttpLink(href?: string): boolean {
+    if (!href) return false;
+    return /^https?:\/\//i.test(href);
+}
+
+function classifyLinkKind(href?: string): LinkKind {
+    if (!isExternalHttpLink(href)) return "default";
+
+    try {
+        const parsed = new URL(href);
+        const hostname = parsed.hostname.toLowerCase();
+        if (hostname !== "github.com" && hostname !== "www.github.com") {
+            return "default";
+        }
+
+        if (parsed.pathname.includes("/commit/")) return "commit";
+        if (parsed.pathname.includes("/blob/")) return "code";
+        return "default";
+    } catch {
+        return "default";
+    }
+}
 
 function isBlockCode(node: PositionNode | undefined, className: string | undefined, rawCode: string): boolean {
     const startLine = node?.position?.start?.line;
@@ -424,6 +454,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                                         {innerChildren}
                                                     </blockquote>
                                                 ),
+                                                a: renderMarkdownAnchor,
                                             }}
                                         >
                                             {normalizeArrowNotation(sections[row.key] || "")}
@@ -507,6 +538,33 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         return slugify(text);
     };
 
+    const renderMarkdownAnchor = ({ href, children, className, ...props }: MarkdownAnchorProps) => {
+        const kind = classifyLinkKind(href);
+        const isExternal = isExternalHttpLink(href);
+        const mergedClassName = ["md-link", kind !== "default" ? `md-link--${kind}` : "", className]
+            .filter(Boolean)
+            .join(" ");
+
+        const icon = kind === "code"
+            ? <Code2 size={14} className="md-link__icon" aria-hidden="true" />
+            : kind === "commit"
+                ? <GitCommitHorizontal size={14} className="md-link__icon" aria-hidden="true" />
+                : null;
+
+        return (
+            <a
+                href={href}
+                className={mergedClassName}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                {...props}
+            >
+                {icon}
+                {children}
+            </a>
+        );
+    };
+
     return (
         <div className="markdown-prose prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-[1.6] prose-li:text-[var(--text-muted)] prose-li:leading-[1.4]">
             <ReactMarkdown
@@ -562,6 +620,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         <hr className="!my-8 border-zinc-200 dark:border-zinc-800" />
                     ),
                     code: renderCode,
+                    a: renderMarkdownAnchor,
                 }}
             >
                 {renderedContent}
