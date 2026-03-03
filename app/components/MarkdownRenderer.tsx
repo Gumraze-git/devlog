@@ -550,7 +550,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                             const content = text.trim().substring(1).trim();
                             return (
                                 <p
-                                    className="!my-4 rounded-lg border border-[var(--border)] bg-[var(--card-subtle)] px-4 py-2 text-sm font-semibold tracking-wide text-[var(--foreground)]"
+                                    className="scroll-mt-24 !mt-8 !mb-4 border-l-4 border-zinc-800 dark:border-zinc-200 pl-4 font-bold text-2xl tracking-tighter !text-black"
                                 >
                                     {content}
                                 </p>
