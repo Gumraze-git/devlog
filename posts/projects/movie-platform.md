@@ -239,17 +239,19 @@ flowchart LR
 - - -
 # 3. 핵심 트러블슈팅 Top3 (프로젝트 기간 중)
 
-## 3.1 인증/접근 제어 정합성
-| As-Is
+~~~troubleshooting
+제목: 3.1 인증/접근 제어 정합성
+
+문제:
 공개 조회 API와 인증 필요 API 경계가 일관되지 않아 비인증 조회에서 401/403 오동작이 발생했습니다.
 
-| Root Cause
+원인:
 보안 경로 정책과 토큰 검증 로직이 분산되어 실제 공개해야 할 경로가 누락되었습니다.
 
-| To-Be
+해결:
 공개 GET 경로를 상수로 분리하고 `boxoffice` 경로를 명시적으로 permitAll 처리했습니다. 또한 JWT null/blank 검증을 선행해 인증 필터 동작을 단순화했습니다.
 
-| Code Evidence
+**Code Evidence**
 ```java
 private static final String[] PUBLIC_GET_ENDPOINTS = {
     "/api/v1/movies/search/**",
@@ -265,30 +267,34 @@ public boolean validateToken(String token) {
 }
 ```
 
-| Commit Evidence
+**Commit Evidence**
 - `1eb2561` (boxoffice endpoint 정합화)
 - `236db2a` (boxoffice 공개 경로 반영)
 - `346f551` (JWT 검증 구조 개선)
 
-| Verification
+결과:
+**Verification**
 - 비인증 사용자로 `GET /api/v1/boxoffice/**` 호출 시 정상 조회
 - 인증 필요 엔드포인트는 기존대로 401/403 보안 정책 유지
 
-| Recurrence Prevention
+**Recurrence Prevention**
 - 공개 API 추가 시 `PUBLIC_GET_ENDPOINTS`/`PUBLIC_POST_ENDPOINTS`에 먼저 반영
 - 보안 정책 변경 시 공개/보호 엔드포인트를 체크리스트로 리뷰
+~~~
 
-## 3.2 외부 연동 실패 대응 (FastAPI 감정분석)
-| As-Is
+~~~troubleshooting
+제목: 3.2 외부 연동 실패 대응 (FastAPI 감정분석)
+
+문제:
 리뷰 저장 흐름에서 FastAPI 호출 실패가 발생하면 서비스 응답이 불안정해졌습니다.
 
-| Root Cause
+원인:
 외부 연동 실패를 도메인 예외로 표준화하지 않아 실패 케이스 처리 일관성이 낮았습니다.
 
-| To-Be
+해결:
 FastAPI 응답 null/호출 예외를 `ExternalServiceException`으로 통일해 상위 계층에서 동일한 예외 계약으로 처리하도록 정리했습니다.
 
-| Code Evidence
+**Code Evidence**
 ```java
 try {
     PredictResponseDTO response = fastApiRestClient.post()
@@ -305,29 +311,33 @@ try {
 }
 ```
 
-| Commit Evidence
+**Commit Evidence**
 - `efc1427` (리뷰 작성 시 감정분석 연동 + 실패 처리)
 - `6c8bdef` (외부 서비스 예외 타입 추가)
 
-| Verification
+결과:
+**Verification**
 - FastAPI 비정상 응답/네트워크 실패 상황에서 예외 코드 일관성 확인
 - 리뷰 작성/수정 API에서 동일한 실패 응답 포맷 유지 확인
 
-| Recurrence Prevention
+**Recurrence Prevention**
 - 외부 시스템 연동 시 `null 응답 + 클라이언트 예외`를 기본 실패 템플릿으로 강제
 - 신규 외부 연동 API는 동일한 도메인 예외 타입 사용
+~~~
 
-## 3.3 감정 데이터 정합성 (입력 범위 + 대표감정 계산)
-| As-Is
+~~~troubleshooting
+제목: 3.3 감정 데이터 정합성 (입력 범위 + 대표감정 계산)
+
+문제:
 감정 입력 스케일과 요약 계산 로직 불일치로 대표 감정 결과가 왜곡될 수 있었습니다.
 
-| Root Cause
+원인:
 입력 DTO 검증 범위와 실제 전달 데이터 스케일이 달랐고, 요약 재계산 시 대표 감정 계산 시점이 일관되지 않았습니다.
 
-| To-Be
+해결:
 감정 입력 검증을 `0~100`으로 정합화하고, 요약 재계산 단계에서 대표 감정을 명시적으로 계산 후 반영하도록 변경했습니다.
 
-| Code Evidence
+**Code Evidence**
 ```java
 @NotNull @Min(0) @Max(100)
 private Float joy;
@@ -341,32 +351,24 @@ avgDto.setRepEmotionType(rep);
 summary.updateFromDTO(avgDto);
 ```
 
-| Commit Evidence
+**Commit Evidence**
 - `53aeac7` (감정 DTO 범위 0~100)
 - `ff72cbc` (대표 감정 계산 오류 개선)
 
-| Verification
+결과:
+**Verification**
 - 감정 입력값 100 초과 시 검증 실패 확인
 - 리뷰 등록/수정 후 대표 감정 필드가 재계산되어 반영되는지 확인
 
-| Recurrence Prevention
+**Recurrence Prevention**
 - 감정 도메인 입력/응답 스케일을 API 계약에 고정
 - 집계 로직 변경 시 대표 감정 계산 테스트 케이스를 필수화
-
-## 3.4 공개 API/인터페이스/타입 변경 사항
-- `GET /api/v1/boxoffice/**` 공개 접근 정책 반영
-- 내부-외부 연동 계약: `POST /api/v1/emotion-predictions` + 실패 예외 표준화
-- 타입 검증 변경: `MemberEmotionSummaryRequestDTO` 감정 값 범위 `0~100`
-
-## 3.5 테스트/검증 시나리오
-1. 비인증 사용자 `GET /api/v1/boxoffice/**` 접근 성공 여부
-2. FastAPI 오류/무응답 시 일관된 예외 응답 확인
-3. 감정 입력값 100 초과 시 검증 실패 확인
-4. 리뷰 등록/수정 후 감정 요약 재계산 반영 확인
+~~~
 
 - - -
-# 4. ERD (프로젝트 종료 시점)
+# 4. ERD
 | ERD 이미지
+
 `[프로젝트 종료 시점 ERD 이미지 첨부 예정]`
 
 | 설명 초안
@@ -376,7 +378,7 @@ summary.updateFromDTO(avgDto);
 - 쓰기 모델과 요약 모델을 분리해 추천 조회 계산 비용을 줄이도록 설계했습니다.
 
 - - -
-# 5. 프로젝트 개선 (종료 이후)
+# 5. 프로젝트 평가 및 개선
 ## 5.1 모노레포/실행 재현성
 - 개선 전: 서비스별 실행/설정 경로가 분산되어 온보딩 비용이 높았습니다.
 - 개선 후: `docker-compose`, `make` 기반으로 프론트/백엔드/AI 통합 실행 경로를 표준화했습니다.
