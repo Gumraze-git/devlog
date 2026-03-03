@@ -171,10 +171,85 @@ function buildTroubleSummary(sections: TroubleContent): string {
     return "트러블슈팅 펼쳐보기";
 }
 
+function replaceArrowOutsideInlineCode(line: string): string {
+    let output = "";
+    let cursor = 0;
+
+    while (cursor < line.length) {
+        const tickStart = line.indexOf("`", cursor);
+        if (tickStart === -1) {
+            output += line.slice(cursor).replace(/->/g, "→");
+            break;
+        }
+
+        output += line.slice(cursor, tickStart).replace(/->/g, "→");
+
+        let tickCount = 1;
+        while (tickStart + tickCount < line.length && line[tickStart + tickCount] === "`") {
+            tickCount += 1;
+        }
+
+        const delimiter = "`".repeat(tickCount);
+        const tickEnd = line.indexOf(delimiter, tickStart + tickCount);
+        if (tickEnd === -1) {
+            output += line.slice(tickStart);
+            break;
+        }
+
+        output += line.slice(tickStart, tickEnd + tickCount);
+        cursor = tickEnd + tickCount;
+    }
+
+    return output;
+}
+
+function normalizeArrowNotation(source: string): string {
+    const lines = source.split("\n");
+    let inCodeFence = false;
+    let fenceChar: "`" | "~" | "" = "";
+    let fenceLength = 0;
+
+    const transformed = lines.map((line) => {
+        const trimmedStart = line.trimStart();
+        const fenceMatch = /^(`{3,}|~{3,})/.exec(trimmedStart);
+
+        if (fenceMatch) {
+            const marker = fenceMatch[1];
+            const markerChar = marker[0] as "`" | "~";
+            const markerLength = marker.length;
+
+            if (!inCodeFence) {
+                inCodeFence = true;
+                fenceChar = markerChar;
+                fenceLength = markerLength;
+                return line;
+            }
+
+            if (markerChar === fenceChar && markerLength >= fenceLength) {
+                inCodeFence = false;
+                fenceChar = "";
+                fenceLength = 0;
+                return line;
+            }
+
+            return line;
+        }
+
+        if (inCodeFence) {
+            return line;
+        }
+
+        return replaceArrowOutsideInlineCode(line);
+    });
+
+    return transformed.join("\n");
+}
+
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlByKey }) => {
     const codeHtmlMap = codeHtmlByKey ?? {};
     const [copiedKey, setCopiedKey] = useState<string | null>(null);
-    const headingSlugByLine = useMemo(() => extractHeadingSlugByLine(content), [content]);
+    const renderedContent = useMemo(() => normalizeArrowNotation(content), [content]);
+    const headingSlugByLine = useMemo(() => extractHeadingSlugByLine(renderedContent), [renderedContent]);
 
     const getTextContent = (children: React.ReactNode): string => {
         if (typeof children === "string" || typeof children === "number") {
@@ -351,7 +426,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                                 ),
                                             }}
                                         >
-                                            {sections[row.key] || ""}
+                                            {normalizeArrowNotation(sections[row.key] || "")}
                                         </ReactMarkdown>
                                     </div>
                                 </article>
@@ -411,8 +486,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             );
         }
 
+        const inlineCodeClassName = ["md-inline-code", className].filter(Boolean).join(" ");
         return (
-            <code className={className} {...props}>
+            <code className={inlineCodeClassName} {...props}>
                 {children}
             </code>
         );
@@ -432,7 +508,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     };
 
     return (
-        <div className="prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-loose prose-li:text-[var(--text-muted)] prose-li:leading-loose">
+        <div className="markdown-prose prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-loose prose-li:text-[var(--text-muted)] prose-li:leading-loose">
             <ReactMarkdown
                 components={{
                     pre: ({ children }) => <>{children}</>,
@@ -490,7 +566,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                     code: renderCode,
                 }}
             >
-                {content}
+                {renderedContent}
             </ReactMarkdown>
         </div>
     );
