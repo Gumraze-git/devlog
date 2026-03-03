@@ -141,6 +141,37 @@ html {
   font-size: 0.9em;
 }
 
+/* Keep markdown links readable in both light and dark themes */
+.markdown-prose a {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-underline-offset: 2px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.markdown-prose a:visited {
+  color: var(--accent-strong);
+}
+
+.markdown-prose a:hover {
+  color: var(--accent-hover);
+}
+
+.dark .markdown-prose a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.dark .markdown-prose a:visited {
+  color: var(--accent);
+}
+
+.dark .markdown-prose a:hover {
+  color: var(--accent-hover);
+}
+
 /* Project detail inline markdown code: keep chip box + soft red text */
 .markdown-prose code.md-inline-code {
   display: inline-block;
