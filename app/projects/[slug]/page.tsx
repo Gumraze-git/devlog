@@ -12,7 +12,7 @@ import { getProject } from "../../lib/projects";
 import { createCodeKey, extractCodeBlocks, extractHeadings } from "../../lib/markdown";
 import { getTechIconMeta } from "../../data/skills";
 import { getSiteUrl } from "../../lib/site";
-import { codeToHtml } from "shiki";
+import { bundledLanguages, codeToHtml } from "shiki";
 
 type Params = {
   slug: string;
@@ -23,6 +23,8 @@ export const dynamicParams = true;
 
 const codeHtmlCache = new Map<string, string>();
 const shikiThemes = { light: "github-dark-high-contrast", dark: "github-dark-high-contrast" } as const;
+const shikiFallbackLang = "md";
+const shikiBundledLangSet = new Set<string>(Object.keys(bundledLanguages));
 const troubleshootingLangs = new Set(["troubleshooting", "trouble", "troubleshoot"]);
 const customRenderedLangs = new Set([
   "mermaid",
@@ -34,6 +36,21 @@ const customRenderedLangs = new Set([
   "reflection",
   ...troubleshootingLangs,
 ]);
+
+function resolveShikiLang(lang: string): string {
+  const normalized = lang.trim().toLowerCase();
+  if (!normalized) return shikiFallbackLang;
+
+  const alias =
+    normalized === "text" ||
+    normalized === "txt" ||
+    normalized === "plain" ||
+    normalized === "plaintext"
+      ? shikiFallbackLang
+      : normalized;
+
+  return shikiBundledLangSet.has(alias) ? alias : shikiFallbackLang;
+}
 
 function extractBacktickCodeBlocks(source: string): Array<{ lang: string; code: string }> {
   const blocks: Array<{ lang: string; code: string }> = [];
@@ -71,10 +88,11 @@ function extractBacktickCodeBlocks(source: string): Array<{ lang: string; code: 
 }
 
 async function highlightCode(code: string, lang: string) {
+  const safeLang = resolveShikiLang(lang);
   try {
-    return await codeToHtml(code, { lang, themes: shikiThemes });
+    return await codeToHtml(code, { lang: safeLang, themes: shikiThemes });
   } catch {
-    return await codeToHtml(code, { lang: "text", themes: shikiThemes });
+    return await codeToHtml(code, { lang: shikiFallbackLang, themes: shikiThemes });
   }
 }
 
@@ -83,7 +101,10 @@ async function buildCodeHtmlByKey(content: string): Promise<Record<string, strin
     const normalizedLang = block.lang.trim().toLowerCase();
 
     if (troubleshootingLangs.has(normalizedLang)) {
-      return extractBacktickCodeBlocks(block.code);
+      return extractBacktickCodeBlocks(block.code).filter((innerBlock) => {
+        const innerLang = innerBlock.lang.trim().toLowerCase();
+        return !customRenderedLangs.has(innerLang);
+      });
     }
 
     if (customRenderedLangs.has(normalizedLang)) {
