@@ -15,6 +15,13 @@
   --accent: #3b82f6;
   --accent-strong: #1d4ed8;
   --accent-hover: #1e40af;
+  --code-bg: #090c12;
+  --code-surface: #101621;
+  --code-border: #2c3647;
+  --code-fg: #f1f5f9;
+  --code-fg-soft: #b2c0d5;
+  --code-copy-bg: #141c2b;
+  --code-copy-border: #3b4a63;
   /* Deep blue for hover in light mode */
   --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
@@ -78,6 +85,29 @@ html {
   display: none;
 }
 
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-soft) 55%, transparent) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-soft) 55%, transparent);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 65%, var(--text-soft));
+}
+
 /* Prose tweaks for modal markdown */
 .prose-modal :is(h1, h2) {
   font-size: 1.15rem;
@@ -118,69 +148,560 @@ html {
   font-size: 0.9em;
 }
 
+/* Keep markdown links readable in both light and dark themes */
+.markdown-prose a {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-underline-offset: 2px;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.markdown-prose a:visited {
+  color: var(--accent-strong);
+}
+
+.markdown-prose a:hover {
+  color: var(--accent-hover);
+  text-decoration-color: color-mix(in srgb, var(--accent-hover) 70%, transparent);
+}
+
+.markdown-prose .md-chip-list {
+  margin: 0.45rem 0 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.markdown-prose .md-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.24rem 0.62rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--card) 86%, var(--background));
+  text-decoration: none;
+}
+
+.markdown-prose .md-chip__icon {
+  flex-shrink: 0;
+  opacity: 0.88;
+}
+
+.markdown-prose a.md-chip--link {
+  text-decoration: none;
+  text-decoration-color: transparent;
+  font-weight: 600;
+  word-break: normal;
+  color: var(--foreground);
+}
+
+.markdown-prose a.md-chip--link:visited {
+  color: var(--foreground);
+}
+
+.markdown-prose a.md-chip--link:hover {
+  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: color-mix(in srgb, var(--card) 62%, var(--accent) 8%);
+}
+
+.markdown-prose .md-chip--code {
+  border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+  color: var(--accent-strong);
+}
+
+.markdown-prose .md-chip--commit {
+  border-color: color-mix(in srgb, var(--accent-strong) 24%, var(--border));
+  color: color-mix(in srgb, var(--accent-strong) 88%, var(--foreground));
+}
+
+.markdown-prose .md-chip--asis {
+  border-color: color-mix(in srgb, #dc2626 28%, var(--border));
+  color: color-mix(in srgb, #b91c1c 82%, var(--foreground));
+  background: color-mix(in srgb, #fee2e2 45%, var(--card));
+}
+
+.markdown-prose .md-chip--tobe {
+  border-color: color-mix(in srgb, #0ea5e9 36%, var(--border));
+  color: color-mix(in srgb, #0369a1 82%, var(--foreground));
+  background: color-mix(in srgb, #e0f2fe 42%, var(--card));
+}
+
+/* Troubleshooting readability */
+.markdown-prose .trouble-card {
+  border-color: color-mix(in srgb, var(--accent) 16%, var(--border));
+}
+
+.markdown-prose .trouble-summary-title {
+  color: var(--foreground);
+  font-weight: 650;
+}
+
+.markdown-prose .trouble-content {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+}
+
+.markdown-prose .trouble-section {
+  border-color: color-mix(in srgb, var(--accent) 12%, var(--border));
+  background: color-mix(in srgb, var(--card) 88%, var(--card-subtle));
+}
+
+.markdown-prose .trouble-section-label {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 0.6rem;
+  padding: 0.24rem 0.58rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.81rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--card-subtle) 88%, var(--background));
+}
+
+.markdown-prose .trouble-section-text {
+  font-size: 0.93rem;
+  line-height: 1.68;
+}
+
+.markdown-prose .trouble-section--problem .trouble-section-label {
+  border-color: color-mix(in srgb, #ef4444 36%, var(--border));
+  color: color-mix(in srgb, #b91c1c 82%, var(--foreground));
+  background: color-mix(in srgb, #fee2e2 56%, var(--card));
+}
+
+.markdown-prose .trouble-section--cause .trouble-section-label {
+  border-color: color-mix(in srgb, #f59e0b 34%, var(--border));
+  color: color-mix(in srgb, #a16207 84%, var(--foreground));
+  background: color-mix(in srgb, #fef3c7 56%, var(--card));
+}
+
+.markdown-prose .trouble-section--solution .trouble-section-label {
+  border-color: color-mix(in srgb, #0ea5e9 34%, var(--border));
+  color: color-mix(in srgb, #0369a1 84%, var(--foreground));
+  background: color-mix(in srgb, #e0f2fe 56%, var(--card));
+}
+
+.markdown-prose .trouble-section--result .trouble-section-label {
+  border-color: color-mix(in srgb, #22c55e 32%, var(--border));
+  color: color-mix(in srgb, #15803d 84%, var(--foreground));
+  background: color-mix(in srgb, #dcfce7 56%, var(--card));
+}
+
+.project-md-readable .md-chip-list {
+  gap: 0.35rem;
+}
+
+.project-md-readable .md-chip {
+  padding: 0.2rem 0.52rem;
+  font-size: 0.74rem;
+  color: var(--text-soft);
+}
+
+.project-md-readable .md-chip__icon {
+  opacity: 0.74;
+}
+
+.project-md-readable a.md-chip--link,
+.project-md-readable a.md-chip--link:visited {
+  color: var(--text-soft);
+}
+
+.dark .project-md-readable a.md-chip--link,
+.dark .project-md-readable a.md-chip--link:visited,
+.dark .project-md-readable a.md-chip--link:hover {
+  color: var(--text-soft);
+}
+
+.project-md-readable .md-chip--code {
+  border-color: color-mix(in srgb, var(--accent) 16%, var(--border));
+  color: color-mix(in srgb, var(--accent-strong) 62%, var(--text-soft));
+}
+
+.project-md-readable .md-chip--commit {
+  border-color: color-mix(in srgb, var(--accent-strong) 16%, var(--border));
+  color: color-mix(in srgb, var(--accent-strong) 58%, var(--text-soft));
+}
+
+.dark .markdown-prose a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.dark .markdown-prose a:visited {
+  color: var(--accent);
+}
+
+.dark .markdown-prose a:hover {
+  color: var(--accent-hover);
+}
+
+.dark .markdown-prose .md-chip--asis {
+  border-color: color-mix(in srgb, #f87171 46%, var(--border));
+  color: color-mix(in srgb, #fecaca 86%, var(--foreground));
+  background: color-mix(in srgb, #7f1d1d 24%, var(--card));
+}
+
+.dark .markdown-prose .md-chip--tobe {
+  border-color: color-mix(in srgb, #38bdf8 52%, var(--border));
+  color: color-mix(in srgb, #bae6fd 86%, var(--foreground));
+  background: color-mix(in srgb, #0c4a6e 26%, var(--card));
+}
+
+.dark .markdown-prose .trouble-card {
+  border-color: color-mix(in srgb, #38bdf8 30%, var(--border));
+}
+
+.dark .markdown-prose .trouble-section {
+  border-color: color-mix(in srgb, #38bdf8 22%, var(--border));
+  background: color-mix(in srgb, var(--card) 82%, #0b1220 18%);
+}
+
+.dark .markdown-prose .trouble-section-label {
+  border-color: color-mix(in srgb, #93c5fd 34%, var(--border));
+  color: color-mix(in srgb, #e2e8f0 88%, var(--foreground));
+  background: color-mix(in srgb, #0f172a 56%, var(--card));
+}
+
+.dark .markdown-prose .trouble-section--problem .trouble-section-label {
+  border-color: color-mix(in srgb, #f87171 54%, var(--border));
+  color: color-mix(in srgb, #fecaca 88%, var(--foreground));
+  background: color-mix(in srgb, #7f1d1d 34%, var(--card));
+}
+
+.dark .markdown-prose .trouble-section--cause .trouble-section-label {
+  border-color: color-mix(in srgb, #fbbf24 52%, var(--border));
+  color: color-mix(in srgb, #fde68a 88%, var(--foreground));
+  background: color-mix(in srgb, #78350f 34%, var(--card));
+}
+
+.dark .markdown-prose .trouble-section--solution .trouble-section-label {
+  border-color: color-mix(in srgb, #38bdf8 58%, var(--border));
+  color: color-mix(in srgb, #bae6fd 88%, var(--foreground));
+  background: color-mix(in srgb, #0c4a6e 34%, var(--card));
+}
+
+.dark .markdown-prose .trouble-section--result .trouble-section-label {
+  border-color: color-mix(in srgb, #4ade80 50%, var(--border));
+  color: color-mix(in srgb, #bbf7d0 88%, var(--foreground));
+  background: color-mix(in srgb, #14532d 34%, var(--card));
+}
+
+/* Project detail inline markdown code: keep chip box + soft red text */
+.markdown-prose code.md-inline-code {
+  display: inline-block;
+  padding: 0.08rem 0.38rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(100, 116, 139, 0.3) !important;
+  background: var(--card-subtle) !important;
+  color: rgba(220, 38, 38, 0.78) !important;
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.dark .markdown-prose code.md-inline-code {
+  border-color: rgba(148, 163, 184, 0.38) !important;
+  background: var(--card-subtle) !important;
+  color: rgba(252, 165, 165, 0.95) !important;
+}
+
+.markdown-prose code.md-inline-code::before,
+.markdown-prose code.md-inline-code::after {
+  content: none !important;
+}
+
 .shiki-block {
   margin: 1.5rem 0;
-  border: 1px solid var(--border);
+  border: 1px solid var(--code-border);
   border-radius: 1rem;
   overflow: hidden;
-  background: var(--card);
-  box-shadow: var(--shadow);
+  background: var(--code-bg);
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
 }
 
 .shiki-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0.85rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--card-subtle);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--text-soft);
+  gap: 0.65rem;
+  padding: 0.62rem 0.92rem;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-surface) !important;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--code-fg-soft);
 }
 
 .shiki-lang {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.62rem;
+  border: 1px solid color-mix(in srgb, var(--code-border) 78%, #ffffff 22%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--code-bg) 80%, #0f172a 20%);
   font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--code-fg-soft);
 }
 
 .shiki-copy {
-  border: 1px solid var(--border);
+  border: 1px solid var(--code-copy-border);
   border-radius: 999px;
-  padding: 0.2rem 0.6rem;
-  font-size: 10px;
+  padding: 0.28rem 0.72rem;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--text-muted);
-  background: var(--card);
-  transition: border-color 0.2s ease, color 0.2s ease;
+  letter-spacing: 0.1em;
+  color: #dbe7f6;
+  background: var(--code-copy-bg) !important;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
 }
 
 .shiki-copy:hover {
-  border-color: var(--accent);
-  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--accent) 72%, #ffffff 28%);
+  background: color-mix(in srgb, var(--code-copy-bg) 72%, var(--accent) 28%);
+  color: #ffffff;
+}
+
+.shiki-copy:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 78%, #ffffff 22%);
+  outline-offset: 2px;
 }
 
 .shiki-wrapper .shiki {
   margin: 0;
-  padding: 1.25rem;
+  padding: 1.28rem 1.32rem;
   overflow-x: auto;
-  font-size: 0.9rem;
-  line-height: 1.7;
+  font-size: 0.97rem;
+  line-height: 1.85;
+  tab-size: 2;
   font-family: var(--font-mono);
+  background: var(--code-bg) !important;
+  color: var(--code-fg) !important;
 }
 
 .shiki-wrapper .shiki code {
   font-family: var(--font-mono);
+  font-variant-ligatures: none;
+  background: transparent !important;
+  color: inherit;
 }
 
 .shiki-fallback {
   margin: 0;
-  padding: 1.25rem;
+  padding: 1.28rem 1.32rem;
   overflow-x: auto;
-  font-size: 0.9rem;
-  line-height: 1.7;
+  font-size: 0.97rem;
+  line-height: 1.85;
+  tab-size: 2;
   font-family: var(--font-mono);
+  background: var(--code-bg);
+  color: var(--code-fg);
+}
+
+.mermaid-diagram {
+  margin: 1.75rem 0;
+}
+
+.mermaid-diagram__interactive {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
   background: var(--card);
+  box-shadow: var(--shadow);
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.mermaid-diagram__interactive:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.mermaid-diagram__surface {
+  overflow-x: auto;
+  padding: 1rem;
+  background: var(--card);
+}
+
+.mermaid-diagram__svg {
+  min-width: max-content;
+}
+
+.mermaid-diagram__svg svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.mermaid-modal__svg svg {
+  display: block;
+  height: auto;
+  max-width: none;
+}
+
+.mermaid-diagram__hint {
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 0.85rem;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-soft);
+  background: var(--card-subtle);
+}
+
+.mermaid-diagram__loading {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+.mermaid-diagram__fallback {
+  margin: 0;
+}
+
+.mermaid-diagram__fallback--bordered {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--card);
+  padding: 0.75rem;
+}
+
+.mermaid-diagram__fallback-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.mermaid-diagram__fallback-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: #ef4444;
+}
+
+.mermaid-diagram__fallback-code {
+  margin: 0.65rem 0 0;
+  overflow-x: auto;
+  border-radius: 0.65rem;
+  border: 1px solid var(--border);
+  background: var(--card-subtle);
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  font-family: var(--font-mono);
+}
+
+.mermaid-modal__header {
+  min-height: 3.25rem;
+}
+
+.mermaid-modal__control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--card);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.mermaid-modal__control:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--foreground);
+}
+
+.mermaid-modal__control:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mermaid-modal__control--reset {
+  padding: 0 0.5rem;
+}
+
+.mermaid-modal__zoom {
+  min-width: 3.25rem;
+  text-align: center;
+}
+
+.mermaid-modal__viewport {
+  position: relative;
+}
+
+.mermaid-modal__viewer-host {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--card) 92%, #ffffff 8%);
+}
+
+.mermaid-modal__viewer {
+  height: 100%;
+  width: 100%;
+}
+
+.mermaid-modal__viewer svg {
+  display: block;
+  max-width: none;
+  height: auto;
+}
+
+.mermaid-minimap {
+  pointer-events: none;
+  position: absolute;
+  bottom: 12px;
+  z-index: 20;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.34);
+}
+
+.mermaid-minimap--left {
+  left: 12px;
+}
+
+.mermaid-minimap--right {
+  right: 12px;
+}
+
+.mermaid-minimap svg {
+  display: block;
+}
+
+.mermaid-minimap__viewport {
+  fill: var(--accent);
+  fill-opacity: 0.15;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.mermaid-modal__loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }

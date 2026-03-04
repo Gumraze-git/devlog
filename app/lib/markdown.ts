@@ -4,6 +4,10 @@ export type HeadingItem = {
   slug: string;
 };
 
+type HeadingWithLine = HeadingItem & {
+  line: number;
+};
+
 export type CodeBlock = {
   lang: string;
   code: string;
@@ -22,7 +26,7 @@ export function stripInlineMarkdown(text: string): string {
     .trim();
 }
 
-function baseSlugify(value: string): string {
+export function slugify(value: string): string {
   const cleaned = value
     .toLowerCase()
     .replace(/['"`]/g, "")
@@ -38,7 +42,7 @@ export function createSlugger() {
   const counts = new Map<string, number>();
 
   return (value: string) => {
-    const base = baseSlugify(value);
+    const base = slugify(value);
     const current = counts.get(base) ?? 0;
     counts.set(base, current + 1);
     if (current === 0) return base;
@@ -60,13 +64,14 @@ export function createCodeKey(lang: string, code: string): string {
   return `${normalizedLang}:${hashString(code)}`;
 }
 
-export function extractHeadings(content: string): HeadingItem[] {
-  const headings: HeadingItem[] = [];
+function parseHeadingsWithLine(content: string): HeadingWithLine[] {
+  const headings: HeadingWithLine[] = [];
   const slugger = createSlugger();
   const lines = content.split("\n");
   let inCodeBlock = false;
 
-  for (const line of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
     const trimmed = line.trim();
     if (/^```/.test(trimmed) || /^~~~/.test(trimmed)) {
       inCodeBlock = !inCodeBlock;
@@ -75,7 +80,7 @@ export function extractHeadings(content: string): HeadingItem[] {
 
     if (inCodeBlock) continue;
 
-    const match = /^(#{2,4})\s+(.+)$/.exec(trimmed);
+    const match = /^(#{1,4})\s+(.+)$/.exec(trimmed);
     if (!match) continue;
 
     const depth = match[1].length;
@@ -87,10 +92,25 @@ export function extractHeadings(content: string): HeadingItem[] {
       depth,
       text,
       slug: slugger(text),
+      line: index + 1,
     });
   }
 
   return headings;
+}
+
+export function extractHeadings(content: string): HeadingItem[] {
+  return parseHeadingsWithLine(content).map(({ depth, text, slug }) => ({
+    depth,
+    text,
+    slug,
+  }));
+}
+
+export function extractHeadingSlugByLine(content: string): Map<number, string> {
+  return new Map(
+    parseHeadingsWithLine(content).map((heading) => [heading.line, heading.slug]),
+  );
 }
 
 export function extractCodeBlocks(content: string): CodeBlock[] {

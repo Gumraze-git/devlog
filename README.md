@@ -35,3 +35,41 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # devlog
+
+## Mermaid Readability Rules
+
+- Keep text/background contrast at least 4.5:1 and key non-text diagram elements at least 3:1.
+- Prefer Mermaid frontmatter `config` for dense, per-diagram tuning (`er.fontSize`, `entityPadding`, `minEntityWidth`, `layoutDirection`).
+- Keep renderer-level theme variables as shared defaults, and only use per-diagram overrides when content density requires it.
+- Mermaid change checklist: validate contrast in both light and dark mode.
+- Mermaid change checklist: visually inspect ER cardinality symbols, relationship labels, and markers.
+- Mermaid change checklist: re-check style priority when mixing `classDef default`, custom `classDef`, and direct `style` statements.
+- Do not force `font-weight` or fixed color on `.nodeLabel`, `.entityLabel`, `.cluster-label` in post-render CSS.
+- Prefer theme variables and in-diagram syntax (for example markdown strings) over post-render label typography overrides.
+
+### Mermaid Palette Baseline
+
+| Role | Dark | Light |
+|---|---|---|
+| entity/node fill | `#2870bd` | `#8b8d98` |
+| entity/node text | `#fcfcfd` | `#0f172a` |
+| relationship/label fill | `#696e77` | `#80838d` |
+| relationship/label text | `#fcfcfd` | `#0f172a` |
+| line/marker/border | `#70b8ff` | `#60646c` |
+| semantic success stroke (`sem-success`) | `#3dd68c` | `#218358` |
+| semantic warning stroke (`sem-warning`) | `#ffca16` | `#ab6400` |
+| semantic danger stroke (`sem-danger`) | `#ff9592` | `#ce2c31` |
+| semantic info stroke (`sem-info`) | `#70b8ff` | `#0d74ce` |
+| ER attribute rows (`rowEven/rowOdd`) | `#ffffff` | `#ffffff` |
+
+### Flowchart Semantic Class Rules
+
+- Use semantic classes on flowchart nodes only (`class <nodes> sem-success|sem-warning|sem-danger|sem-info;`).
+- Semantic classes are stroke-only overrides to avoid breaking text contrast inside nodes.
+- Keep ER diagrams on neutral structural colors unless there is a clear domain need for semantic emphasis.
+- For ER diagrams, keep the entity title row colored and attribute rows white (`rowEven/rowOdd = #ffffff`).
+
+### Mermaid Contrast Check
+
+- Run `npm run check:mermaid-contrast` after Mermaid palette updates.
+- This gate enforces text contrast `>= 4.5:1` and non-text contrast `>= 3.0:1` for the shared palette.

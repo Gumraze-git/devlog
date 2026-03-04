@@ -3,9 +3,21 @@ import path from "path";
 
 import matter from "gray-matter";
 
+export type ProjectSource = {
+  label: string;
+  url: string;
+};
+
+export type ProjectHeroImage = {
+  src: string;
+  caption?: string;
+  alt?: string;
+};
+
 export type ProjectMeta = {
   slug: string;
   title: string;
+  projectTitle?: string;
   summary: string;
   period: string;
   members: string;
@@ -15,6 +27,8 @@ export type ProjectMeta = {
   education?: string[];
   role?: string;
   repo?: string;
+  sources?: ProjectSource[];
+  heroImages?: ProjectHeroImage[];
   thumbnail?: string;
   published?: boolean;
 };
@@ -22,6 +36,82 @@ export type ProjectMeta = {
 export type Project = ProjectMeta & { content: string };
 
 const projectsDir = path.join(process.cwd(), "posts/projects");
+
+function normalizeSources(rawSources: unknown, repoFallback?: string): ProjectSource[] {
+  const parsed = Array.isArray(rawSources)
+    ? rawSources
+      .map((item) => {
+        if (typeof item === "string") {
+          const url = item.trim();
+          if (!url) return null;
+          return { label: "Source", url };
+        }
+
+        if (item && typeof item === "object") {
+          const record = item as Record<string, unknown>;
+          const label = typeof record.label === "string" ? record.label.trim() : "";
+          const url = typeof record.url === "string" ? record.url.trim() : "";
+          if (!url) return null;
+          return { label: label || "Source", url };
+        }
+
+        return null;
+      })
+      .filter((value): value is ProjectSource => value !== null)
+    : [];
+
+  if (parsed.length > 0) {
+    return parsed;
+  }
+
+  if (repoFallback) {
+    return [{ label: "GitHub", url: repoFallback }];
+  }
+
+  return [];
+}
+
+function normalizeHeroImages(rawHeroImages: unknown): ProjectHeroImage[] {
+  if (!Array.isArray(rawHeroImages)) return [];
+
+  const parsed = rawHeroImages
+    .map((item) => {
+      if (typeof item === "string") {
+        const src = item.trim();
+        if (!src) return null;
+        return { src };
+      }
+
+      if (item && typeof item === "object") {
+        const record = item as Record<string, unknown>;
+        const src = typeof record.src === "string" ? record.src.trim() : "";
+        if (!src) return null;
+
+        const caption = typeof record.caption === "string" ? record.caption.trim() : "";
+        const alt = typeof record.alt === "string" ? record.alt.trim() : "";
+
+        return {
+          src,
+          ...(caption ? { caption } : {}),
+          ...(alt ? { alt } : {}),
+        };
+      }
+
+      return null;
+    })
+    .filter((value): value is ProjectHeroImage => value !== null);
+
+  const uniqueImages: ProjectHeroImage[] = [];
+  const seen = new Set<string>();
+
+  parsed.forEach((image) => {
+    if (seen.has(image.src)) return;
+    seen.add(image.src);
+    uniqueImages.push(image);
+  });
+
+  return uniqueImages;
+}
 
 export function getAllProjects(): Project[] {
   if (!fs.existsSync(projectsDir)) return [];
@@ -34,10 +124,14 @@ export function getAllProjects(): Project[] {
       const fullPath = path.join(projectsDir, file);
       const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data, content } = matter(fileContents);
+      const repo = data.repo ?? data.github_link ?? data.githubLink;
+      const sources = normalizeSources(data.sources, repo);
+      const heroImages = normalizeHeroImages(data.hero_images ?? data.heroImages);
 
       return {
         slug,
         title: data.title ?? slug,
+        projectTitle: data.project_title ?? data.projectTitle ?? "",
         summary: data.summary ?? "",
         period: data.period ?? "",
         members: data.members ?? "",
@@ -46,8 +140,10 @@ export function getAllProjects(): Project[] {
         education: Array.isArray(data.education) ? data.education : data.education ? [data.education] : [],
         date: data.date ?? "",
         role: data.role ?? "",
-        repo: data.repo,
-        thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
+        repo,
+        sources,
+        heroImages,
+        thumbnail: data.thumbnail ?? heroImages[0]?.src ?? "/devlog-placeholder.svg",
         published: data.published !== false,
         content,
       } as Project;
@@ -68,10 +164,14 @@ export function getProject(slug: string): Project | null {
 
   const fileContents = fs.readFileSync(fullPath, "utf8");
   const { data, content } = matter(fileContents);
+  const repo = data.repo ?? data.github_link ?? data.githubLink;
+  const sources = normalizeSources(data.sources, repo);
+  const heroImages = normalizeHeroImages(data.hero_images ?? data.heroImages);
 
   return {
     slug,
     title: data.title ?? slug,
+    projectTitle: data.project_title ?? data.projectTitle ?? "",
     summary: data.summary ?? "",
     period: data.period ?? "",
     members: data.members ?? "",
@@ -80,8 +180,10 @@ export function getProject(slug: string): Project | null {
     education: Array.isArray(data.education) ? data.education : data.education ? [data.education] : [],
     date: data.date ?? "",
     role: data.role ?? "",
-    repo: data.repo,
-    thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
+    repo,
+    sources,
+    heroImages,
+    thumbnail: data.thumbnail ?? heroImages[0]?.src ?? "/devlog-placeholder.svg",
     published: data.published !== false,
     content,
   };
