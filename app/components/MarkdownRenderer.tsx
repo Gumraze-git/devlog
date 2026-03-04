@@ -9,6 +9,7 @@ import MermaidDiagram from "./MermaidDiagram";
 interface MarkdownRendererProps {
     content: string;
     codeHtmlByKey?: Record<string, string>;
+    className?: string;
 }
 
 type TroubleKey = "title" | "problem" | "cause" | "solution" | "result";
@@ -58,10 +59,47 @@ type MarkdownCodeProps = React.HTMLAttributes<HTMLElement> & {
     node?: PositionNode;
 };
 
-type LinkKind = "default" | "code" | "commit";
-
 type MarkdownAnchorProps = React.ComponentPropsWithoutRef<"a"> & {
     node?: unknown;
+};
+
+type ChipVariant = "default" | "code" | "commit" | "asis" | "tobe";
+
+type ChipItem = {
+    label: string;
+    href?: string;
+    variant: ChipVariant;
+};
+
+const languageLabelMap: Record<string, string> = {
+    text: "Text",
+    js: "JavaScript",
+    jsx: "JSX",
+    ts: "TypeScript",
+    tsx: "TSX",
+    json: "JSON",
+    yaml: "YAML",
+    yml: "YAML",
+    html: "HTML",
+    css: "CSS",
+    scss: "SCSS",
+    bash: "Bash",
+    shell: "Shell",
+    sh: "Shell",
+    java: "Java",
+    kotlin: "Kotlin",
+    python: "Python",
+    go: "Go",
+    rust: "Rust",
+    sql: "SQL",
+    xml: "XML",
+    markdown: "Markdown",
+    md: "Markdown",
+    mermaid: "Mermaid",
+    c: "C",
+    cpp: "C++",
+    cs: "C#",
+    csharp: "C#",
 };
 
 function isExternalHttpLink(href?: string): boolean {
@@ -69,22 +107,56 @@ function isExternalHttpLink(href?: string): boolean {
     return /^https?:\/\//i.test(href);
 }
 
-function classifyLinkKind(href?: string): LinkKind {
-    if (!isExternalHttpLink(href)) return "default";
+function normalizeChipVariant(value?: string): ChipVariant {
+    if (!value) return "default";
+    const normalized = value.trim().toLowerCase();
+    if (
+        normalized === "code" ||
+        normalized === "commit" ||
+        normalized === "asis" ||
+        normalized === "tobe"
+    ) return normalized;
+    return "default";
+}
 
-    try {
-        const parsed = new URL(href);
-        const hostname = parsed.hostname.toLowerCase();
-        if (hostname !== "github.com" && hostname !== "www.github.com") {
-            return "default";
-        }
+function parseChipLines(source: string): ChipItem[] {
+    const lines = source.split("\n");
+    const chips: ChipItem[] = [];
 
-        if (parsed.pathname.includes("/commit/")) return "commit";
-        if (parsed.pathname.includes("/blob/")) return "code";
-        return "default";
-    } catch {
-        return "default";
+    for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (line.length === 0 || line.startsWith("#")) continue;
+
+        const parts = line.split("|").map((part) => part.trim());
+        const label = parts[0] ?? "";
+        if (label.length === 0) continue;
+
+        const rawHref = parts[1] ?? "";
+        const href = rawHref.length > 0 && !/\s/.test(rawHref) ? rawHref : undefined;
+        const variant = normalizeChipVariant(parts[2]);
+
+        chips.push({
+            label,
+            href,
+            variant,
+        });
     }
+
+    return chips;
+}
+
+function formatLanguageLabel(lang: string): string {
+    const normalized = lang.trim().toLowerCase();
+    if (!normalized) return "Text";
+
+    const known = languageLabelMap[normalized];
+    if (known) return known;
+
+    return normalized
+        .split(/[-_]+/)
+        .filter((segment) => segment.length > 0)
+        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+        .join(" ");
 }
 
 function isBlockCode(node: PositionNode | undefined, className: string | undefined, rawCode: string): boolean {
@@ -144,7 +216,9 @@ function parseTroubleshootingContent(source: string): TroubleContent {
         }
 
         if (!inBacktickCodeFence) {
-            const labelMatch = /^(?:[-*]\s*)?(?:\*\*)?([A-Za-z가-힣]+)(?:\*\*)?\s*[:：]\s*(.*)$/.exec(trimmed);
+            // Treat labels only when they start at the line head.
+            // This prevents list items like "- 문제: ..." from being misread as a section switch.
+            const labelMatch = /^(?:\*\*)?([A-Za-z가-힣]+)(?:\*\*)?\s*[:：]\s*(.*)$/.exec(trimmed);
             if (labelMatch) {
                 const mapped = normalizeTroubleLabel(labelMatch[1]);
                 if (mapped) {
@@ -275,7 +349,7 @@ function normalizeArrowNotation(source: string): string {
     return transformed.join("\n");
 }
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlByKey }) => {
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlByKey, className }) => {
     const codeHtmlMap = codeHtmlByKey ?? {};
     const [copiedKey, setCopiedKey] = useState<string | null>(null);
     const renderedContent = useMemo(() => normalizeArrowNotation(content), [content]);
@@ -330,11 +404,56 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         const rawCode = String(children);
         const code = rawCode.replace(/\n$/, "");
         const isBlockCodeNode = isBlockCode(node, className, rawCode);
-        const label = lang === "text" ? "TEXT" : lang.toUpperCase();
+        const label = formatLanguageLabel(lang);
 
         if (isBlockCodeNode && lang === "mermaid") {
             return (
                 <MermaidDiagram code={code} />
+            );
+        }
+
+        if (isBlockCodeNode && (lang === "chips" || lang === "chip")) {
+            const chips = parseChipLines(code);
+            if (chips.length === 0) return null;
+
+            return (
+                <div className="md-chip-list not-prose">
+                    {chips.map((chip, index) => {
+                        const variantClassName = chip.variant !== "default" ? `md-chip--${chip.variant}` : "";
+                        const className = ["md-chip", chip.href ? "md-chip--link" : "", variantClassName]
+                            .filter(Boolean)
+                            .join(" ");
+                        const key = `${chip.label}-${chip.href ?? "text"}-${chip.variant}-${index}`;
+                        const icon = chip.variant === "code"
+                            ? <Code2 size={13} className="md-chip__icon" aria-hidden="true" />
+                            : chip.variant === "commit"
+                                ? <GitCommitHorizontal size={13} className="md-chip__icon" aria-hidden="true" />
+                                : null;
+
+                        if (!chip.href) {
+                            return (
+                                <span key={key} className={className}>
+                                    {icon}
+                                    {chip.label}
+                                </span>
+                            );
+                        }
+
+                        const external = isExternalHttpLink(chip.href);
+                        return (
+                            <a
+                                key={key}
+                                href={chip.href}
+                                className={className}
+                                target={external ? "_blank" : undefined}
+                                rel={external ? "noopener noreferrer" : undefined}
+                            >
+                                {icon}
+                                {chip.label}
+                            </a>
+                        );
+                    })}
+                </div>
             );
         }
 
@@ -409,37 +528,37 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             const activeRows = troubleRows.filter((row) => Boolean(sections[row.key]));
 
             return (
-                <details className="group my-6 not-prose rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-3 shadow-sm transition-colors open:border-[var(--accent)] open:bg-[var(--card-subtle)]">
+                <details className="trouble-card group my-6 not-prose rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-3 shadow-sm transition-colors open:border-[var(--accent)] open:bg-[var(--card-subtle)]">
                     <summary className="flex cursor-pointer list-none items-center gap-3 [&::-webkit-details-marker]:hidden">
                         <span className="inline-flex h-7 items-center rounded-full border border-[var(--border)] bg-[var(--card-subtle)] px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)]">
                             Trouble
                         </span>
-                        <span className="text-[15px] font-semibold leading-relaxed text-[var(--foreground)]">{summary}</span>
+                        <span className="trouble-summary-title text-[15px] font-semibold leading-relaxed text-[var(--foreground)]">{summary}</span>
                         <span className="ml-auto text-xs text-[var(--text-soft)] transition-transform duration-200 group-open:rotate-180">▼</span>
                     </summary>
 
-                    <div className="mt-4 space-y-3 border-t border-[var(--border)] pt-4">
+                    <div className="trouble-content mt-4 space-y-3 border-t border-[var(--border)] pt-4">
                         {activeRows.length > 0 ? (
                             activeRows.map((row) => (
                                 <article
                                     key={row.key}
-                                    className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3"
+                                    className={`trouble-section trouble-section--${row.key} rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3`}
                                 >
-                                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-soft)]">
+                                    <h5 className="trouble-section-label">
                                         {row.label}
-                                    </p>
+                                    </h5>
                                     <div className="space-y-3">
                                         <ReactMarkdown
                                             components={{
                                                 pre: ({ children: innerChildren }) => <>{innerChildren}</>,
                                                 code: renderCode,
                                                 p: ({ children: innerChildren }) => (
-                                                    <p className="text-[14px] leading-relaxed text-[var(--text-muted)]">
+                                                    <p className="trouble-section-text text-[14px] leading-relaxed text-[var(--text-muted)]">
                                                         {innerChildren}
                                                     </p>
                                                 ),
                                                 li: ({ children: innerChildren }) => (
-                                                    <li className="text-[14px] leading-relaxed text-[var(--text-muted)]">
+                                                    <li className="trouble-section-text text-[14px] leading-relaxed text-[var(--text-muted)]">
                                                         {innerChildren}
                                                     </li>
                                                 ),
@@ -539,17 +658,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     };
 
     const renderMarkdownAnchor = ({ href, children, className, ...props }: MarkdownAnchorProps) => {
-        const kind = classifyLinkKind(href);
         const isExternal = isExternalHttpLink(href);
-        const mergedClassName = ["md-link", kind !== "default" ? `md-link--${kind}` : "", className]
+        const mergedClassName = ["md-link", className]
             .filter(Boolean)
             .join(" ");
-
-        const icon = kind === "code"
-            ? <Code2 size={14} className="md-link__icon" aria-hidden="true" />
-            : kind === "commit"
-                ? <GitCommitHorizontal size={14} className="md-link__icon" aria-hidden="true" />
-                : null;
 
         return (
             <a
@@ -559,14 +671,20 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                 rel={isExternal ? "noopener noreferrer" : undefined}
                 {...props}
             >
-                {icon}
                 {children}
             </a>
         );
     };
 
+    const containerClassName = [
+        "markdown-prose prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-[1.6] prose-li:text-[var(--text-muted)] prose-li:leading-[1.4]",
+        className,
+    ]
+        .filter(Boolean)
+        .join(" ");
+
     return (
-        <div className="markdown-prose prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-[1.6] prose-li:text-[var(--text-muted)] prose-li:leading-[1.4]">
+        <div className={containerClassName}>
             <ReactMarkdown
                 components={{
                     pre: ({ children }) => <>{children}</>,

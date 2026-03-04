@@ -20,6 +20,19 @@ export interface MermaidDiagramProps {
 
 type MermaidThemeMode = "light" | "dark";
 
+type MermaidSemanticToken = {
+  fill: string;
+  border: string;
+  text: string;
+};
+
+type MermaidSemanticPalette = {
+  success: MermaidSemanticToken;
+  warning: MermaidSemanticToken;
+  danger: MermaidSemanticToken;
+  info: MermaidSemanticToken;
+};
+
 type MermaidSvgMeta = {
   minX: number;
   minY: number;
@@ -48,30 +61,89 @@ let initializedTheme: MermaidThemeMode | null = null;
 function getThemeVariables(mode: MermaidThemeMode) {
   if (mode === "dark") {
     return {
-      primaryColor: "#1e293b",
+      // Dark theme defaults tuned for edge-label and node contrast.
+      darkMode: true,
+      primaryColor: "#1b2b40",
       primaryTextColor: "#e2e8f0",
       textColor: "#e2e8f0",
       nodeTextColor: "#e2e8f0",
-      primaryBorderColor: "#60a5fa",
-      lineColor: "#94a3b8",
-      secondaryColor: "#0f172a",
-      tertiaryColor: "#020617",
-      edgeLabelBackground: "#1e293b",
-      mainBkg: "transparent",
+      primaryBorderColor: "#93b4db",
+      nodeBorder: "#93b4db",
+      lineColor: "#93b4db",
+      secondaryColor: "#152238",
+      tertiaryColor: "#233349",
+      edgeLabelBackground: "#233349",
+      mainBkg: "#1b2b40",
+      rowEven: "#ffffff",
+      rowOdd: "#f8fafc",
     };
   }
 
   return {
-    primaryColor: "#eef4ff",
+    darkMode: false,
+    primaryColor: "#eef2f7",
     primaryTextColor: "#0f172a",
     textColor: "#0f172a",
     nodeTextColor: "#0f172a",
-    primaryBorderColor: "#2563eb",
-    lineColor: "#64748b",
-    secondaryColor: "#f1f5f9",
-    tertiaryColor: "#ffffff",
-    edgeLabelBackground: "#ffffff",
-    mainBkg: "#eef4ff",
+    primaryBorderColor: "#475569",
+    nodeBorder: "#475569",
+    lineColor: "#475569",
+    secondaryColor: "#f8fafc",
+    tertiaryColor: "#dbe4f0",
+    edgeLabelBackground: "#dbe4f0",
+    mainBkg: "#eef2f7",
+    rowEven: "#ffffff",
+    rowOdd: "#f8fafc",
+  };
+}
+
+function getSemanticPalette(mode: MermaidThemeMode): MermaidSemanticPalette {
+  if (mode === "dark") {
+    return {
+      success: {
+        fill: "#113828",
+        border: "#3dd68c",
+        text: "#d7ffe8",
+      },
+      warning: {
+        fill: "#3a2a08",
+        border: "#ffca16",
+        text: "#fff1c2",
+      },
+      danger: {
+        fill: "#43161a",
+        border: "#ff9592",
+        text: "#ffe4e2",
+      },
+      info: {
+        fill: "#0f2a45",
+        border: "#70b8ff",
+        text: "#deefff",
+      },
+    };
+  }
+
+  return {
+    success: {
+      fill: "#e7f8ef",
+      border: "#1f7a4f",
+      text: "#0f2e1f",
+    },
+    warning: {
+      fill: "#fff5e6",
+      border: "#9a5a00",
+      text: "#402605",
+    },
+    danger: {
+      fill: "#fdecec",
+      border: "#b4232c",
+      text: "#4c0f15",
+    },
+    info: {
+      fill: "#e8f3ff",
+      border: "#0b67b2",
+      text: "#0c2a45",
+    },
   };
 }
 
@@ -159,19 +231,107 @@ function injectScopedEdgeLabelStyle(
   svgMarkup: string,
   rootId: string,
   themeVars: ReturnType<typeof getThemeVariables>,
+  semanticPalette: MermaidSemanticPalette,
 ): string {
   const escapedRootId = escapeCssId(rootId);
   const scope = `#${escapedRootId}`;
-  const edgeLabelTextColor = themeVars.nodeTextColor ?? themeVars.textColor ?? themeVars.primaryTextColor;
+  const textColor = themeVars.nodeTextColor ?? themeVars.textColor ?? themeVars.primaryTextColor;
+  const borderColor = themeVars.nodeBorder ?? themeVars.primaryBorderColor ?? themeVars.lineColor ?? textColor;
+  const diagramFill = themeVars.mainBkg ?? themeVars.primaryColor ?? "transparent";
+  const edgeLabelFill = themeVars.edgeLabelBackground ?? themeVars.tertiaryColor ?? diagramFill;
+  const relationLabelFill = themeVars.tertiaryColor ?? edgeLabelFill;
+  const attributeRowTextColor = themeVars.darkMode ? "#0f172a" : textColor;
 
   const injectedStyle = `<style>
     ${scope} .edgeLabel rect, ${scope} .edge-thickness-normal rect, ${scope} .edge-thickness-thick rect, ${scope} .edge-thickness-invisible rect {
-      fill: ${themeVars.edgeLabelBackground} !important;
+      fill: ${edgeLabelFill} !important;
       stroke: none !important;
     }
     ${scope} .edgeLabel text, ${scope} .edgeLabel tspan {
-      fill: ${edgeLabelTextColor} !important;
-      color: ${edgeLabelTextColor} !important;
+      fill: ${textColor} !important;
+      color: ${textColor} !important;
+    }
+    ${scope} .entityBox {
+      fill: ${diagramFill} !important;
+      stroke: ${borderColor} !important;
+    }
+    ${scope} .relationshipLabelBox,
+    ${scope} .labelBkg {
+      fill: ${relationLabelFill} !important;
+      background-color: ${relationLabelFill} !important;
+      opacity: 1 !important;
+    }
+    ${scope} .relationshipLine,
+    ${scope} .marker {
+      stroke: ${borderColor} !important;
+      stroke-width: 1.5 !important;
+      stroke-linecap: round !important;
+      stroke-linejoin: round !important;
+    }
+    ${scope} .er .label,
+    ${scope} .relationshipLabel,
+    ${scope} .relationshipLabel tspan {
+      fill: ${textColor} !important;
+      color: ${textColor} !important;
+    }
+    ${scope} .attribute-type,
+    ${scope} .attribute-type text,
+    ${scope} .attribute-type tspan,
+    ${scope} .attribute-name,
+    ${scope} .attribute-name text,
+    ${scope} .attribute-name tspan,
+    ${scope} .attribute-keys,
+    ${scope} .attribute-keys text,
+    ${scope} .attribute-keys tspan,
+    ${scope} .attribute-comment,
+    ${scope} .attribute-comment text,
+    ${scope} .attribute-comment tspan {
+      fill: ${attributeRowTextColor} !important;
+      color: ${attributeRowTextColor} !important;
+    }
+    ${scope} .sem-success rect, ${scope} .sem-success circle, ${scope} .sem-success ellipse, ${scope} .sem-success polygon, ${scope} .sem-success path {
+      fill: ${semanticPalette.success.fill} !important;
+      stroke: ${semanticPalette.success.border} !important;
+      stroke-width: 2px !important;
+      stroke-linecap: round !important;
+      stroke-linejoin: round !important;
+    }
+    ${scope} .sem-success text, ${scope} .sem-success tspan {
+      fill: ${semanticPalette.success.text} !important;
+      color: ${semanticPalette.success.text} !important;
+    }
+    ${scope} .sem-warning rect, ${scope} .sem-warning circle, ${scope} .sem-warning ellipse, ${scope} .sem-warning polygon, ${scope} .sem-warning path {
+      fill: ${semanticPalette.warning.fill} !important;
+      stroke: ${semanticPalette.warning.border} !important;
+      stroke-width: 2px !important;
+      stroke-linecap: round !important;
+      stroke-linejoin: round !important;
+    }
+    ${scope} .sem-warning text, ${scope} .sem-warning tspan {
+      fill: ${semanticPalette.warning.text} !important;
+      color: ${semanticPalette.warning.text} !important;
+    }
+    ${scope} .sem-danger rect, ${scope} .sem-danger circle, ${scope} .sem-danger ellipse, ${scope} .sem-danger polygon, ${scope} .sem-danger path {
+      fill: ${semanticPalette.danger.fill} !important;
+      stroke: ${semanticPalette.danger.border} !important;
+      stroke-width: 2px !important;
+      stroke-linecap: round !important;
+      stroke-linejoin: round !important;
+    }
+    ${scope} .sem-danger text, ${scope} .sem-danger tspan {
+      fill: ${semanticPalette.danger.text} !important;
+      color: ${semanticPalette.danger.text} !important;
+    }
+    ${scope} .sem-info rect, ${scope} .sem-info circle, ${scope} .sem-info ellipse, ${scope} .sem-info polygon, ${scope} .sem-info path {
+      fill: ${semanticPalette.info.fill} !important;
+      stroke: ${semanticPalette.info.border} !important;
+      stroke-width: 2px !important;
+      stroke-linecap: round !important;
+      stroke-linejoin: round !important;
+    }
+    ${scope} .sem-info text, ${scope} .sem-info tspan {
+      fill: ${semanticPalette.info.text} !important;
+      color: ${semanticPalette.info.text} !important;
     }
   </style>`;
 
@@ -239,7 +399,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
     : null;
   const modalError = effectiveError ?? emptyMarkupError;
   const modalSvgStyle = useMemo(() => parseInlineStyle(modalMeta?.style), [modalMeta]);
-  const viewerCanvasBackground = resolvedTheme === "dark" ? "#0f172a" : "#eef4ff";
+  const viewerCanvasBackground = resolvedTheme === "dark" ? "#0f172a" : "#ffffff";
 
   const computedFitScale = useMemo(() => {
     if (!modalMeta) return 1;
@@ -373,6 +533,7 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
 
   useEffect(() => {
     const themeMode: MermaidThemeMode = resolvedTheme === "dark" ? "dark" : "light";
+    const semanticPalette = getSemanticPalette(themeMode);
     let cancelled = false;
 
     const renderVariant = async (prefix: "inline" | "modal") => {
@@ -385,7 +546,12 @@ export default function MermaidDiagram({ code, className, caption }: MermaidDiag
       }
 
       const scopedRootId = initialParsed.rootId ?? renderId;
-      const modifiedSvg = injectScopedEdgeLabelStyle(result.svg, scopedRootId, getThemeVariables(themeMode));
+      const modifiedSvg = injectScopedEdgeLabelStyle(
+        result.svg,
+        scopedRootId,
+        getThemeVariables(themeMode),
+        semanticPalette,
+      );
       const parsed = parseMermaidSvg(modifiedSvg);
       if (!parsed) {
         throw new Error("Mermaid SVG 파싱에 실패했습니다.");
