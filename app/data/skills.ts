@@ -73,6 +73,31 @@ const baseTechIconMap: Record<string, TechIconMeta> = skills.reduce((acc, item) 
 // Additional aliases / tools not listed in skills array but used in projects
 const extraTechIconMap: Record<string, TechIconMeta> = {
   "spring boot": { key: "spring boot", label: "Spring Boot", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/spring-boot.svg" },
+  "spring security": {
+    key: "spring security",
+    label: "Spring Security",
+    icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/SpringSecurity.png",
+  },
+  swagger: {
+    key: "swagger",
+    label: "Swagger",
+    icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/Swagger.png",
+  },
+  openapi: {
+    key: "openapi",
+    label: "OpenAPI",
+    icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/Swagger.png",
+  },
+  "swagger/openapi": {
+    key: "swagger/openapi",
+    label: "Swagger/OpenAPI",
+    icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/Swagger.png",
+  },
+  "swagger / openapi": {
+    key: "swagger / openapi",
+    label: "Swagger/OpenAPI",
+    icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/Swagger.png",
+  },
   "aws ecs": { key: "aws ecs", label: "AWS ECS", icon: baseTechIconMap["aws"]?.icon ?? vercelBlob("AWS-Cloud-logo_32_Dark.svg") },
   ec2: { key: "ec2", label: "Amazon EC2", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/EC2.svg" },
   redis: { key: "redis", label: "Redis", icon: null },
