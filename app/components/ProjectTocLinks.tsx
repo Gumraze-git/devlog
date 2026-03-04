@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { HeadingItem } from "../lib/markdown";
 
 type ProjectTocLinksProps = {
@@ -8,7 +8,7 @@ type ProjectTocLinksProps = {
   className?: string;
 };
 
-export default function ProjectTocLinks({ items, className = "space-y-1.5" }: ProjectTocLinksProps) {
+export default function ProjectTocLinks({ items, className = "space-y-0.5" }: ProjectTocLinksProps) {
   const clickLockRef = useRef<{ slug: string; expiresAt: number } | null>(null);
   const [activeSlug, setActiveSlug] = useState<string>(() => items[0]?.slug ?? "");
 
@@ -104,43 +104,32 @@ export default function ProjectTocLinks({ items, className = "space-y-1.5" }: Pr
     };
   }, [items]);
 
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>, slug: string) => {
+  const handleClick = (slug: string) => {
     clickLockRef.current = {
       slug,
       expiresAt: window.performance.now() + 800,
     };
     setActiveSlug(slug);
-
-    const details = event.currentTarget.closest("details");
-    if (details instanceof HTMLDetailsElement) {
-      details.open = false;
-    }
   };
 
   return (
     <div className={className}>
       {items.map((item, index) => {
         const isActive = activeSlug === item.slug;
-        const indentClass = item.depth === 2 ? "ml-3" : item.depth === 3 ? "ml-6" : "";
+        const indentClass = item.depth === 3 ? "ml-3" : "";
 
         return (
           <a
             key={`${item.slug}-${index}`}
             href={`#${item.slug}`}
             aria-current={isActive ? "location" : undefined}
-            onClick={(event) => handleClick(event, item.slug)}
-            className={`group relative flex w-full items-start gap-2 rounded-lg border px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] ${
+            onClick={() => handleClick(item.slug)}
+            className={`group block border-l-2 py-0.5 pl-3 text-[13px] leading-relaxed transition-colors focus-visible:outline-none focus-visible:text-[var(--foreground)] focus-visible:underline focus-visible:decoration-[var(--accent)] focus-visible:underline-offset-4 ${
               isActive
-                ? "border-[var(--accent)]/40 bg-[color-mix(in_srgb,var(--accent)_10%,var(--card))] font-semibold text-[var(--foreground)]"
-                : "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--card-subtle)]/70 hover:text-[var(--foreground)]"
+                ? "border-[var(--accent)] font-medium text-[var(--foreground)]"
+                : "border-transparent text-[var(--text-soft)] hover:text-[var(--text-muted)]"
             }`}
           >
-            <span
-              aria-hidden
-              className={`mt-1 h-4 w-1 shrink-0 rounded-full transition-colors ${
-                isActive ? "bg-[var(--accent)]" : "bg-transparent group-hover:bg-[var(--border)]"
-              }`}
-            />
             <span className={`block leading-relaxed ${indentClass}`}>{item.text}</span>
           </a>
         );

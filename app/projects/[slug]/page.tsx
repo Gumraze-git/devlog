@@ -144,7 +144,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   const project = getProject(resolved.slug);
   if (!project) return notFound();
   const headings = extractHeadings(project.content);
-  const tocItems = headings.filter((heading) => heading.depth <= 3);
+  const tocItems = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
   const codeHtmlByKey = use(buildCodeHtmlByKey(project.content));
   const allowedRoleItems = ["백엔드 개발", "데이터 모델링"] as const;
   const roleItems = (project.role ?? "")
@@ -163,6 +163,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   const hasSourceLinks = sourceLinks.length > 0;
   const overviewGridColsClass = hasSourceLinks ? "lg:grid-cols-3" : "lg:grid-cols-2";
   const stackSectionSpanClass = hasSourceLinks ? "sm:col-span-2 lg:col-span-3" : "sm:col-span-2 lg:col-span-2";
+  const detailContainerClass = tocItems.length > 0 ? "max-w-4xl lg:max-w-6xl" : "max-w-4xl";
 
   const renderTechIcons = (techs: string[]) => {
     return (
@@ -200,7 +201,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
 
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28">
-      <div className="max-w-4xl mx-auto w-full">
+      <div className={`${detailContainerClass} mx-auto w-full`}>
         <section className="space-y-6 mb-12">
           <BackToPreviousLink
             fallbackHref="/projects"
@@ -295,44 +296,22 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </div>
           </div>
         </section>
-
-        {tocItems.length > 0 && (
-          <aside className="md:hidden mb-8">
-            <details className="group rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] p-4 shadow-sm">
-              <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] [&::-webkit-details-marker]:hidden">
-                목차
-                <span className="text-xs text-[var(--text-soft)] transition-transform duration-200 group-open:rotate-180">▼</span>
-              </summary>
-              <nav aria-label="Table of contents" className="mt-4">
-                <ProjectTocLinks items={tocItems} className="space-y-2" />
-              </nav>
-            </details>
-          </aside>
-        )}
-
-        <div className="relative">
-          {/* Left column: Main content (Now single column) */}
+        <div className={tocItems.length > 0 ? "relative lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-10" : "relative"}>
           <div className="space-y-12">
             <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
           </div>
 
           {tocItems.length > 0 && (
-            <aside className="hidden md:block fixed top-1/2 right-0 -translate-y-1/2 z-[100]">
-              <details className="group flex items-center justify-end">
-                <div className="hidden w-64 shrink-0 group-open:block">
-                  <div className="w-64 rounded-l-2xl border border-[var(--border)] bg-[var(--card)]/95 p-6 shadow-2xl backdrop-blur-md">
-                    <nav aria-label="Table of contents" className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                      <h3 className="border-l-2 border-[var(--accent)] pl-3 text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">목차</h3>
-                      <ProjectTocLinks items={tocItems} />
-                    </nav>
-                  </div>
+            <aside className="hidden lg:block">
+              <nav
+                aria-label="Table of contents"
+                className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 custom-scrollbar"
+              >
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-soft)]">On this page</h3>
+                <div className="relative mt-3 pl-4 before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-[var(--border)]">
+                  <ProjectTocLinks items={tocItems} />
                 </div>
-
-                <summary className="flex h-16 cursor-pointer list-none items-center gap-2 rounded-l-xl border border-r-0 border-[var(--border)] bg-[var(--card)] px-3 text-[var(--text-muted)] shadow-sm transition-colors hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] [&::-webkit-details-marker]:hidden">
-                  <span className="h-6 w-1 rounded-full bg-[var(--border)] transition-colors group-open:bg-[var(--accent)]" />
-                  <span className="text-xs font-bold uppercase tracking-[0.18em]">목차</span>
-                </summary>
-              </details>
+              </nav>
             </aside>
           )}
         </div>
