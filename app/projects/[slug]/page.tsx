@@ -6,6 +6,7 @@ import { ExternalLink, Github } from "lucide-react";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import ProjectTocLinks from "../../components/ProjectTocLinks";
 import BackToPreviousLink from "./BackToPreviousLink";
+import ProjectHeroCarousel from "./ProjectHeroCarousel";
 
 import { getProject } from "../../lib/projects";
 import { createCodeKey, extractCodeBlocks, extractHeadings } from "../../lib/markdown";
@@ -21,10 +22,12 @@ export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 const codeHtmlCache = new Map<string, string>();
-const shikiThemes = { light: "vitesse-light", dark: "vitesse-dark" } as const;
+const shikiThemes = { light: "github-dark-high-contrast", dark: "github-dark-high-contrast" } as const;
 const troubleshootingLangs = new Set(["troubleshooting", "trouble", "troubleshoot"]);
 const customRenderedLangs = new Set([
   "mermaid",
+  "chips",
+  "chip",
   "steps",
   "step",
   "reflections",
@@ -120,6 +123,7 @@ export async function generateMetadata(
 
   const siteUrl = getSiteUrl();
   const canonicalPath = `/projects/${project.slug}`;
+  const openGraphImage = project.heroImages?.[0]?.src ?? project.thumbnail;
 
   return {
     title: project.title,
@@ -133,7 +137,7 @@ export async function generateMetadata(
       url: `${siteUrl}${canonicalPath}`,
       title: project.title,
       description: project.summary,
-      images: project.thumbnail ? [{ url: project.thumbnail, alt: project.title }] : undefined,
+      images: openGraphImage ? [{ url: openGraphImage, alt: project.title }] : undefined,
       publishedTime: project.date ? new Date(project.date).toISOString() : undefined,
     },
   };
@@ -164,6 +168,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
   const overviewGridColsClass = hasSourceLinks ? "lg:grid-cols-3" : "lg:grid-cols-2";
   const stackSectionSpanClass = hasSourceLinks ? "sm:col-span-2 lg:col-span-3" : "sm:col-span-2 lg:col-span-2";
   const detailContainerClass = tocItems.length > 0 ? "max-w-4xl lg:max-w-6xl" : "max-w-4xl";
+  const heroImages =
+    project.heroImages && project.heroImages.length > 0
+      ? project.heroImages
+      : project.thumbnail
+        ? [{ src: project.thumbnail, alt: project.title }]
+        : [];
 
   const renderTechIcons = (techs: string[]) => {
     return (
@@ -227,19 +237,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </p>
           </div>
 
-          {project.thumbnail && (
-            <div className="w-full !mt-8">
-              <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
-                <Image
-                  src={project.thumbnail}
-                  alt={project.title}
-                  fill
-                  sizes="(max-width: 1200px) 100vw, 1200px"
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            </div>
+          {heroImages.length > 0 && (
+            <ProjectHeroCarousel images={heroImages} projectTitle={project.title} />
           )}
 
           <div className="!mt-4 rounded-2xl border border-[var(--border-muted)] bg-[var(--card-subtle)]/40 p-3 md:p-4">
@@ -296,9 +295,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<Params> 
             </div>
           </div>
         </section>
+
         <div className={tocItems.length > 0 ? "relative lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-10" : "relative"}>
           <div className="space-y-12">
-            <MarkdownRenderer content={project.content} codeHtmlByKey={codeHtmlByKey} />
+            <MarkdownRenderer
+              content={project.content}
+              codeHtmlByKey={codeHtmlByKey}
+              className="project-md-readable max-w-3xl prose-p:leading-[1.72] prose-li:leading-[1.65] prose-li:my-2"
+            />
           </div>
 
           {tocItems.length > 0 && (

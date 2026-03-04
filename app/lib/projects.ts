@@ -8,6 +8,12 @@ export type ProjectSource = {
   url: string;
 };
 
+export type ProjectHeroImage = {
+  src: string;
+  caption?: string;
+  alt?: string;
+};
+
 export type ProjectMeta = {
   slug: string;
   title: string;
@@ -22,6 +28,7 @@ export type ProjectMeta = {
   role?: string;
   repo?: string;
   sources?: ProjectSource[];
+  heroImages?: ProjectHeroImage[];
   thumbnail?: string;
   published?: boolean;
 };
@@ -64,6 +71,48 @@ function normalizeSources(rawSources: unknown, repoFallback?: string): ProjectSo
   return [];
 }
 
+function normalizeHeroImages(rawHeroImages: unknown): ProjectHeroImage[] {
+  if (!Array.isArray(rawHeroImages)) return [];
+
+  const parsed = rawHeroImages
+    .map((item) => {
+      if (typeof item === "string") {
+        const src = item.trim();
+        if (!src) return null;
+        return { src };
+      }
+
+      if (item && typeof item === "object") {
+        const record = item as Record<string, unknown>;
+        const src = typeof record.src === "string" ? record.src.trim() : "";
+        if (!src) return null;
+
+        const caption = typeof record.caption === "string" ? record.caption.trim() : "";
+        const alt = typeof record.alt === "string" ? record.alt.trim() : "";
+
+        return {
+          src,
+          ...(caption ? { caption } : {}),
+          ...(alt ? { alt } : {}),
+        };
+      }
+
+      return null;
+    })
+    .filter((value): value is ProjectHeroImage => value !== null);
+
+  const uniqueImages: ProjectHeroImage[] = [];
+  const seen = new Set<string>();
+
+  parsed.forEach((image) => {
+    if (seen.has(image.src)) return;
+    seen.add(image.src);
+    uniqueImages.push(image);
+  });
+
+  return uniqueImages;
+}
+
 export function getAllProjects(): Project[] {
   if (!fs.existsSync(projectsDir)) return [];
 
@@ -77,6 +126,7 @@ export function getAllProjects(): Project[] {
       const { data, content } = matter(fileContents);
       const repo = data.repo ?? data.github_link ?? data.githubLink;
       const sources = normalizeSources(data.sources, repo);
+      const heroImages = normalizeHeroImages(data.hero_images ?? data.heroImages);
 
       return {
         slug,
@@ -92,7 +142,8 @@ export function getAllProjects(): Project[] {
         role: data.role ?? "",
         repo,
         sources,
-        thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
+        heroImages,
+        thumbnail: data.thumbnail ?? heroImages[0]?.src ?? "/devlog-placeholder.svg",
         published: data.published !== false,
         content,
       } as Project;
@@ -115,6 +166,7 @@ export function getProject(slug: string): Project | null {
   const { data, content } = matter(fileContents);
   const repo = data.repo ?? data.github_link ?? data.githubLink;
   const sources = normalizeSources(data.sources, repo);
+  const heroImages = normalizeHeroImages(data.hero_images ?? data.heroImages);
 
   return {
     slug,
@@ -130,7 +182,8 @@ export function getProject(slug: string): Project | null {
     role: data.role ?? "",
     repo,
     sources,
-    thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
+    heroImages,
+    thumbnail: data.thumbnail ?? heroImages[0]?.src ?? "/devlog-placeholder.svg",
     published: data.published !== false,
     content,
   };
