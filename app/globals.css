@@ -667,38 +667,6 @@ html {
   height: auto;
 }
 
-.mermaid-minimap {
-  pointer-events: none;
-  position: absolute;
-  bottom: 12px;
-  z-index: 20;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  overflow: hidden;
-  background: var(--card);
-  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.34);
-}
-
-.mermaid-minimap--left {
-  left: 12px;
-}
-
-.mermaid-minimap--right {
-  right: 12px;
-}
-
-.mermaid-minimap svg {
-  display: block;
-}
-
-.mermaid-minimap__viewport {
-  fill: var(--accent);
-  fill-opacity: 0.15;
-  stroke: var(--accent);
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
 .mermaid-modal__loading {
   position: absolute;
   left: 50%;

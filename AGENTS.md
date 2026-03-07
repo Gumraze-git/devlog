@@ -29,7 +29,6 @@ This file gives coding agents the project-specific context needed to work safely
 ## Project layout
 - `app/`: App Router routes, layouts, pages, and UI.
 - `app/components/`: Reusable UI components (see `app/components/ui/` for primitives).
-- `app/sections/`: Page sections.
 - `app/lib/`: Shared helpers and utilities.
 - `app/data/`: Local data sources.
 - `posts/`: Content (organized by topic).
@@ -37,7 +36,8 @@ This file gives coding agents the project-specific context needed to work safely
 
 ## Content pipeline (project-specific)
 - Devlog list is built from Velog RSS in `app/lib/posts.ts` (`getAllPostsWithVelog`). Local devlog files are only used by the detail page and should live in `posts/devlog/` if you add them.
-- Projects and education content are parsed from `posts/projects/` and `posts/education/` via `app/lib/projects.ts` and `app/lib/education.ts` (front matter required).
+- Project content is parsed from `posts/projects/` via `app/lib/projects.ts` (front matter required).
+- `posts/education/` currently stores content only; do not assume there is an active page or loader for it unless you add one.
 - Markdown rendering (including `mermaid`) uses `app/components/MarkdownRenderer.tsx`. Reuse this component for new markdown pages.
 - For project troubleshooting accordions, use `~~~troubleshooting` blocks with labeled sections: `제목:`, `문제:`, `원인:`, `해결:`, `결과:`. Each section can contain multiline markdown, bullet/number lists, and fenced code blocks.
 - Label lines must start at the beginning of the line (for example `문제:`). List items like `- 문제: ...` are treated as normal bullets, not section labels.
