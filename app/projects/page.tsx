@@ -4,8 +4,6 @@ import Image from "next/image";
 
 import { getAllProjects, type Project } from "../lib/projects";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: "Projects",
   description: "프로젝트 경험과 기술 스택을 정리한 목록입니다.",

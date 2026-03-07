@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
 import { getPost } from "../../lib/posts";
+import { getAllDevlogs } from "../../lib/devlog";
 import { getSiteUrl } from "../../lib/site";
 import TagBadge from "../../components/ui/TagBadge";
 
@@ -12,8 +12,13 @@ type Params = {
   slug: string;
 };
 
-export const dynamic = "force-dynamic";
-export const dynamicParams = true;
+export const dynamicParams = false;
+
+export function generateStaticParams(): Params[] {
+  return getAllDevlogs().map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export async function generateMetadata(
   { params }: { params: Promise<Params> },
@@ -47,8 +52,8 @@ export async function generateMetadata(
   };
 }
 
-export default function DevlogDetailPage({ params }: { params: Promise<Params> }) {
-  const resolved = use(params);
+export default async function DevlogDetailPage({ params }: { params: Promise<Params> }) {
+  const resolved = await params;
   const post = getPost(resolved.slug);
   if (!post) return notFound();
 

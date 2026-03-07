@@ -2,31 +2,22 @@ import type { Metadata } from "next";
 import { getAllPostsWithVelog } from "../lib/posts";
 import DevlogListClient from "./DevlogListClient";
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "react";
+import { Skeleton } from "../components/ui/Skeleton";
+
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Devlog",
   description: "Velog 연동 개발 기록과 태그별 분류를 제공하는 Devlog 목록입니다.",
 };
 
-interface PageProps {
-  searchParams: Promise<{ tag?: string }>;
-}
-
-import { Suspense } from "react";
-import { Skeleton } from "../components/ui/Skeleton";
-
-async function DevlogContent({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
+async function DevlogContent() {
   const username = process.env.VELOG_USERNAME ?? process.env.NEXT_PUBLIC_VELOG_USERNAME ?? "gumraze";
   const posts = await getAllPostsWithVelog({ includeVelog: true, username });
+  const allTags = Array.from(new Set(posts.flatMap((post) => post.tags || []))).sort();
 
-  const resolvedSearchParams = await searchParams;
-  const currentTag = resolvedSearchParams.tag;
-  const selectedTags = currentTag ? currentTag.split(",").filter(Boolean) : [];
-
-  const allTags = Array.from(new Set(posts.flatMap(post => post.tags || []))).sort();
-
-  return <DevlogListClient posts={posts} allTags={allTags} initialSelectedTags={selectedTags} />;
+  return <DevlogListClient posts={posts} allTags={allTags} />;
 }
 
 function DevlogSkeleton() {
@@ -60,7 +51,7 @@ function DevlogSkeleton() {
   );
 }
 
-export default function DevlogListPage({ searchParams }: PageProps) {
+export default function DevlogListPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <header className="space-y-4">
@@ -71,7 +62,7 @@ export default function DevlogListPage({ searchParams }: PageProps) {
       </header>
 
       <Suspense fallback={<DevlogSkeleton />}>
-        <DevlogContent searchParams={searchParams} />
+        <DevlogContent />
       </Suspense>
     </div>
   );

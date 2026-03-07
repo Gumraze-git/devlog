@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { ExternalLink, Github } from "lucide-react";
@@ -8,7 +7,7 @@ import ProjectTocLinks from "../../components/ProjectTocLinks";
 import BackToPreviousLink from "./BackToPreviousLink";
 import ProjectHeroCarousel from "./ProjectHeroCarousel";
 
-import { getProject } from "../../lib/projects";
+import { getAllProjects, getProject } from "../../lib/projects";
 import { createCodeKey, extractCodeBlocks, extractHeadings } from "../../lib/markdown";
 import { getTechIconMeta } from "../../data/skills";
 import { getSiteUrl } from "../../lib/site";
@@ -18,8 +17,13 @@ type Params = {
   slug: string;
 };
 
-export const dynamic = "force-dynamic";
-export const dynamicParams = true;
+export const dynamicParams = false;
+
+export function generateStaticParams(): Params[] {
+  return getAllProjects().map((project) => ({
+    slug: project.slug,
+  }));
+}
 
 const codeHtmlCache = new Map<string, string>();
 const shikiThemes = { light: "github-dark-high-contrast", dark: "github-dark-high-contrast" } as const;
@@ -164,13 +168,13 @@ export async function generateMetadata(
   };
 }
 
-export default function ProjectDetailPage({ params }: { params: Promise<Params> }) {
-  const resolved = use(params);
+export default async function ProjectDetailPage({ params }: { params: Promise<Params> }) {
+  const resolved = await params;
   const project = getProject(resolved.slug);
   if (!project) return notFound();
   const headings = extractHeadings(project.content);
   const tocItems = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
-  const codeHtmlByKey = use(buildCodeHtmlByKey(project.content));
+  const codeHtmlByKey = await buildCodeHtmlByKey(project.content);
   const allowedRoleItems = ["백엔드 개발", "데이터 모델링"] as const;
   const roleItems = (project.role ?? "")
     .split(/\s*,\s*|\s\/\s/g)

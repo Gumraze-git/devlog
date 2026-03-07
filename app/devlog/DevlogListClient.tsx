@@ -12,7 +12,6 @@ import { type Post } from "../lib/posts";
 type DevlogListClientProps = {
   posts: Post[];
   allTags: string[];
-  initialSelectedTags: string[];
 };
 
 function parseSelectedTags(search: string): string[] {
@@ -35,9 +34,8 @@ function buildNextUrl(tags: string[]): string {
 export default function DevlogListClient({
   posts,
   allTags,
-  initialSelectedTags,
 }: DevlogListClientProps) {
-  const [selectedTags, setSelectedTags] = useState<string[]>(initialSelectedTags);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const filteredPosts = useMemo(() => {
     if (selectedTags.length === 0) return posts;

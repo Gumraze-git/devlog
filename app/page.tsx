@@ -8,6 +8,8 @@ import { getTechIconMeta } from "./data/skills";
 import { Suspense } from "react";
 import { Skeleton } from "./components/ui/Skeleton";
 
+export const revalidate = 1800;
+
 async function RecentPostsSection() {
   const username = process.env.VELOG_USERNAME ?? process.env.NEXT_PUBLIC_VELOG_USERNAME ?? "gumraze";
   const recentPosts = await getAllPostsWithVelog({
