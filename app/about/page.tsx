@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
 import { experienceItems } from "../data/experience";
+import { getAboutProjects } from "../lib/projects";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,8 +15,9 @@ import { Suspense } from "react";
 import { Skeleton } from "../components/ui/Skeleton";
 
 function AboutContent() {
-    const renderTechIcons = (techString: string) => {
-        const techs = techString.split(",").map(t => t.trim());
+    const aboutProjects = getAboutProjects();
+
+    const renderTechIcons = (techs: string[]) => {
         return (
             <div className="flex flex-wrap gap-8 mt-4 items-center">
                 {techs.map((tech, index) => {
@@ -113,68 +115,7 @@ function AboutContent() {
                 </div>
 
                 <div className="space-y-8">
-                    {[
-                        {
-                            slug: "badminton-app",
-                            title: "배드민턴 웹/앱 애플리케이션 개발",
-                            period: "2026.01 - 진행중",
-                            org: "",
-                            description: "현대오토에버 SW 스쿨에서의 경험을 기반으로 시스템의 안정성과 확장성을 확보하기 위해 JUnit 테스트를 활용한 비즈니스 로직을 구현하였습니다. 또한, DevOps 환경을 직접 경험하고 인프라 구성을 학습하기 위해 AWS와 Docker를 활용하여 배포 환경과 동일한 개발 환경을 구축하고 인프라를 구성하였습니다.",
-                            tech: "Spring Boot, PostgreSQL, JUnit, AWS EC2, Github Actions, Docker",
-                            tasks: [
-                                "핵심 비즈니스 로직 개발 및 RESTful API 개발",
-                                "JUnit 테스트 기반으로 견고한 기능 개발",
-                                "ERD 구조 설계",
-                                "Github Actions로 자동 배포 프로세스 구축",
-                                "AWS EC2 배포 환경 구축",
-                                "Docker를 이용하여 배포 환경과 동일한 개발 환경 구축"
-                            ]
-                        },
-                        {
-                            slug: "autoever-everp",
-                            title: "ERP 시스템 개발",
-                            period: "2025.09 - 2025.11",
-                            org: "현대오토에버 SW 스쿨 2기",
-                            description: "전사적 자원관리 시스템 개발 프로젝트를 통해 ERP의 견적, 주문, 발주, 구매, 생산, 배송에 이르는 핵심 프로세스와 인사 및 고객사 관리까지 포함된 일련의 시스템을 개발하였습니다. 팀 리더로서 백엔드 아키텍처 설계를 주도하며 복잡한 비즈니스 로직을 MSA 구조 내에서 안정적으로 구현하는 경험을 쌓았습니다.",
-                            tech: "Spring Boot, OAuth, PostgreSQL, Docker, Kafka, Swift",
-                            tasks: [
-                                "ERP 도메인 지식을 바탕으로 프로젝트 리딩을 수행하며, 서비스의 백엔드 아키텍처 설계 및 개발을 주도함",
-                                "OAuth 2.1 기반 인증 및 인가 서버 구축",
-                                "Kafka 및 WebFlux 파이프라인 구축",
-                                "Gateway 서비스 개발",
-                                "최신 IOS Liquid Glass 디자인 기반 Swift 개발"
-                            ]
-                        },
-                        {
-                            slug: "autoever-campick",
-                            title: "중고 캠핑 자동차 모바일 애플리케이션",
-                            period: "2025.09.15 - 09.25",
-                            org: "현대오토에버 SW 스쿨 2기",
-                            description: "중고 캠핑카 거래를 위한 모바일 전용 플랫폼을 구현한 프로젝트입니다. iOS 아키텍처 리드로서 Clean Architecture와 MVVM 패턴을 적용하여 코드의 가독성과 유지보수성을 높였습니다.",
-                            tech: "Swift",
-                            tasks: [
-                                "iOS 아키텍처 리드: Clean Architecture + MVVM 재구성, Domain/Data/Presentation 분리",
-                                "Vehicle 및 Auth 도메인 핵심 비즈니스 로직 구현",
-                                "매물 검색/필터 및 상세 정보 제공을 위한 UX 플로우 구축",
-                                "차량 및 프로필 이미지 업로드를 위한 미디어 처리 서비스 개발"
-                            ]
-                        },
-                        {
-                            slug: "movie-platform",
-                            title: "영화 플랫폼 개발",
-                            period: "2025.06 - 07",
-                            org: "현대오토에버 SW 스쿨 2기",
-                            description: "학습한 SOLID 원칙, RESTful API 개발, DB 구조 설계를 기반으로 기본적인 CRUD 기능을 연습하였습니다. 추가로 FastAPI에 AI 모델을 얹어 사용자의 댓글 감정 분석 결과를 기반으로 맞춤형 영화를 추천하는 기능을 구현한 프로젝트로, 데이터 처리와 AI 모델 연동의 흐름을 깊이 있게 학습하였습니다.",
-                            tech: "Spring Boot, FastAPI, OAuth, MongoDB, MySQL",
-                            tasks: [
-                                "ERD 구조 모델 설계",
-                                "OAuth 2.1 표준을 준수하는 견고한 인가 서버 및 인증 시스템 구축",
-                                "RESTful API 설계를 통한 대용량 콘텐츠 메타데이터 고속 검색 기능 구현",
-                                "Frontend 팀과의 긴밀한 협업을 통한 API 스펙 조율 및 원활한 통합 수행",
-                                "사용자 취향 기반 영화 추천 서비스 로직 설계 및 연동"
-                            ]
-                        }
-                    ].map((project, i, arr) => (
+                    {aboutProjects.map((project, i, arr) => (
                         <div key={i} className="space-y-6">
                             <div className="grid md:grid-cols-[250px_1fr] gap-10">
                                 <div className="space-y-2">
@@ -184,8 +125,8 @@ function AboutContent() {
                                         </h3>
                                         <ArrowUpRight size={18} className="flex-shrink-0 text-[var(--text-soft)] group-hover/title:text-[var(--accent)] transition-transform group-hover/title:-translate-y-0.5 group-hover/title:translate-x-0.5" />
                                     </Link>
-                                    {project.org && (
-                                        <p className="text-sm font-semibold text-[var(--accent-strong)]">{project.org}</p>
+                                    {project.organization && (
+                                        <p className="text-sm font-semibold text-[var(--accent-strong)]">{project.organization}</p>
                                     )}
                                     <p className="text-sm font-mono text-[var(--text-soft)]">{project.period}</p>
                                 </div>
@@ -210,7 +151,7 @@ function AboutContent() {
 
                                         <div className="space-y-2 pt-4 border-t border-[var(--border)] border-dashed">
                                             <h4 className="text-sm font-bold text-[var(--foreground)] uppercase tracking-wider">기술 스택</h4>
-                                            {renderTechIcons(project.tech)}
+                                            {renderTechIcons(project.stack)}
                                         </div>
                                     </div>
                                 </div>

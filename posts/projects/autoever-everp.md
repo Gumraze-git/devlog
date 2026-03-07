@@ -21,6 +21,14 @@ role: "백엔드"
 repo: "https://github.com/AutoEver-4Ever"
 published: true
 education: "현대오토에버 모빌리티 SW 스쿨 2기"
+about_organization: "현대오토에버 SW 스쿨 2기"
+about_description: "전사적 자원관리 시스템 개발 프로젝트를 통해 ERP의 견적, 주문, 발주, 구매, 생산, 배송에 이르는 핵심 프로세스와 인사 및 고객사 관리까지 포함된 일련의 시스템을 개발하였습니다. 팀 리더로서 백엔드 아키텍처 설계를 주도하며 복잡한 비즈니스 로직을 MSA 구조 내에서 안정적으로 구현하는 경험을 쌓았습니다."
+about_tasks:
+  - ERP 도메인 지식을 바탕으로 프로젝트 리딩을 수행하며, 서비스의 백엔드 아키텍처 설계 및 개발을 주도함
+  - OAuth 2.1 기반 인증 및 인가 서버 구축
+  - Kafka 및 WebFlux 파이프라인 구축
+  - Gateway 서비스 개발
+  - 최신 IOS Liquid Glass 디자인 기반 Swift 개발
 ---
 
 ## 역할
