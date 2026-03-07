@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getAllPostsWithVelog } from "../lib/posts";
+import { createPageMetadata } from "../lib/metadata";
 import DevlogListClient from "./DevlogListClient";
 
 import { Suspense } from "react";
@@ -7,10 +8,11 @@ import { Skeleton } from "../components/ui/Skeleton";
 
 export const revalidate = 1800;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Devlog",
   description: "Velog 연동 개발 기록과 태그별 분류를 제공하는 Devlog 목록입니다.",
-};
+  path: "/devlog",
+});
 
 async function DevlogContent() {
   const username = process.env.VELOG_USERNAME ?? process.env.NEXT_PUBLIC_VELOG_USERNAME ?? "gumraze";

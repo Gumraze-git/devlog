@@ -7,10 +7,10 @@ import ProjectTocLinks from "../../components/ProjectTocLinks";
 import BackToPreviousLink from "./BackToPreviousLink";
 import ProjectHeroCarousel from "./ProjectHeroCarousel";
 
+import { createPageMetadata } from "../../lib/metadata";
 import { getAllProjects, getProject } from "../../lib/projects";
 import { createCodeKey, extractCodeBlocks, extractHeadings } from "../../lib/markdown";
 import { getTechIconMeta } from "../../data/skills";
-import { getSiteUrl } from "../../lib/site";
 import { bundledLanguages, codeToHtml } from "shiki";
 
 type Params = {
@@ -146,26 +146,18 @@ export async function generateMetadata(
     };
   }
 
-  const siteUrl = getSiteUrl();
-  const canonicalPath = `/projects/${project.slug}`;
   const openGraphImage = project.heroImages?.[0]?.src ?? project.thumbnail;
+  const publishedTime = project.date ? new Date(project.date).toISOString() : undefined;
 
-  return {
+  return createPageMetadata({
     title: project.title,
     description: project.summary,
-    alternates: {
-      canonical: canonicalPath,
-    },
+    path: `/projects/${project.slug}`,
     keywords: project.stack,
-    openGraph: {
-      type: "article",
-      url: `${siteUrl}${canonicalPath}`,
-      title: project.title,
-      description: project.summary,
-      images: openGraphImage ? [{ url: openGraphImage, alt: project.title }] : undefined,
-      publishedTime: project.date ? new Date(project.date).toISOString() : undefined,
-    },
-  };
+    type: "article",
+    images: openGraphImage ? [{ url: openGraphImage, alt: project.title }] : undefined,
+    publishedTime,
+  });
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<Params> }) {

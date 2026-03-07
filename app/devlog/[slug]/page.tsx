@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { getPost } from "../../lib/posts";
 import { getAllDevlogs } from "../../lib/devlog";
-import { getSiteUrl } from "../../lib/site";
+import { createPageMetadata } from "../../lib/metadata";
 import TagBadge from "../../components/ui/TagBadge";
 
 type Params = {
@@ -31,25 +31,17 @@ export async function generateMetadata(
     };
   }
 
-  const siteUrl = getSiteUrl();
-  const canonicalPath = `/devlog/${post.slug}`;
+  const publishedTime = post.date ? new Date(post.date).toISOString() : undefined;
 
-  return {
+  return createPageMetadata({
     title: post.title,
     description: post.description,
-    alternates: {
-      canonical: canonicalPath,
-    },
+    path: `/devlog/${post.slug}`,
     keywords: post.tags,
-    openGraph: {
-      type: "article",
-      url: `${siteUrl}${canonicalPath}`,
-      title: post.title,
-      description: post.description,
-      images: post.thumbnail ? [{ url: post.thumbnail, alt: post.title }] : undefined,
-      publishedTime: post.date ? new Date(post.date).toISOString() : undefined,
-    },
-  };
+    type: "article",
+    images: post.thumbnail ? [{ url: post.thumbnail, alt: post.title }] : undefined,
+    publishedTime,
+  });
 }
 
 export default async function DevlogDetailPage({ params }: { params: Promise<Params> }) {

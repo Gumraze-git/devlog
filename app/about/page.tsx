@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { getTechIconMeta } from "../data/skills";
 import { experienceItems } from "../data/experience";
+import { createPageMetadata } from "../lib/metadata";
 import { getAboutProjects } from "../lib/projects";
 import Image from "next/image";
 import Link from "next/link";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
     title: "About",
     description: "개발자 소개, 경험, 프로젝트 요약 정보를 담은 페이지입니다.",
-};
+    path: "/about",
+});
 
 import { Suspense } from "react";
 import { Skeleton } from "../components/ui/Skeleton";

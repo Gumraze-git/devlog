@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 
+import { createPageMetadata } from "../lib/metadata";
 import { getAllProjects, type Project } from "../lib/projects";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Projects",
   description: "프로젝트 경험과 기술 스택을 정리한 목록입니다.",
-};
+  path: "/projects",
+});
 
 function ProjectRow({ project }: { project: Project }) {
   return (
