@@ -79,6 +79,8 @@ This file gives coding agents the project-specific context needed to work safely
 - ALWAYS run `npm run lint` after meaningful code changes.
 - Run `npm run build` when you change Next.js config, routing, or server/client boundaries.
 - There is no automated test script configured yet; add one if you introduce tests.
+- In every final response, ALWAYS include a concise `Manual QA` section with step-by-step checks relevant to the change, even when automated checks pass.
+- When changes affect routing, caching, server/client boundaries, data fetching, or UI behavior, the `Manual QA` section should cover direct URL entry, refresh behavior, back/forward navigation, and the main happy path plus at least one failure or empty-state scenario.
 
 ## Dependency changes
 - Ask before adding new production dependencies.
@@ -86,6 +88,7 @@ This file gives coding agents the project-specific context needed to work safely
 
 ## Change summaries
 - When you change UI behavior or layout, summarize the user-visible impact in the final response.
+- Pair the change summary with concrete manual verification steps so the user can validate behavior locally without inferring the checks.
 
 ## Official references used for this guide
 - Next.js App Router: https://nextjs.org/docs/app
