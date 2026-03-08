@@ -170,7 +170,7 @@ function AboutContent() {
                     <h2 className="text-3xl font-bold tracking-tight uppercase">Skills</h2>
                 </div>
 
-                <div className="grid gap-12">
+                <div className="grid gap-10 md:grid-cols-2">
                     {[
                         {
                             category: "Overall",
@@ -242,7 +242,7 @@ function AboutContent() {
                 </div>
 
                 <div className="pt-10 border-t border-[var(--border)]">
-                    <div className="max-w-3xl space-y-8 text-base text-[var(--text-muted)] leading-[1.8]">
+                    <div className="max-w-5xl space-y-8 text-base text-[var(--text-muted)] leading-[1.8]">
                         <div className="space-y-4">
                             <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">몰입과 기록을 통해 경험을 지식으로 전환하는 개발자</h3>
                             <p>

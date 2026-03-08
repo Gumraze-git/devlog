@@ -106,8 +106,8 @@ export default function ProjectsListPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <header className="space-y-3 border-b border-[var(--border-muted)] pb-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">Archive</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">Project</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">Projects</p>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">Idea to Execution</h1>
       </header>
 
       <Suspense fallback={<ProjectsSkeleton />}>
