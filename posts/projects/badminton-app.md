@@ -17,6 +17,23 @@ highlights:
 period: "2026.01 - 진행중"
 members: "1명 (개인 프로젝트 / 현대오토에버 SW 스쿨 기반)"
 role: "Full Stack / DevOps"
+roles:
+  - Full Stack
+  - DevOps
+category: "Sports Service"
+project_type: "Personal Project"
+status: "In Progress"
+feature_cards:
+  - title: "테스트 우선 백엔드 설계"
+    description: "JUnit과 Mockito 기반으로 핵심 비즈니스 로직을 검증 가능한 구조로 만들고 있습니다."
+  - title: "운영 환경 기준 개발 환경 통일"
+    description: "Docker를 활용해 로컬과 배포 환경의 차이를 줄이고 재현 가능한 개발 흐름을 구성했습니다."
+  - title: "CI/CD 자동화"
+    description: "GitHub Actions를 통해 테스트와 배포를 자동화하며 릴리스 과정을 단순화했습니다."
+results:
+  - JUnit 테스트 기반의 견고한 비즈니스 로직 구현
+  - AWS 및 Docker를 활용한 운영 환경 기반의 개발 환경 구축
+  - Github Actions를 통한 자동화된 배포 프로세스(CI/CD) 정립
 published: true
 education: "현대오토에버 모빌리티 SW 스쿨 2기"
 about_organization: ""

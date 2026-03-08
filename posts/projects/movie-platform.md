@@ -42,6 +42,24 @@ stack:
 period: "2025.06 - 2025.07"
 members: "프론트엔드 / 백엔드"
 role: "백엔드 개발, 데이터 모델링, 외부 API/AI 연동"
+roles:
+  - Backend Development
+  - Data Modeling
+  - External API / AI Integration
+category: "Review & Recommendation Service"
+project_type: "Team Project"
+status: "Completed"
+feature_cards:
+  - title: "레이어드 백엔드 기본기 구축"
+    description: "Movie·Review·Member·Auth 도메인 API를 레이어드 구조로 정리해 책임 경계를 명확히 했습니다."
+  - title: "AI 감정 분석 연동"
+    description: "Spring Boot와 FastAPI를 연결해 리뷰 감정 분석 결과가 추천 흐름으로 이어지도록 구성했습니다."
+  - title: "REST/Swagger 계약 정합화"
+    description: "REST v1 경로와 Swagger 문서를 정리해 프론트엔드와의 협업 비용을 줄였습니다."
+results:
+  - 레이어드 아키텍처 기반으로 Movie/Review/Member/Auth 백엔드 API 구축
+  - 리뷰 감정 분석과 추천 연동을 위한 Spring Boot ↔ FastAPI 파이프라인 구현
+  - RESTful API 및 Swagger 계약 정비로 프론트엔드 협업 정합성 개선
 published: true
 education: "현대오토에버 SW 스쿨 2기"
 about_organization: "현대오토에버 SW 스쿨 2기"

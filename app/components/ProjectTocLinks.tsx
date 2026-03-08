@@ -6,9 +6,14 @@ import type { HeadingItem } from "../lib/markdown";
 type ProjectTocLinksProps = {
   items: HeadingItem[];
   className?: string;
+  variant?: "vertical" | "horizontal";
 };
 
-export default function ProjectTocLinks({ items, className = "space-y-0.5" }: ProjectTocLinksProps) {
+export default function ProjectTocLinks({
+  items,
+  className,
+  variant = "vertical",
+}: ProjectTocLinksProps) {
   const clickLockRef = useRef<{ slug: string; expiresAt: number } | null>(null);
   const [activeSlug, setActiveSlug] = useState<string>(() => items[0]?.slug ?? "");
 
@@ -17,7 +22,7 @@ export default function ProjectTocLinks({ items, className = "space-y-0.5" }: Pr
 
     let rafId = 0;
     let ticking = false;
-    const offsetTop = 140;
+    const offsetTop = variant === "horizontal" ? 180 : 140;
     const clickLockDurationMs = 800;
     const setActive = (slug: string) => {
       setActiveSlug((prev) => (prev === slug ? prev : slug));
@@ -102,7 +107,7 @@ export default function ProjectTocLinks({ items, className = "space-y-0.5" }: Pr
       window.removeEventListener("resize", requestUpdate);
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, [items]);
+  }, [items, variant]);
 
   const handleClick = (slug: string) => {
     clickLockRef.current = {
@@ -112,11 +117,37 @@ export default function ProjectTocLinks({ items, className = "space-y-0.5" }: Pr
     setActiveSlug(slug);
   };
 
+  if (variant === "horizontal") {
+    return (
+      <div className={className ?? "flex items-center gap-2 overflow-x-auto no-scrollbar"}>
+        {items.map((item, index) => {
+          const isActive = activeSlug === item.slug;
+
+          return (
+            <a
+              key={`${item.slug}-${index}`}
+              href={`#${item.slug}`}
+              aria-current={isActive ? "location" : undefined}
+              onClick={() => handleClick(item.slug)}
+              className={`inline-flex shrink-0 items-center rounded-full border px-3 py-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] ${
+                isActive
+                  ? "border-[var(--accent)]/45 bg-[var(--card)] text-[var(--foreground)]"
+                  : "border-[var(--border)] bg-[var(--card-subtle)]/70 text-[var(--text-muted)] hover:border-[var(--accent)]/25 hover:text-[var(--foreground)]"
+              }`}
+            >
+              {item.text}
+            </a>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
-    <div className={className}>
+    <div className={className ?? "space-y-0.5"}>
       {items.map((item, index) => {
         const isActive = activeSlug === item.slug;
-        const indentClass = item.depth === 3 ? "ml-3" : "";
+        const indentClass = item.depth > items[0].depth ? "ml-3" : "";
 
         return (
           <a

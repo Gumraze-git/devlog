@@ -14,6 +14,11 @@ export type ProjectHeroImage = {
   alt?: string;
 };
 
+export type ProjectFeatureCard = {
+  title: string;
+  description?: string;
+};
+
 export type ProjectMeta = {
   slug: string;
   title: string;
@@ -26,10 +31,17 @@ export type ProjectMeta = {
   date?: string;
   education?: string[];
   role?: string;
+  roles?: string[];
+  category?: string;
+  projectType?: string;
+  status?: string;
+  demo?: string;
   repo?: string;
   sources?: ProjectSource[];
   heroImages?: ProjectHeroImage[];
   thumbnail?: string;
+  featureCards?: ProjectFeatureCard[];
+  results?: string[];
   published?: boolean;
   aboutDescription?: string;
   aboutTasks?: string[];
@@ -57,7 +69,25 @@ function normalizeStringArray(raw: unknown): string[] {
     .filter(Boolean);
 }
 
-function normalizeSources(rawSources: unknown, repoFallback?: string): ProjectSource[] {
+function normalizeRoleList(rawRoles: unknown, roleFallback?: string): string[] {
+  const fromArray = normalizeStringArray(rawRoles);
+  if (fromArray.length > 0) {
+    return Array.from(new Set(fromArray));
+  }
+
+  if (!roleFallback) return [];
+
+  return Array.from(
+    new Set(
+      roleFallback
+        .split(/\s*,\s*|\s+\/\s+/)
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ),
+  );
+}
+
+function normalizeSources(rawSources: unknown, repoFallback?: string, demoFallback?: string): ProjectSource[] {
   const parsed = Array.isArray(rawSources)
     ? rawSources
       .map((item) => {
@@ -80,15 +110,22 @@ function normalizeSources(rawSources: unknown, repoFallback?: string): ProjectSo
       .filter((value): value is ProjectSource => value !== null)
     : [];
 
-  if (parsed.length > 0) {
-    return parsed;
-  }
-
+  const fallbacks: ProjectSource[] = [];
   if (repoFallback) {
-    return [{ label: "GitHub", url: repoFallback }];
+    fallbacks.push({ label: "GitHub", url: repoFallback });
+  }
+  if (demoFallback) {
+    fallbacks.push({ label: "Live Demo", url: demoFallback });
   }
 
-  return [];
+  const combined = [...parsed, ...fallbacks];
+  const seen = new Set<string>();
+
+  return combined.filter((source) => {
+    if (seen.has(source.url)) return false;
+    seen.add(source.url);
+    return true;
+  });
 }
 
 function normalizeHeroImages(rawHeroImages: unknown): ProjectHeroImage[] {
@@ -133,6 +170,37 @@ function normalizeHeroImages(rawHeroImages: unknown): ProjectHeroImage[] {
   return uniqueImages;
 }
 
+function normalizeFeatureCards(rawFeatureCards: unknown, fallbackHighlights: string[]): ProjectFeatureCard[] {
+  const parsed = Array.isArray(rawFeatureCards)
+    ? rawFeatureCards
+      .map((item) => {
+        if (typeof item === "string") {
+          const title = item.trim();
+          if (!title) return null;
+          return { title };
+        }
+
+        if (item && typeof item === "object") {
+          const record = item as Record<string, unknown>;
+          const title = typeof record.title === "string" ? record.title.trim() : "";
+          const description = typeof record.description === "string" ? record.description.trim() : "";
+          if (!title && !description) return null;
+          return {
+            title: title || description,
+            ...(title && description ? { description } : {}),
+          };
+        }
+
+        return null;
+      })
+      .filter((value): value is ProjectFeatureCard => value !== null)
+    : [];
+
+  if (parsed.length > 0) return parsed;
+
+  return fallbackHighlights.map((item) => ({ title: item }));
+}
+
 function normalizeEducation(rawEducation: unknown): string[] {
   if (Array.isArray(rawEducation)) {
     return rawEducation
@@ -152,11 +220,16 @@ function parseProjectFile(slug: string, fileContents: string): Project {
   const { data, content } = matter(fileContents);
   const repoRaw = data.repo ?? data.github_link ?? data.githubLink;
   const repo = typeof repoRaw === "string" ? repoRaw.trim() || undefined : undefined;
-  const sources = normalizeSources(data.sources, repo);
+  const demoRaw = data.demo;
+  const demo = typeof demoRaw === "string" ? demoRaw.trim() || undefined : undefined;
+  const sources = normalizeSources(data.sources, repo, demo);
   const heroImages = normalizeHeroImages(data.hero_images ?? data.heroImages);
+  const highlights = normalizeStringArray(data.highlights);
+  const results = normalizeStringArray(data.results);
   const aboutDescriptionRaw = data.about_description ?? data.aboutDescription;
   const aboutOrganizationRaw = data.about_organization ?? data.aboutOrganization;
   const aboutTasksRaw = data.about_tasks ?? data.aboutTasks;
+  const role = typeof data.role === "string" ? data.role.trim() : "";
 
   return {
     slug,
@@ -170,10 +243,19 @@ function parseProjectFile(slug: string, fileContents: string): Project {
     period: typeof data.period === "string" ? data.period.trim() : "",
     members: typeof data.members === "string" ? data.members.trim() : "",
     stack: normalizeStringArray(data.stack),
-    highlights: normalizeStringArray(data.highlights),
+    highlights,
+    featureCards: normalizeFeatureCards(data.feature_cards ?? data.featureCards, highlights),
+    results: results.length > 0 ? results : highlights,
     education: normalizeEducation(data.education),
     date: typeof data.date === "string" ? data.date.trim() : "",
-    role: typeof data.role === "string" ? data.role.trim() : "",
+    role,
+    roles: normalizeRoleList(data.roles, role),
+    category: typeof data.category === "string" ? data.category.trim() || undefined : undefined,
+    projectType: typeof (data.project_type ?? data.projectType) === "string"
+      ? String(data.project_type ?? data.projectType).trim() || undefined
+      : undefined,
+    status: typeof data.status === "string" ? data.status.trim() || undefined : undefined,
+    demo,
     repo,
     sources,
     heroImages,

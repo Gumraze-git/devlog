@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
 
 import { createPageMetadata } from "../lib/metadata";
 import { getAllProjects, type Project } from "../lib/projects";
@@ -11,39 +12,103 @@ export const metadata: Metadata = createPageMetadata({
   path: "/projects",
 });
 
-function ProjectRow({ project }: { project: Project }) {
+function renderMeta(project: Project) {
+  const meta = [project.projectType, project.category].filter(Boolean);
+  if (meta.length > 0) return meta;
+
+  if (project.members) return [project.members];
+  return [];
+}
+
+function ProjectCard({ project }: { project: Project }) {
+  const metaItems = renderMeta(project);
+  const previewHighlights = project.results && project.results.length > 0
+    ? project.results.slice(0, 2)
+    : project.highlights.slice(0, 2);
+  const previewStack = project.stack.slice(0, 4);
+
   return (
     <Link
       href={`/projects/${project.slug}`}
       aria-label={`${project.title} 상세 페이지로 이동`}
-      className="group block border-b border-[var(--border-muted)] py-6 transition-all hover:bg-[var(--card-subtle)] hover:border-transparent sm:-mx-4 sm:rounded-2xl sm:px-4"
+      className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-[var(--border)] bg-[var(--card)] transition-colors hover:border-[var(--accent)]/25 hover:bg-[var(--card-muted)]"
     >
-      <div className="grid gap-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)]">
-          <Image
-            src={project.thumbnail || "/devlog-placeholder.svg"}
-            alt={`${project.title} thumbnail`}
-            fill
-            sizes="(max-width: 768px) 100vw, 220px"
-            className="object-cover"
-          />
+      <div className="relative aspect-[16/10] overflow-hidden border-b border-[var(--border-muted)] bg-[var(--card-subtle)]">
+        <Image
+          src={project.thumbnail || "/devlog-placeholder.svg"}
+          alt={`${project.title} thumbnail`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 420px"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      </div>
+
+      <div className="flex flex-1 flex-col gap-5 p-6">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--text-soft)]">
+          <span>{(project.period || "Ongoing").replace(/~/g, "-")}</span>
+          {project.status && (
+            <span className="inline-flex items-center rounded-full border border-[var(--border)] px-2 py-0.5 tracking-[0.12em] text-[10px] text-[var(--text-muted)]">
+              {project.status}
+            </span>
+          )}
         </div>
 
-        <div className="space-y-3 min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-soft)]">
-              {(project.period || "Ongoing").replace(/~/g, "-")}
-            </span>
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2">
+            <h2 className="text-2xl font-bold leading-tight text-[var(--foreground)] transition-colors group-hover:text-[var(--accent-strong)]">
+              {project.title}
+            </h2>
+            <ArrowUpRight size={18} className="text-[var(--text-soft)] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent)]" />
           </div>
-
-          <h2 className="text-2xl font-bold leading-tight text-[var(--foreground)] transition-colors group-hover:text-[var(--accent-strong)]">
-            {project.title}
-          </h2>
-
-          <p className="text-[var(--text-muted)] leading-relaxed line-clamp-2">
+          <p className="text-[var(--text-muted)] leading-relaxed">
             {project.summary || "Click to view details."}
           </p>
         </div>
+
+        {(project.roles?.length ?? 0) > 0 || metaItems.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {project.roles?.slice(0, 3).map((role) => (
+              <span
+                key={role}
+                className="inline-flex items-center rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/6 px-3 py-1 text-xs font-medium text-[var(--accent-strong)]"
+              >
+                {role}
+              </span>
+            ))}
+            {metaItems.slice(0, 2).map((item) => (
+              <span
+                key={item}
+                className="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--card-subtle)] px-3 py-1 text-xs font-medium text-[var(--text-muted)]"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        {previewHighlights.length > 0 ? (
+          <ul className="space-y-2 border-t border-dashed border-[var(--border)] pt-4 text-sm text-[var(--text-muted)] leading-relaxed">
+            {previewHighlights.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--accent)]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        {previewStack.length > 0 ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {previewStack.map((stack) => (
+              <span
+                key={stack}
+                className="inline-flex items-center rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-medium text-[var(--text-soft)]"
+              >
+                {stack}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
     </Link>
   );
@@ -58,9 +123,9 @@ function ProjectsContent() {
   return (
     <section className="space-y-8">
       {projects.length > 0 ? (
-        <div className="flex flex-col">
+        <div className="grid gap-6 xl:grid-cols-2">
           {projects.map((project) => (
-            <ProjectRow key={project.slug} project={project} />
+            <ProjectCard key={project.slug} project={project} />
           ))}
         </div>
       ) : (
@@ -74,26 +139,27 @@ function ProjectsContent() {
 
 function ProjectsSkeleton() {
   return (
-    <div className="flex flex-col">
+    <div className="grid gap-6 xl:grid-cols-2">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="group block border-b border-[var(--border-muted)] px-1 py-6">
-          <div className="grid gap-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
-            <Skeleton className="aspect-[16/10] w-full rounded-lg" />
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-4 w-16" />
-              </div>
-              <Skeleton className="h-8 w-1/2" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-              <div className="flex gap-3">
-                <Skeleton className="h-6 w-16 rounded-full" />
-                <Skeleton className="h-6 w-16 rounded-full" />
-                <Skeleton className="h-6 w-16 rounded-full" />
-              </div>
+        <div key={i} className="overflow-hidden rounded-[28px] border border-[var(--border)] bg-[var(--card)]">
+          <Skeleton className="aspect-[16/10] w-full rounded-none" />
+          <div className="space-y-4 p-6">
+            <div className="flex gap-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-4 w-16 rounded-full" />
+            </div>
+            <Skeleton className="h-8 w-3/4" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-7 w-20 rounded-full" />
+              <Skeleton className="h-7 w-24 rounded-full" />
+            </div>
+            <div className="space-y-2 pt-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-4/5" />
             </div>
           </div>
         </div>
@@ -105,9 +171,14 @@ function ProjectsSkeleton() {
 export default function ProjectsListPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-      <header className="space-y-3 border-b border-[var(--border-muted)] pb-8">
+      <header className="space-y-4 border-b border-[var(--border-muted)] pb-8">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">Projects</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">Idea to Execution</h1>
+        <div className="space-y-3">
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">Idea to Execution</h1>
+          <p className="max-w-3xl text-base leading-relaxed text-[var(--text-muted)] sm:text-lg">
+            문제를 정의하고 구조를 설계한 뒤, 구현과 검증까지 이어간 프로젝트들을 케이스 스터디 관점에서 정리했습니다.
+          </p>
+        </div>
       </header>
 
       <Suspense fallback={<ProjectsSkeleton />}>

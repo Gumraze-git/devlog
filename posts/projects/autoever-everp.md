@@ -18,6 +18,23 @@ highlights:
 period: "2025.09 - 2025.11"
 members: "총 6명 (프론트 3, 백엔드 3)"
 role: "백엔드"
+roles:
+  - Backend
+  - Team Lead
+category: "ERP Platform"
+project_type: "Team Project"
+status: "Completed"
+feature_cards:
+  - title: "MSA 기반 ERP 설계"
+    description: "견적부터 생산·정산까지 이어지는 핵심 프로세스를 마이크로서비스로 분리해 설계했습니다."
+  - title: "OAuth + Gateway 통합 인증"
+    description: "OAuth 2.1 인증 서버와 Gateway 권한 검사를 결합해 서비스 접근 제어를 정리했습니다."
+  - title: "Kafka 이벤트 파이프라인"
+    description: "도메인 간 비동기 메시지와 SAGA 흐름을 적용해 분산 트랜잭션을 조율했습니다."
+results:
+  - MSA(Microservices Architecture)를 기반으로 전사적 자원 관리 플랫폼 설계 및 구축
+  - OAuth 2.1 인증 서버 구축 및 Gateway를 통한 통합 권한 관리 구현
+  - Kafka를 활용한 서비스 간 비동기 메시지 파이프라인 및 SAGA 패턴 적용
 repo: "https://github.com/AutoEver-4Ever"
 published: true
 education: "현대오토에버 모빌리티 SW 스쿨 2기"
@@ -28,7 +45,7 @@ about_tasks:
   - OAuth 2.1 기반 인증 및 인가 서버 구축
   - Kafka 및 WebFlux 파이프라인 구축
   - Gateway 서비스 개발
-  - 최신 IOS Liquid Glass 디자인 기반 Swift 개발
+  - 최신 iOS Liquid Glass 디자인 기반 Swift 개발
 ---
 
 ## 역할
