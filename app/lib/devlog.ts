@@ -19,6 +19,14 @@ export type Devlog = DevlogMeta & { content: string };
 
 const devlogDir = path.join(process.cwd(), "posts/devlog");
 
+function normalizeDevlogSlug(value: string): string {
+  try {
+    return decodeURIComponent(value).normalize("NFC");
+  } catch {
+    return value.normalize("NFC");
+  }
+}
+
 export function getAllDevlogs(): Devlog[] {
   if (!fs.existsSync(devlogDir)) return [];
 
@@ -30,7 +38,7 @@ export function getAllDevlogs(): Devlog[] {
       const fullPath = path.join(devlogDir, file);
       const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data, content } = matter(fileContents);
-      const slugFromFrontMatter = data.slug ?? slug;
+      const slugFromFrontMatter = normalizeDevlogSlug(data.slug ?? slug);
 
       return {
         slug: slugFromFrontMatter,
@@ -52,25 +60,6 @@ export function getAllDevlogs(): Devlog[] {
 }
 
 export function getDevlog(slug: string): Devlog | null {
-  const fullPath = path.join(devlogDir, `${slug}.md`);
-  if (!fs.existsSync(fullPath)) return null;
-
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data, content } = matter(fileContents);
-  const published = data.published !== false;
-  if (!published) return null;
-  const resolvedSlug = data.slug ?? slug;
-
-  return {
-    slug: resolvedSlug,
-    title: data.title ?? resolvedSlug,
-    description: data.description ?? "",
-    date: data.date ?? "1970-01-01",
-    thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
-    tags: data.tags ?? [],
-    views: data.views ?? 0,
-    published,
-    velogUrl: data.velog_url ?? data.velogUrl,
-    content,
-  };
+  const normalizedSlug = normalizeDevlogSlug(slug);
+  return getAllDevlogs().find((post) => normalizeDevlogSlug(post.slug) === normalizedSlug) ?? null;
 }
