@@ -10,7 +10,7 @@ export const revalidate = 1800;
 
 export const metadata: Metadata = createPageMetadata({
   title: "Devlog",
-  description: "Velog 연동 개발 기록과 태그별 분류를 제공하는 Devlog 목록입니다.",
+  description: "내 사이트를 원문으로 제공하는 개발 기록과 태그별 분류를 모아둔 Devlog 목록입니다.",
   path: "/devlog",
 });
 

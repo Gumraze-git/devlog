@@ -35,7 +35,9 @@ This file gives coding agents the project-specific context needed to work safely
 - `public/`: Static assets.
 
 ## Content pipeline (project-specific)
-- Devlog list is built from Velog RSS in `app/lib/posts.ts` (`getAllPostsWithVelog`). Local devlog files are only used by the detail page and should live in `posts/devlog/` if you add them.
+- Devlog list is `local-first` in `app/lib/posts.ts` (`getAllPostsWithVelog`). Canonical devlog articles should live in `posts/devlog/`.
+- Velog content is now a secondary source used for fallback cards and import/bootstrap flows, not the canonical article source.
+- Use `npm run import:velog -- <velog-url>` to create a markdown draft in `posts/devlog/` from a Velog post.
 - Project content is parsed from `posts/projects/` via `app/lib/projects.ts` (front matter required).
 - `posts/education/` currently stores content only; do not assume there is an active page or loader for it unless you add one.
 - Markdown rendering (including `mermaid`) uses `app/components/MarkdownRenderer.tsx`. Reuse this component for new markdown pages.

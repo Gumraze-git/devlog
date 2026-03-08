@@ -12,6 +12,7 @@ export type DevlogMeta = {
   tags?: string[];
   views?: number;
   published?: boolean;
+  velogUrl?: string;
 };
 
 export type Devlog = DevlogMeta & { content: string };
@@ -29,16 +30,18 @@ export function getAllDevlogs(): Devlog[] {
       const fullPath = path.join(devlogDir, file);
       const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data, content } = matter(fileContents);
+      const slugFromFrontMatter = data.slug ?? slug;
 
       return {
-        slug,
-        title: data.title ?? slug,
+        slug: slugFromFrontMatter,
+        title: data.title ?? slugFromFrontMatter,
         description: data.description ?? "",
         date: data.date ?? "1970-01-01",
         thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
         tags: data.tags ?? [],
         views: data.views ?? 0,
         published: data.published !== false,
+        velogUrl: data.velog_url ?? data.velogUrl,
         content,
       } as Devlog;
     })
@@ -54,16 +57,20 @@ export function getDevlog(slug: string): Devlog | null {
 
   const fileContents = fs.readFileSync(fullPath, "utf8");
   const { data, content } = matter(fileContents);
+  const published = data.published !== false;
+  if (!published) return null;
+  const resolvedSlug = data.slug ?? slug;
 
   return {
-    slug,
-    title: data.title ?? slug,
+    slug: resolvedSlug,
+    title: data.title ?? resolvedSlug,
     description: data.description ?? "",
     date: data.date ?? "1970-01-01",
     thumbnail: data.thumbnail ?? "/devlog-placeholder.svg",
     tags: data.tags ?? [],
     views: data.views ?? 0,
-    published: data.published !== false,
+    published,
+    velogUrl: data.velog_url ?? data.velogUrl,
     content,
   };
 }

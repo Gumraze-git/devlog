@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check:mermaid-contrast": "node scripts/contrast-check-mermaid.mjs"
+    "check:mermaid-contrast": "node scripts/contrast-check-mermaid.mjs",
+    "import:velog": "node scripts/import-velog-post.mjs"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",

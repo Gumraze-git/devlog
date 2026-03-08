@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
+import MarkdownRenderer from "../../components/MarkdownRenderer";
+import { createArticleJsonLd } from "../../lib/articleJsonLd";
+import { buildCodeHtmlByKey } from "../../lib/codeHighlight";
 import { getPost } from "../../lib/posts";
 import { getAllDevlogs } from "../../lib/devlog";
 import { createPageMetadata } from "../../lib/metadata";
@@ -48,9 +51,24 @@ export default async function DevlogDetailPage({ params }: { params: Promise<Par
   const resolved = await params;
   const post = getPost(resolved.slug);
   if (!post) return notFound();
+  const codeHtmlByKey = await buildCodeHtmlByKey(post.content);
+  const publishedTime = post.date ? new Date(post.date).toISOString() : new Date().toISOString();
+  const articleJsonLd = createArticleJsonLd({
+    title: post.title,
+    description: post.description,
+    path: `/devlog/${post.slug}`,
+    datePublished: publishedTime,
+    image: post.thumbnail,
+    keywords: post.tags,
+  });
 
   return (
     <div className="w-full space-y-12 animate-in fade-in duration-500 pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+
       <Link
         href="/devlog"
         className="inline-flex items-center text-sm font-medium text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors"
@@ -102,14 +120,11 @@ export default async function DevlogDetailPage({ params }: { params: Promise<Par
           </div>
         )}
 
-        <div className="prose prose-zinc dark:prose-invert max-w-none text-lg leading-relaxed text-[var(--text-muted)]">
-          {post.content
-            .split("\n")
-            .filter((line) => line.trim().length > 0)
-            .map((line, idx) => (
-              <p key={idx}>{line}</p>
-            ))}
-        </div>
+        <MarkdownRenderer
+          content={post.content}
+          codeHtmlByKey={codeHtmlByKey}
+          className="max-w-none"
+        />
       </article>
     </div>
   );
