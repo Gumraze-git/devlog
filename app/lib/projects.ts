@@ -273,30 +273,83 @@ function parseProjectFile(slug: string, fileContents: string): Project {
 export function getAllProjects(): Project[] {
   if (!fs.existsSync(projectsDir)) return [];
 
-  const files = fs.readdirSync(projectsDir).filter((file) => file.endsWith(".md"));
+  const files = fs.readdirSync(projectsDir).filter((file) => {
+    const fullPath = path.join(projectsDir, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      return fs.existsSync(path.join(fullPath, "index.md"));
+    }
+    return file.endsWith(".md");
+  });
 
   const projects = files
     .map((file) => {
-      const slug = file.replace(/\.md$/, "");
       const fullPath = path.join(projectsDir, file);
-      const fileContents = fs.readFileSync(fullPath, "utf8");
+      const isDirectory = fs.statSync(fullPath).isDirectory();
+      
+      let slug = file;
+      let fileContents = "";
+      
+      if (isDirectory) {
+         const indexPath = path.join(fullPath, "index.md");
+         if (!fs.existsSync(indexPath)) return null;
+         
+         fileContents = fs.readFileSync(indexPath, "utf8");
+         
+         const subFiles = fs.readdirSync(fullPath)
+           .filter(f => f.endsWith(".md") && f !== "index.md")
+           .sort((a, b) => a.localeCompare(b));
+           
+         for (const subFile of subFiles) {
+           const subContent = fs.readFileSync(path.join(fullPath, subFile), "utf8");
+           const subParsed = matter(subContent);
+           const disableToc = subParsed.data.toc === false ? "\n<!-- toc: false -->\n" : "";
+           fileContents += "\n\n" + disableToc + subParsed.content;
+         }
+      } else {
+         if (!file.endsWith(".md")) return null;
+         slug = file.replace(/\.md$/, "");
+         fileContents = fs.readFileSync(fullPath, "utf8");
+      }
+      
       return parseProjectFile(slug, fileContents);
     })
-    .filter((p) => p.published)
+    .filter((p) => p !== null && p.published)
     .sort((a, b) => {
-      const aTime = a.date ? new Date(a.date).getTime() : 0;
-      const bTime = b.date ? new Date(b.date).getTime() : 0;
+      const aTime = a!.date ? new Date(a!.date).getTime() : 0;
+      const bTime = b!.date ? new Date(b!.date).getTime() : 0;
       return bTime - aTime;
-    });
+    }) as Project[];
 
   return projects;
 }
 
 export function getProject(slug: string): Project | null {
-  const fullPath = path.join(projectsDir, `${slug}.md`);
-  if (!fs.existsSync(fullPath)) return null;
+  const dirPath = path.join(projectsDir, slug);
+  const filePath = path.join(projectsDir, `${slug}.md`);
+  
+  let fileContents = "";
+  
+  if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
+     const indexPath = path.join(dirPath, "index.md");
+     if (!fs.existsSync(indexPath)) return null;
+     
+     fileContents = fs.readFileSync(indexPath, "utf8");
+     
+     const subFiles = fs.readdirSync(dirPath)
+       .filter(f => f.endsWith(".md") && f !== "index.md")
+       .sort((a, b) => a.localeCompare(b));
+       
+     for (const subFile of subFiles) {
+       const subContent = fs.readFileSync(path.join(dirPath, subFile), "utf8");
+       const subParsed = matter(subContent);
+       fileContents += "\n\n" + subParsed.content;
+     }
+  } else if (fs.existsSync(filePath)) {
+    fileContents = fs.readFileSync(filePath, "utf8");
+  } else {
+    return null;
+  }
 
-  const fileContents = fs.readFileSync(fullPath, "utf8");
   return parseProjectFile(slug, fileContents);
 }
 
