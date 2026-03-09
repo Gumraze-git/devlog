@@ -3,7 +3,16 @@
 import React, { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Code2, GitCommitHorizontal } from "lucide-react";
-import { createCodeKey, extractHeadingSlugByLine, slugify, stripInlineMarkdown } from "../lib/markdown";
+import {
+    buildTroubleSummary,
+    createCodeKey,
+    extractHeadingSlugByLine,
+    normalizeArrowNotation,
+    parseTroubleshootingContent,
+    slugify,
+    stripInlineMarkdown,
+    TROUBLE_ROWS,
+} from "../lib/markdown";
 import MermaidDiagram from "./MermaidDiagram";
 
 interface MarkdownRendererProps {
@@ -11,36 +20,6 @@ interface MarkdownRendererProps {
     codeHtmlByKey?: Record<string, string>;
     className?: string;
 }
-
-type TroubleKey = "title" | "problem" | "cause" | "solution" | "result";
-type TroubleContent = Partial<Record<TroubleKey, string>>;
-
-const troubleKeyMap: Record<string, TroubleKey> = {
-    "title": "title",
-    "제목": "title",
-    "problem": "problem",
-    "issue": "problem",
-    "문제": "problem",
-    "cause": "cause",
-    "reason": "cause",
-    "원인": "cause",
-    "solution": "solution",
-    "fix": "solution",
-    "해결": "solution",
-    "result": "result",
-    "outcome": "result",
-    "impact": "result",
-    "결과": "result",
-};
-
-const troubleRows: Array<{ key: Exclude<TroubleKey, "title">; label: string }> = [
-    { key: "problem", label: "문제" },
-    { key: "cause", label: "원인" },
-    { key: "solution", label: "해결" },
-    { key: "result", label: "결과" },
-];
-
-const TROUBLE_SUMMARY_LIMIT = 70;
 
 type PositionNode = {
     position?: {
@@ -173,181 +152,6 @@ function isBlockCode(node: PositionNode | undefined, className: string | undefin
     return rawCode.includes("\n");
 }
 
-function trimEdgeEmptyLines(lines: string[]): string[] {
-    const next = [...lines];
-    while (next.length > 0 && next[0].trim().length === 0) next.shift();
-    while (next.length > 0 && next[next.length - 1].trim().length === 0) next.pop();
-    return next;
-}
-
-function normalizeTroubleLabel(raw: string): TroubleKey | undefined {
-    const key = raw.trim().replace(/\*\*/g, "").toLowerCase();
-    return troubleKeyMap[key];
-}
-
-function createTroubleSectionStore() {
-    return {
-        title: [] as string[],
-        problem: [] as string[],
-        cause: [] as string[],
-        solution: [] as string[],
-        result: [] as string[],
-    };
-}
-
-function parseTroubleshootingContent(source: string): TroubleContent {
-    const sections = createTroubleSectionStore();
-    let currentKey: TroubleKey | null = null;
-    let inBacktickCodeFence = false;
-
-    const append = (key: TroubleKey, line: string) => {
-        sections[key].push(line);
-    };
-
-    for (const rawLine of source.split("\n")) {
-        const trimmed = rawLine.trim();
-        const fenceMatch = /^```/.exec(trimmed);
-
-        if (fenceMatch) {
-            if (!currentKey) currentKey = "problem";
-            append(currentKey, rawLine);
-            inBacktickCodeFence = !inBacktickCodeFence;
-            continue;
-        }
-
-        if (!inBacktickCodeFence) {
-            // Treat labels only when they start at the line head.
-            // This prevents list items like "- 문제: ..." from being misread as a section switch.
-            const labelMatch = /^(?:\*\*)?([A-Za-z가-힣]+)(?:\*\*)?\s*[:：]\s*(.*)$/.exec(trimmed);
-            if (labelMatch) {
-                const mapped = normalizeTroubleLabel(labelMatch[1]);
-                if (mapped) {
-                    currentKey = mapped;
-                    if (labelMatch[2].length > 0) {
-                        append(mapped, labelMatch[2]);
-                    }
-                    continue;
-                }
-            }
-        }
-
-        if (!currentKey) {
-            if (trimmed.length === 0) continue;
-            currentKey = "problem";
-        }
-
-        append(currentKey, rawLine);
-    }
-
-    const result: TroubleContent = {};
-    (Object.keys(sections) as TroubleKey[]).forEach((key) => {
-        const cleaned = trimEdgeEmptyLines(sections[key]);
-        if (cleaned.length > 0) {
-            result[key] = cleaned.join("\n");
-        }
-    });
-
-    return result;
-}
-
-function stripMarkdownForSummary(value: string): string {
-    return value
-        .replace(/```[\s\S]*?```/g, " ")
-        .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
-        .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-        .replace(/`([^`]+)`/g, "$1")
-        .replace(/[*_~>#-]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-function buildTroubleSummary(sections: TroubleContent): string {
-    if (sections.title) {
-        return stripInlineMarkdown(sections.title) || "트러블슈팅 펼쳐보기";
-    }
-
-    if (sections.problem) {
-        const plain = stripMarkdownForSummary(sections.problem);
-        if (plain.length <= TROUBLE_SUMMARY_LIMIT) return plain;
-        return `${plain.slice(0, TROUBLE_SUMMARY_LIMIT - 3).trimEnd()}...`;
-    }
-
-    return "트러블슈팅 펼쳐보기";
-}
-
-function replaceArrowOutsideInlineCode(line: string): string {
-    let output = "";
-    let cursor = 0;
-
-    while (cursor < line.length) {
-        const tickStart = line.indexOf("`", cursor);
-        if (tickStart === -1) {
-            output += line.slice(cursor).replace(/->/g, "→");
-            break;
-        }
-
-        output += line.slice(cursor, tickStart).replace(/->/g, "→");
-
-        let tickCount = 1;
-        while (tickStart + tickCount < line.length && line[tickStart + tickCount] === "`") {
-            tickCount += 1;
-        }
-
-        const delimiter = "`".repeat(tickCount);
-        const tickEnd = line.indexOf(delimiter, tickStart + tickCount);
-        if (tickEnd === -1) {
-            output += line.slice(tickStart);
-            break;
-        }
-
-        output += line.slice(tickStart, tickEnd + tickCount);
-        cursor = tickEnd + tickCount;
-    }
-
-    return output;
-}
-
-function normalizeArrowNotation(source: string): string {
-    const lines = source.split("\n");
-    let inCodeFence = false;
-    let fenceChar: "`" | "~" | "" = "";
-    let fenceLength = 0;
-
-    const transformed = lines.map((line) => {
-        const trimmedStart = line.trimStart();
-        const fenceMatch = /^(`{3,}|~{3,})/.exec(trimmedStart);
-
-        if (fenceMatch) {
-            const marker = fenceMatch[1];
-            const markerChar = marker[0] as "`" | "~";
-            const markerLength = marker.length;
-
-            if (!inCodeFence) {
-                inCodeFence = true;
-                fenceChar = markerChar;
-                fenceLength = markerLength;
-                return line;
-            }
-
-            if (markerChar === fenceChar && markerLength >= fenceLength) {
-                inCodeFence = false;
-                fenceChar = "";
-                fenceLength = 0;
-                return line;
-            }
-
-            return line;
-        }
-
-        if (inCodeFence) {
-            return line;
-        }
-
-        return replaceArrowOutsideInlineCode(line);
-    });
-
-    return transformed.join("\n");
-}
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlByKey, className }) => {
     const codeHtmlMap = codeHtmlByKey ?? {};
@@ -369,6 +173,51 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         }
 
         return "";
+    };
+
+    const isCompareMarker = (node: React.ReactNode) => {
+        const text = getTextContent(node).trim().toLowerCase();
+        return text === "!compare" || text === "compare";
+    };
+
+    const normalizeCompareLabel = (value: string) => {
+        return value.trim().toLowerCase().replace(/\s+/g, "").replace(/[^a-z-]/g, "");
+    };
+
+    const renderCompareLayout = (children: React.ReactNode, className: string) => {
+        const nodes = React.Children.toArray(children).filter((node) => {
+            const text = getTextContent(node).trim();
+            if (text.length === 0) return false;
+            return !isCompareMarker(node);
+        });
+
+        const leftColumn: React.ReactNode[] = [];
+        const rightColumn: React.ReactNode[] = [];
+        let currentColumn: "left" | "right" = "left";
+
+        nodes.forEach((node) => {
+            const normalizedText = normalizeCompareLabel(getTextContent(node));
+            if (normalizedText === "to-be" || normalizedText === "tobe") {
+                currentColumn = "right";
+            }
+
+            if (currentColumn === "left") {
+                leftColumn.push(node);
+            } else {
+                rightColumn.push(node);
+            }
+        });
+
+        const fallbackMidpoint = Math.ceil(nodes.length / 2);
+        const col1 = leftColumn.length > 0 ? leftColumn : nodes.slice(0, fallbackMidpoint);
+        const col2 = rightColumn.length > 0 ? rightColumn : nodes.slice(fallbackMidpoint);
+
+        return (
+            <div className={className}>
+                <div className="space-y-3 min-w-0">{col1}</div>
+                <div className="space-y-3 min-w-0">{col2}</div>
+            </div>
+        );
     };
 
     const copyToClipboard = async (value: string, key: string) => {
@@ -497,24 +346,27 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             const reflections = numberedItems.length > 0 ? numberedItems : paragraphItems;
 
             return (
-                <section className="my-8 not-prose rounded-3xl border border-[var(--border)] bg-[var(--card-subtle)] p-5 md:p-6 shadow-sm">
-                    <div className="mb-4 flex items-center gap-3">
-                        <span className="inline-flex h-8 items-center rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-[11px] font-semibold uppercase tracking-widest text-[var(--accent)]">
-                            Reflection
+                <section className="my-10 not-prose">
+                    <div className="mb-8 flex items-center justify-center gap-4">
+                        <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--accent)]/50" />
+                        <span className="text-[13px] font-extrabold uppercase tracking-[0.25em] text-[var(--accent)]">
+                            Reflections
                         </span>
-                        <div className="h-px flex-1 bg-[var(--border)]" />
+                        <div className="h-px w-16 bg-gradient-to-l from-transparent to-[var(--accent)]/50" />
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-12">
                         {reflections.map((item, i) => (
                             <article
                                 key={i}
-                                className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-4 md:px-5"
+                                className="relative px-2 sm:px-6 md:px-10"
                             >
-                                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-soft)]">
-                                    Insight {i + 1}
+                                <p className="mb-3 text-[12px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">
+                                    Insight <span className="text-[var(--accent)]">{i + 1}</span>
                                 </p>
-                                <p className="text-[15px] leading-relaxed text-[var(--text-muted)]">{item}</p>
+                                <p className="text-base leading-[2.1] md:text-[17px] text-[var(--foreground)] tracking-tight font-medium opacity-90">
+                                    {item}
+                                </p>
                             </article>
                         ))}
                     </div>
@@ -525,29 +377,31 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         if (isBlockCodeNode && (lang === "troubleshooting" || lang === "trouble" || lang === "troubleshoot")) {
             const sections = parseTroubleshootingContent(code);
             const summary = buildTroubleSummary(sections);
-            const activeRows = troubleRows.filter((row) => Boolean(sections[row.key]));
+            const activeRows = TROUBLE_ROWS.filter((row) => Boolean(sections[row.key]));
 
             return (
-                <details className="trouble-card group my-6 not-prose rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-3 shadow-sm transition-colors open:border-[var(--accent)] open:bg-[var(--card-subtle)]">
-                    <summary className="flex cursor-pointer list-none items-center gap-3 [&::-webkit-details-marker]:hidden">
-                        <span className="inline-flex h-7 items-center rounded-full border border-[var(--border)] bg-[var(--card-subtle)] px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)]">
-                            Trouble
+                <div className="trouble-card my-8 not-prose rounded-3xl border border-[var(--border)] bg-[var(--card-subtle)]/50 p-5 md:p-6 shadow-sm">
+                    <div className="trouble-summary mb-5 flex items-center gap-3">
+                        <span className="inline-flex h-8 items-center rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-[11px] font-semibold uppercase tracking-widest text-[var(--accent)]">
+                            Case Study
                         </span>
-                        <span className="trouble-summary-title text-[15px] font-semibold leading-relaxed text-[var(--foreground)]">{summary}</span>
-                        <span className="ml-auto text-xs text-[var(--text-soft)] transition-transform duration-200 group-open:rotate-180">▼</span>
-                    </summary>
+                        <h4 className="trouble-summary-title min-w-0 flex-1 text-[16px] md:text-lg font-bold leading-relaxed text-[var(--foreground)]">{summary}</h4>
+                        <div className="h-px flex-1 bg-[var(--border)] hidden sm:block" />
+                    </div>
 
-                    <div className="trouble-content mt-4 space-y-3 border-t border-[var(--border)] pt-4">
+                    <div className="trouble-content mt-4 space-y-4">
                         {activeRows.length > 0 ? (
                             activeRows.map((row) => (
                                 <article
                                     key={row.key}
-                                    className={`trouble-section trouble-section--${row.key} rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3`}
+                                    className={`trouble-section trouble-section--${row.key} rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-4 md:px-5`}
                                 >
-                                    <h5 className="trouble-section-label">
-                                        {row.label}
-                                    </h5>
-                                    <div className="space-y-3">
+                                    <div className="trouble-section-header mb-3 flex items-center gap-3">
+                                        <p className="trouble-section-label text-[13px] font-bold uppercase tracking-[0.15em] text-[var(--text-soft)]">
+                                            {row.label}
+                                        </p>
+                                    </div>
+                                    <div className="trouble-section-body space-y-3">
                                         <ReactMarkdown
                                             components={{
                                                 pre: ({ children: innerChildren }) => <>{innerChildren}</>,
@@ -563,16 +417,25 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                                     </li>
                                                 ),
                                                 ul: ({ children: innerChildren }) => (
-                                                    <ul className="list-disc pl-5 space-y-1">{innerChildren}</ul>
+                                                    <ul className="list-disc pl-5 space-y-1 mt-1 font-medium">{innerChildren}</ul>
                                                 ),
                                                 ol: ({ children: innerChildren }) => (
-                                                    <ol className="list-decimal pl-5 space-y-1">{innerChildren}</ol>
+                                                    <ol className="list-decimal pl-5 space-y-1 mt-1 font-medium">{innerChildren}</ol>
                                                 ),
-                                                blockquote: ({ children: innerChildren }) => (
-                                                    <blockquote className="border-l-2 border-[var(--border)] pl-3 text-[var(--text-soft)] italic">
-                                                        {innerChildren}
-                                                    </blockquote>
-                                                ),
+                                                blockquote: ({ children: innerChildren }) => {
+                                                    const textStr = getTextContent(innerChildren).trim();
+                                                    if (textStr.includes("!compare")) {
+                                                        return renderCompareLayout(
+                                                            innerChildren,
+                                                            "grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 my-4 p-4 md:p-5 rounded-2xl border border-[var(--border)] bg-[var(--background)]/30 backdrop-blur-sm",
+                                                        );
+                                                    }
+                                                    return (
+                                                        <blockquote className="border-l-2 border-[var(--border)] pl-3 text-[var(--text-soft)] italic mt-2">
+                                                            {innerChildren}
+                                                        </blockquote>
+                                                    );
+                                                },
                                                 a: renderMarkdownAnchor,
                                             }}
                                         >
@@ -583,11 +446,11 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                             ))
                         ) : (
                             <p className="text-[14px] leading-relaxed text-[var(--text-muted)]">
-                                작성된 트러블슈팅 내용이 없습니다.
+                                작성된 내용이 없습니다.
                             </p>
                         )}
                     </div>
-                </details>
+                </div>
             );
         }
 
@@ -734,9 +597,20 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         }
                         return <p>{children}</p>;
                     },
-                    hr: () => (
-                        <hr className="!my-8 border-zinc-200 dark:border-zinc-800" />
-                    ),
+                    blockquote: ({ children }) => {
+                        const textStr = getTextContent(children).trim();
+                        if (textStr.includes("!compare") || textStr.includes("compare")) {
+                            return renderCompareLayout(
+                                children,
+                                "grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 my-6 p-4 md:p-6 rounded-3xl border border-[var(--border)] bg-[var(--card-subtle)]/40 backdrop-blur-sm shadow-sm",
+                            );
+                        }
+                        return (
+                            <blockquote className="border-l-2 border-[var(--border)] pl-4 text-[var(--text-soft)] italic my-4 py-2 bg-[var(--card-subtle)]/30 rounded-r-xl">
+                                {children}
+                            </blockquote>
+                        );
+                    },
                     code: renderCode,
                     a: renderMarkdownAnchor,
                 }}

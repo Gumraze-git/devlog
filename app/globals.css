@@ -237,11 +237,21 @@ html {
 /* Troubleshooting readability */
 .markdown-prose .trouble-card {
   border-color: color-mix(in srgb, var(--accent) 16%, var(--border));
+  background: color-mix(in srgb, var(--card) 92%, var(--card-subtle));
+  box-shadow: 0 16px 40px -28px rgba(15, 23, 42, 0.55);
+}
+
+.markdown-prose .trouble-summary {
+  min-width: 0;
 }
 
 .markdown-prose .trouble-summary-title {
   color: var(--foreground);
   font-weight: 650;
+}
+
+.markdown-prose .trouble-summary-count {
+  letter-spacing: 0.01em;
 }
 
 .markdown-prose .trouble-content {
@@ -254,19 +264,35 @@ html {
   background: color-mix(in srgb, var(--card) 88%, var(--card-subtle));
 }
 
-.markdown-prose .trouble-section-label {
+.markdown-prose .trouble-section-header {
+  min-width: 0;
+}
+
+.markdown-prose .trouble-step-index {
   display: inline-flex;
   align-items: center;
-  margin: 0 0 0.6rem;
-  padding: 0.24rem 0.58rem;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
   border: 1px solid var(--border);
   border-radius: 999px;
-  font-size: 0.81rem;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  line-height: 1.1;
   color: var(--foreground);
-  background: color-mix(in srgb, var(--card-subtle) 88%, var(--background));
+  background: color-mix(in srgb, var(--card-subtle) 90%, var(--background));
+}
+
+.markdown-prose .trouble-section-label {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  min-height: 2rem;
+  font-size: 0.94rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--foreground);
 }
 
 .markdown-prose .trouble-section-text {
@@ -274,28 +300,83 @@ html {
   line-height: 1.68;
 }
 
-.markdown-prose .trouble-section--problem .trouble-section-label {
+.markdown-prose .trouble-section--problem {
+  border-color: color-mix(in srgb, #ef4444 26%, var(--border));
+  background: color-mix(in srgb, #fee2e2 10%, var(--card));
+}
+
+.markdown-prose .trouble-section--problem .trouble-step-index {
   border-color: color-mix(in srgb, #ef4444 36%, var(--border));
   color: color-mix(in srgb, #b91c1c 82%, var(--foreground));
   background: color-mix(in srgb, #fee2e2 56%, var(--card));
 }
 
-.markdown-prose .trouble-section--cause .trouble-section-label {
+.markdown-prose .trouble-section--problem .trouble-section-label {
+  color: color-mix(in srgb, #b91c1c 82%, var(--foreground));
+}
+
+.markdown-prose .trouble-section--cause {
+  border-color: color-mix(in srgb, #f59e0b 24%, var(--border));
+  background: color-mix(in srgb, #fef3c7 10%, var(--card));
+}
+
+.markdown-prose .trouble-section--cause .trouble-step-index {
   border-color: color-mix(in srgb, #f59e0b 34%, var(--border));
   color: color-mix(in srgb, #a16207 84%, var(--foreground));
   background: color-mix(in srgb, #fef3c7 56%, var(--card));
 }
 
-.markdown-prose .trouble-section--solution .trouble-section-label {
+.markdown-prose .trouble-section--cause .trouble-section-label {
+  color: color-mix(in srgb, #a16207 84%, var(--foreground));
+}
+
+.markdown-prose .trouble-section--solution {
+  border-color: color-mix(in srgb, #0ea5e9 24%, var(--border));
+  background: color-mix(in srgb, #e0f2fe 10%, var(--card));
+}
+
+.markdown-prose .trouble-section--solution .trouble-step-index {
   border-color: color-mix(in srgb, #0ea5e9 34%, var(--border));
   color: color-mix(in srgb, #0369a1 84%, var(--foreground));
   background: color-mix(in srgb, #e0f2fe 56%, var(--card));
 }
 
-.markdown-prose .trouble-section--result .trouble-section-label {
+.markdown-prose .trouble-section--solution .trouble-section-label {
+  color: color-mix(in srgb, #0369a1 84%, var(--foreground));
+}
+
+.markdown-prose .trouble-section--result {
+  border-color: color-mix(in srgb, #22c55e 22%, var(--border));
+  background: color-mix(in srgb, #dcfce7 10%, var(--card));
+}
+
+.markdown-prose .trouble-section--result .trouble-step-index {
   border-color: color-mix(in srgb, #22c55e 32%, var(--border));
   color: color-mix(in srgb, #15803d 84%, var(--foreground));
   background: color-mix(in srgb, #dcfce7 56%, var(--card));
+}
+
+.markdown-prose .trouble-section--result .trouble-section-label {
+  color: color-mix(in srgb, #15803d 84%, var(--foreground));
+}
+
+.markdown-prose .trouble-section-body > :first-child {
+  margin-top: 0;
+}
+
+.markdown-prose .trouble-section-body > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .markdown-prose .trouble-summary {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .markdown-prose .trouble-summary-count {
+    order: 3;
+  }
 }
 
 .project-md-readable .md-chip-list {

@@ -38,30 +38,63 @@ function extractBacktickCodeBlocks(source: string): Array<{ lang: string; code: 
   let inFence = false;
   let lang = "text";
   let buffer: string[] = [];
+  let quoteDepth = 0;
+
+  const parseFenceLine = (line: string) => {
+    const quotedMatch = /^(>\s*)+```(.*)$/.exec(line.trim());
+    if (quotedMatch) {
+      const quotePrefix = quotedMatch[0].slice(0, quotedMatch[0].indexOf("```"));
+      const depth = (quotePrefix.match(/>/g) ?? []).length;
+      return {
+        info: quotedMatch[2].trim(),
+        quoteDepth: depth,
+      };
+    }
+
+    const plainMatch = /^```(.*)$/.exec(line.trim());
+    if (plainMatch) {
+      return {
+        info: plainMatch[1].trim(),
+        quoteDepth: 0,
+      };
+    }
+
+    return null;
+  };
+
+  const stripQuotedPrefix = (line: string, depth: number) => {
+    if (depth === 0) return line;
+
+    let next = line;
+    for (let i = 0; i < depth; i += 1) {
+      next = next.replace(/^\s*>\s?/, "");
+    }
+    return next;
+  };
 
   for (const line of lines) {
-    const trimmed = line.trim();
-    const fenceMatch = /^```(.*)$/.exec(trimmed);
+    const fenceLine = parseFenceLine(line);
 
     if (!inFence) {
-      if (!fenceMatch) continue;
+      if (!fenceLine) continue;
       inFence = true;
-      const info = fenceMatch[1].trim();
-      const token = info.split(/\s+/)[0] ?? "";
+      quoteDepth = fenceLine.quoteDepth;
+      const token = fenceLine.info.split(/\s+/)[0] ?? "";
       lang = token.replace(/^language-/, "") || "text";
       buffer = [];
       continue;
     }
 
-    if (fenceMatch) {
+    if (fenceLine && fenceLine.quoteDepth === quoteDepth) {
       blocks.push({ lang, code: buffer.join("\n").replace(/\n$/, "") });
       inFence = false;
       lang = "text";
       buffer = [];
+      quoteDepth = 0;
       continue;
     }
 
-    buffer.push(line);
+    buffer.push(stripQuotedPrefix(line, quoteDepth));
   }
 
   return blocks;
