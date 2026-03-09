@@ -101,6 +101,7 @@ const extraTechIconMap: Record<string, TechIconMeta> = {
   "aws ecs": { key: "aws ecs", label: "AWS ECS", icon: baseTechIconMap["aws"]?.icon ?? vercelBlob("AWS-Cloud-logo_32_Dark.svg") },
   ec2: { key: "ec2", label: "Amazon EC2", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/EC2.svg" },
   redis: { key: "redis", label: "Redis", icon: null },
+  "jpa (hibernate)": { key: "jpa (hibernate)", label: "JPA (Hibernate)", icon: "/jpa.svg" },
   firebase: { key: "firebase", label: "Firebase", icon: vercelBlob("firebase.svg") },
   "react native": { key: "react native", label: "React Native", icon: baseTechIconMap["react"]?.icon ?? vercelBlob("React_Logo_3.svg") },
   "react query": { key: "react query", label: "React Query", icon: null },
