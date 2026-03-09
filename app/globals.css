@@ -503,6 +503,12 @@ html {
   content: none !important;
 }
 
+html,
+body {
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
 .shiki-block {
   margin: 1.5rem 0;
   border: 1px solid var(--code-border);

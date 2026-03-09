@@ -4,7 +4,7 @@ import { ThemeToggle } from "../ui/ThemeToggle";
 
 export function LeftSidebar() {
     return (
-        <aside className="hidden lg:flex fixed top-14 left-0 bottom-0 w-64 border-r border-[var(--border)] bg-[var(--background)] flex-col p-6">
+        <aside className="hidden lg:flex fixed top-14 left-0 bottom-0 z-40 w-64 border-r border-[var(--border)] bg-[var(--background)] flex-col p-6">
             {/* Profile Section */}
             <div className="mb-8 flex flex-col gap-4">
                 <div className="relative w-48 h-48 rounded-full overflow-hidden border border-[var(--border)] bg-[var(--card)] mx-auto lg:mx-0">

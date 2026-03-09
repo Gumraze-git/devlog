@@ -37,8 +37,8 @@ export default function ProjectHeroCarousel({ images, projectTitle }: ProjectHer
   };
 
   return (
-    <section className="w-full !mt-8" aria-label="프로젝트 상단 이미지 캐러셀">
-      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)] shadow-xl shadow-black/5">
+    <section className="w-full h-full" aria-label="프로젝트 상단 이미지 캐러셀">
+      <div className="relative aspect-[16/9] w-full bg-[var(--card-subtle)]">
         <Image
           src={activeImage.src}
           alt={activeImage.alt || activeImage.caption || projectTitle}
