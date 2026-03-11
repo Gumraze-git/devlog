@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
 import { PageIntro } from "../components/common/PageIntro";
-import { Skeleton } from "../components/ui/Skeleton";
 import { createPageMetadata } from "../lib/metadata";
 import { getAllProjects, type Project } from "../lib/projects";
 
@@ -137,37 +135,6 @@ function ProjectsContent() {
   );
 }
 
-function ProjectsSkeleton() {
-  return (
-    <div className="grid gap-6 xl:grid-cols-2">
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="overflow-hidden rounded-[28px] border border-[var(--border)] bg-[var(--card)]">
-          <Skeleton className="aspect-[16/10] w-full rounded-none" />
-          <div className="space-y-4 p-6">
-            <div className="flex gap-2">
-              <Skeleton className="h-4 w-28" />
-              <Skeleton className="h-4 w-16 rounded-full" />
-            </div>
-            <Skeleton className="h-8 w-3/4" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-5/6" />
-            </div>
-            <div className="flex gap-2">
-              <Skeleton className="h-7 w-20 rounded-full" />
-              <Skeleton className="h-7 w-24 rounded-full" />
-            </div>
-            <div className="space-y-2 pt-4">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-4/5" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function ProjectsListPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -178,9 +145,7 @@ export default function ProjectsListPage() {
         bordered
       />
 
-      <Suspense fallback={<ProjectsSkeleton />}>
-        <ProjectsContent />
-      </Suspense>
+      <ProjectsContent />
     </div>
   );
 }

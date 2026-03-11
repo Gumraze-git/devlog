@@ -5,7 +5,6 @@ import { ArrowRight } from "lucide-react";
 
 import { SectionHeader } from "./components/common/SectionHeader";
 import { FeaturedProjectsSection } from "./components/home/FeaturedProjectsSection";
-import { FeaturedProjectsSkeleton } from "./components/home/FeaturedProjectsSkeleton";
 import { HomeHeroSection } from "./components/home/HomeHeroSection";
 import { RecentPostsSection } from "./components/home/RecentPostsSection";
 import { RecentPostsSkeleton } from "./components/home/RecentPostsSkeleton";
@@ -54,9 +53,7 @@ export default function Home() {
           )}
         />
 
-        <Suspense fallback={<FeaturedProjectsSkeleton />}>
-          <FeaturedProjectsSection />
-        </Suspense>
+        <FeaturedProjectsSection />
       </section>
 
     </div>
