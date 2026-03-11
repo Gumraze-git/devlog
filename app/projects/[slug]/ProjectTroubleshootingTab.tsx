@@ -93,7 +93,7 @@ export default function ProjectTroubleshootingTab({
                       className="border-l-4 border-[var(--border)] pl-4 md:pl-6"
                     >
                       <div className="mb-4">
-                        <h4 className="text-[15px] font-bold uppercase tracking-wider text-[var(--text-soft)]">
+                        <h4 className={`text-[15px] font-bold uppercase tracking-wider trouble-label--${row.key}`}>
                           {row.label}
                         </h4>
                       </div>
@@ -109,28 +109,56 @@ export default function ProjectTroubleshootingTab({
                       {compareValue && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mt-6 p-4 md:p-6 rounded-3xl border border-[var(--border)] bg-[var(--card-subtle)]/40 backdrop-blur-sm shadow-sm">
                           {(() => {
-                            // Clean up blockquote prefix
+                            // Clean up redundant markers like !compare
                             const cleanCompare = compareValue
                               .split("\n")
+                              .filter(l => !l.trim().endsWith("!compare"))
                               .map(l => l.startsWith("> ") ? l.substring(2) : l.startsWith(">") ? l.substring(1) : l)
                               .join("\n");
                             
                             // Split into As-Is and To-Be chunks by looking for ```chips
-                            const chunks = cleanCompare.split(/(?=```chips)/).filter(c => c.trim().length > 0);
+                            const rawChunks = cleanCompare.split(/(?=```chips)/).filter(c => c.trim().length > 0);
                             
-                            if (chunks.length >= 2) {
-                              return (
-                                <>
-                                  <div className="space-y-3 min-w-0">
-                                    <MarkdownRenderer content={chunks[0]} codeHtmlByKey={codeHtmlByKey} />
-                                  </div>
-                                  <div className="space-y-3 min-w-0">
-                                    <MarkdownRenderer content={chunks.slice(1).join("")} codeHtmlByKey={codeHtmlByKey} />
-                                  </div>
-                                </>
-                              );
-                            }
-                            return <MarkdownRenderer content={cleanCompare} codeHtmlByKey={codeHtmlByKey} />;
+                            const asIsContent: string[] = [];
+                            const toBeContent: string[] = [];
+                            
+                            rawChunks.forEach(chunk => {
+                              const normalizedChunk = chunk.toLowerCase().replace(/\s+/g, "").replace(/[^a-z-]/g, "");
+                              
+                              if (normalizedChunk.includes("asis") || normalizedChunk.includes("as-is")) {
+                                asIsContent.push(chunk);
+                              } else if (normalizedChunk.includes("tobe") || normalizedChunk.includes("to-be")) {
+                                toBeContent.push(chunk);
+                              } else {
+                                // Fallback: append to whoever was last or default to As-Is if first
+                                if (asIsContent.length === 0) {
+                                  asIsContent.push(chunk);
+                                } else if (toBeContent.length > 0 && asIsContent.length === toBeContent.length) {
+                                  toBeContent[toBeContent.length - 1] += "\n" + chunk;
+                                } else {
+                                  asIsContent[asIsContent.length - 1] += "\n" + chunk;
+                                }
+                              }
+                            });
+
+                            return (
+                              <>
+                                <div className="space-y-6 min-w-0">
+                                  {asIsContent.map((content, i) => (
+                                    <div key={`asis-${i}`} className="space-y-3">
+                                      <MarkdownRenderer content={content} codeHtmlByKey={codeHtmlByKey} />
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="space-y-6 min-w-0">
+                                  {toBeContent.map((content, i) => (
+                                    <div key={`tobe-${i}`} className="space-y-3">
+                                      <MarkdownRenderer content={content} codeHtmlByKey={codeHtmlByKey} />
+                                    </div>
+                                  ))}
+                                </div>
+                              </>
+                            );
                           })()}
                         </div>
                       )}

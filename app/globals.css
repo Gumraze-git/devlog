@@ -223,161 +223,256 @@ html {
 }
 
 .markdown-prose .md-chip--asis {
-  border-color: color-mix(in srgb, #dc2626 28%, var(--border));
-  color: color-mix(in srgb, #b91c1c 82%, var(--foreground));
-  background: color-mix(in srgb, #fee2e2 45%, var(--card));
+  border-radius: 4px;
+  border: 1px solid #f43f5e;
+  background: transparent;
+  color: #f43f5e;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 .markdown-prose .md-chip--tobe {
-  border-color: color-mix(in srgb, #0ea5e9 36%, var(--border));
-  color: color-mix(in srgb, #0369a1 82%, var(--foreground));
-  background: color-mix(in srgb, #e0f2fe 42%, var(--card));
+  border-radius: 4px;
+  border: 1px solid #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+  text-shadow: none;
 }
 
-/* Troubleshooting readability */
-.markdown-prose .trouble-card {
-  border-color: color-mix(in srgb, var(--accent) 16%, var(--border));
-  background: color-mix(in srgb, var(--card) 92%, var(--card-subtle));
-  box-shadow: 0 16px 40px -28px rgba(15, 23, 42, 0.55);
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
 }
 
-.markdown-prose .trouble-summary {
-  min-width: 0;
+.compare-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
+  border-radius: 1.75rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--card) 88%, rgba(255, 255, 255, 0.05)) 0%, color-mix(in srgb, var(--card) 94%, rgba(15, 23, 42, 0.12)) 100%);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 24px 60px -36px rgba(15, 23, 42, 0.88),
+    0 12px 28px -20px rgba(15, 23, 42, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
 }
 
-.markdown-prose .trouble-summary-title {
-  color: var(--foreground);
-  font-weight: 650;
+.compare-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 18%);
+  opacity: 0.9;
 }
 
-.markdown-prose .trouble-summary-count {
-  letter-spacing: 0.01em;
+.compare-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 30px 80px -40px rgba(15, 23, 42, 0.95),
+    0 18px 40px -24px rgba(15, 23, 42, 0.82),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.markdown-prose .trouble-content {
-  margin-top: 0.9rem;
-  padding-top: 0.9rem;
+.compare-card__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 7rem;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 1.15rem 1.15rem 1.05rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.015) 100%);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.markdown-prose .trouble-section {
-  border-color: color-mix(in srgb, var(--accent) 12%, var(--border));
-  background: color-mix(in srgb, var(--card) 88%, var(--card-subtle));
-}
-
-.markdown-prose .trouble-section-header {
-  min-width: 0;
-}
-
-.markdown-prose .trouble-step-index {
+.compare-card__status {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 2rem;
-  height: 2rem;
-  border: 1px solid var(--border);
+  align-self: flex-start;
+  gap: 0.48rem;
+  border: 1px solid color-mix(in srgb, var(--border) 64%, transparent);
   border-radius: 999px;
-  font-size: 0.78rem;
+  padding: 0.42rem 0.88rem;
+  font-size: 0.73rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--foreground);
-  background: color-mix(in srgb, var(--card-subtle) 90%, var(--background));
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 22px -16px rgba(15, 23, 42, 0.8);
 }
 
-.markdown-prose .trouble-section-label {
-  display: flex;
-  align-items: center;
+.compare-card__status::before {
+  content: "";
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 16px currentColor;
+}
+
+.compare-card__status--asis {
+  border-radius: 0;
+  border: none;
+  border-left: 4px solid #f43f5e;
+  background: rgba(244, 63, 94, 0.08);
+  color: #f43f5e;
+  padding: 0.4rem 0.8rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  box-shadow: none;
+  text-shadow: none;
+  backdrop-filter: none;
+}
+
+.compare-card__status--tobe {
+  border-radius: 0;
+  border: none;
+  border-left: 4px solid #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  color: #10b981;
+  padding: 0.4rem 0.8rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.1);
+  text-shadow: none;
+  backdrop-filter: none;
+}
+
+.compare-card__status--asis::before,
+.compare-card__status--tobe::before {
+  content: none;
+}
+
+.compare-card__summary {
   margin: 0;
-  min-height: 2rem;
-  font-size: 0.94rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  color: var(--foreground);
+  color: color-mix(in srgb, var(--foreground) 96%, white 4%);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
-.markdown-prose .trouble-section-text {
-  font-size: 0.93rem;
-  line-height: 1.68;
+.compare-card__body {
+  position: relative;
+  z-index: 1;
+  padding: 1.15rem;
 }
 
-.markdown-prose .trouble-section--problem {
-  border-color: color-mix(in srgb, #ef4444 26%, var(--border));
-  background: color-mix(in srgb, #fee2e2 10%, var(--card));
-}
-
-.markdown-prose .trouble-section--problem .trouble-step-index {
-  border-color: color-mix(in srgb, #ef4444 36%, var(--border));
-  color: color-mix(in srgb, #b91c1c 82%, var(--foreground));
-  background: color-mix(in srgb, #fee2e2 56%, var(--card));
-}
-
-.markdown-prose .trouble-section--problem .trouble-section-label {
-  color: color-mix(in srgb, #b91c1c 82%, var(--foreground));
-}
-
-.markdown-prose .trouble-section--cause {
-  border-color: color-mix(in srgb, #f59e0b 24%, var(--border));
-  background: color-mix(in srgb, #fef3c7 10%, var(--card));
-}
-
-.markdown-prose .trouble-section--cause .trouble-step-index {
-  border-color: color-mix(in srgb, #f59e0b 34%, var(--border));
-  color: color-mix(in srgb, #a16207 84%, var(--foreground));
-  background: color-mix(in srgb, #fef3c7 56%, var(--card));
-}
-
-.markdown-prose .trouble-section--cause .trouble-section-label {
-  color: color-mix(in srgb, #a16207 84%, var(--foreground));
-}
-
-.markdown-prose .trouble-section--solution {
-  border-color: color-mix(in srgb, #0ea5e9 24%, var(--border));
-  background: color-mix(in srgb, #e0f2fe 10%, var(--card));
-}
-
-.markdown-prose .trouble-section--solution .trouble-step-index {
-  border-color: color-mix(in srgb, #0ea5e9 34%, var(--border));
-  color: color-mix(in srgb, #0369a1 84%, var(--foreground));
-  background: color-mix(in srgb, #e0f2fe 56%, var(--card));
-}
-
-.markdown-prose .trouble-section--solution .trouble-section-label {
-  color: color-mix(in srgb, #0369a1 84%, var(--foreground));
-}
-
-.markdown-prose .trouble-section--result {
-  border-color: color-mix(in srgb, #22c55e 22%, var(--border));
-  background: color-mix(in srgb, #dcfce7 10%, var(--card));
-}
-
-.markdown-prose .trouble-section--result .trouble-step-index {
-  border-color: color-mix(in srgb, #22c55e 32%, var(--border));
-  color: color-mix(in srgb, #15803d 84%, var(--foreground));
-  background: color-mix(in srgb, #dcfce7 56%, var(--card));
-}
-
-.markdown-prose .trouble-section--result .trouble-section-label {
-  color: color-mix(in srgb, #15803d 84%, var(--foreground));
-}
-
-.markdown-prose .trouble-section-body > :first-child {
+.compare-card__body > :first-child {
   margin-top: 0;
 }
 
-.markdown-prose .trouble-section-body > :last-child {
+.compare-card__body > :last-child {
   margin-bottom: 0;
 }
 
-@media (max-width: 640px) {
-  .markdown-prose .trouble-summary {
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
+.compare-card__body .md-chip-list {
+  display: none;
+}
 
-  .markdown-prose .trouble-summary-count {
-    order: 3;
+.compare-card__body .shiki-block {
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(180deg, rgba(8, 15, 31, 0.96) 0%, rgba(3, 8, 18, 0.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.015),
+    0 18px 34px -28px rgba(15, 23, 42, 0.88);
+}
+
+.compare-card__body .shiki-header {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(15, 23, 42, 0.42) 100%);
+  border-bottom-color: color-mix(in srgb, var(--border) 58%, transparent);
+}
+
+.compare-card__body .shiki-lang {
+  border-color: color-mix(in srgb, rgba(255, 255, 255, 0.32) 46%, transparent);
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.compare-card__body .shiki-copy {
+  border-color: color-mix(in srgb, rgba(255, 255, 255, 0.24) 60%, transparent);
+  background: rgba(15, 23, 42, 0.46);
+  color: color-mix(in srgb, var(--foreground) 92%, white 8%);
+}
+
+.compare-card__body .shiki-copy:hover {
+  border-color: color-mix(in srgb, var(--foreground) 26%, transparent);
+  background: rgba(15, 23, 42, 0.68);
+}
+
+.compare-card--asis {
+  border-color: color-mix(in srgb, #fb7185 26%, var(--border));
+  background:
+    linear-gradient(180deg, rgba(127, 29, 29, 0.16) 0%, rgba(15, 23, 42, 0.18) 24%, rgba(2, 6, 23, 0.98) 100%);
+  box-shadow:
+    0 24px 60px -36px rgba(15, 23, 42, 0.88),
+    0 0 0 1px rgba(251, 113, 133, 0.08),
+    0 0 52px -36px rgba(251, 113, 133, 0.55);
+}
+
+.compare-card--tobe {
+  border-color: color-mix(in srgb, #38bdf8 28%, var(--border));
+  background:
+    linear-gradient(180deg, rgba(14, 116, 144, 0.16) 0%, rgba(15, 23, 42, 0.18) 24%, rgba(2, 6, 23, 0.98) 100%);
+  box-shadow:
+    0 24px 60px -36px rgba(15, 23, 42, 0.88),
+    0 0 0 1px rgba(56, 189, 248, 0.08),
+    0 0 56px -36px rgba(56, 189, 248, 0.52);
+}
+
+.compare-card--asis .compare-card__header {
+  background:
+    linear-gradient(180deg, rgba(127, 29, 29, 0.34) 0%, rgba(69, 10, 10, 0.08) 100%);
+}
+
+.compare-card--tobe .compare-card__header {
+  background:
+    linear-gradient(180deg, rgba(8, 47, 73, 0.42) 0%, rgba(8, 47, 73, 0.1) 100%);
+}
+
+@media (min-width: 1280px) {
+  .compare-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem;
   }
 }
+
+/* Troubleshooting block styles removed; using simple colored labels instead */
 
 .project-md-readable .md-chip-list {
   gap: 0.35rem;
@@ -428,55 +523,30 @@ html {
 }
 
 .dark .markdown-prose .md-chip--asis {
-  border-color: color-mix(in srgb, #f87171 46%, var(--border));
-  color: color-mix(in srgb, #fecaca 86%, var(--foreground));
-  background: color-mix(in srgb, #7f1d1d 24%, var(--card));
+  border: 1px solid #f43f5e;
+  background: rgba(244, 63, 94, 0.1);
+  color: #fb7185;
 }
 
 .dark .markdown-prose .md-chip--tobe {
-  border-color: color-mix(in srgb, #38bdf8 52%, var(--border));
-  color: color-mix(in srgb, #bae6fd 86%, var(--foreground));
-  background: color-mix(in srgb, #0c4a6e 26%, var(--card));
+  border: 1px solid #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
 }
 
-.dark .markdown-prose .trouble-card {
-  border-color: color-mix(in srgb, #38bdf8 30%, var(--border));
-}
+/* Troubleshooting Labels */
+.trouble-label--problem { color: #ef4444; }
+.dark .trouble-label--problem { color: #f87171; }
 
-.dark .markdown-prose .trouble-section {
-  border-color: color-mix(in srgb, #38bdf8 22%, var(--border));
-  background: color-mix(in srgb, var(--card) 82%, #0b1220 18%);
-}
+.trouble-label--cause { color: #f59e0b; }
+.dark .trouble-label--cause { color: #fbbf24; }
 
-.dark .markdown-prose .trouble-section-label {
-  border-color: color-mix(in srgb, #93c5fd 34%, var(--border));
-  color: color-mix(in srgb, #e2e8f0 88%, var(--foreground));
-  background: color-mix(in srgb, #0f172a 56%, var(--card));
-}
+.trouble-label--solution { color: #0ea5e9; }
+.dark .trouble-label--solution { color: #38bdf8; }
 
-.dark .markdown-prose .trouble-section--problem .trouble-section-label {
-  border-color: color-mix(in srgb, #f87171 54%, var(--border));
-  color: color-mix(in srgb, #fecaca 88%, var(--foreground));
-  background: color-mix(in srgb, #7f1d1d 34%, var(--card));
-}
-
-.dark .markdown-prose .trouble-section--cause .trouble-section-label {
-  border-color: color-mix(in srgb, #fbbf24 52%, var(--border));
-  color: color-mix(in srgb, #fde68a 88%, var(--foreground));
-  background: color-mix(in srgb, #78350f 34%, var(--card));
-}
-
-.dark .markdown-prose .trouble-section--solution .trouble-section-label {
-  border-color: color-mix(in srgb, #38bdf8 58%, var(--border));
-  color: color-mix(in srgb, #bae6fd 88%, var(--foreground));
-  background: color-mix(in srgb, #0c4a6e 34%, var(--card));
-}
-
-.dark .markdown-prose .trouble-section--result .trouble-section-label {
-  border-color: color-mix(in srgb, #4ade80 50%, var(--border));
-  color: color-mix(in srgb, #bbf7d0 88%, var(--foreground));
-  background: color-mix(in srgb, #14532d 34%, var(--card));
-}
+.trouble-label--result { color: #22c55e; }
+.dark .trouble-label--result { color: #4ade80; }
 
 /* Project detail inline markdown code: keep chip box + soft red text */
 .markdown-prose code.md-inline-code {

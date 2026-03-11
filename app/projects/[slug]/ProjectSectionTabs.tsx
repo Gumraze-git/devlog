@@ -21,7 +21,6 @@ export default function ProjectSectionTabs({
   const currentActiveSlug = activeSection?.slug ?? "";
   const isTroubleshootingTab = activeSection?.title.includes("트러블") ?? false;
   const isEvaluationTab = activeSection?.title.includes("평가") ?? false;
-  const isRetrospectiveTab = activeSection?.title.includes("회고") ?? false;
   
   const shouldHideToc = isTroubleshootingTab || isEvaluationTab;
   const headings = shouldHideToc ? [] : extractHeadings(activeSection?.content ?? "");
@@ -72,7 +71,7 @@ export default function ProjectSectionTabs({
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span aria-hidden="true" className="text-base">{emoji}</span>
+                  <span aria-hidden="true" className="text-[1.1em]">{emoji}</span>
                   <span>{section.title}</span>
                 </div>
               </button>
@@ -89,29 +88,23 @@ export default function ProjectSectionTabs({
         className="pt-6 pb-12 w-full mx-auto max-w-6xl animate-in fade-in zoom-in-95 duration-300"
       >
         {activeSection.content.trim().length > 0 ? (
-          isTroubleshootingTab ? (
+          isTroubleshootingTab || isEvaluationTab ? (
             <ProjectTroubleshootingTab
               title={activeSection.title}
               content={activeSection.content}
               codeHtmlByKey={codeHtmlByKey}
             />
           ) : (
-            <div className={`flex flex-col gap-10 lg:flex-row lg:items-stretch ${isRetrospectiveTab ? "retrospective-mode" : ""}`}>
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch">
               <div className="flex-1 min-w-0 space-y-6">
-                {!isRetrospectiveTab && (
-                  <h2 className="text-2xl font-extrabold tracking-tight text-[var(--foreground)] md:text-3xl">
-                    {activeSection.title}
-                  </h2>
-                )}
+                <h2 className="text-2xl font-extrabold tracking-tight text-[var(--foreground)] md:text-3xl">
+                  {activeSection.title}
+                </h2>
 
                 <MarkdownRenderer
                   content={activeSection.content}
                   codeHtmlByKey={codeHtmlByKey}
-                  className={`project-md-readable max-w-none mx-0 ${
-                    isRetrospectiveTab
-                      ? "prose-p:leading-[2.0] prose-p:text-lg prose-p:text-[var(--text-soft)] prose-blockquote:border-l-4 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--accent)]/5 prose-blockquote:py-2 prose-blockquote:px-5 prose-blockquote:rounded-r-xl prose-blockquote:text-xl prose-blockquote:italic"
-                      : "prose-p:leading-[1.8] prose-li:my-2.5 prose-li:leading-[1.75]"
-                  }`}
+                  className="project-md-readable max-w-none mx-0 prose-p:leading-[1.8] prose-li:my-2.5 prose-li:leading-[1.75]"
                 />
               </div>
 
@@ -128,7 +121,7 @@ export default function ProjectSectionTabs({
                         <li key={`${heading.slug}-${idx}`} style={{ paddingLeft: `${(heading.depth - 2) * 0.75}rem` }}>
                           <a
                             href={`#${heading.slug}`}
-                            className="block text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors leading-snug break-keep"
+                            className="block text-[14px] font-medium text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors leading-snug break-keep"
                           >
                             {heading.text}
                           </a>

@@ -14,6 +14,7 @@ import {
     TROUBLE_ROWS,
 } from "../lib/markdown";
 import MermaidDiagram from "./MermaidDiagram";
+import remarkGfm from "remark-gfm";
 
 interface MarkdownRendererProps {
     content: string;
@@ -48,6 +49,15 @@ type ChipItem = {
     label: string;
     href?: string;
     variant: ChipVariant;
+};
+
+type CompareVariant = "asis" | "tobe" | "default";
+
+type CompareCard = {
+    label: string;
+    variant: CompareVariant;
+    summary?: string;
+    bodyNodes: React.ReactNode[];
 };
 
 const languageLabelMap: Record<string, string> = {
@@ -86,15 +96,24 @@ function isExternalHttpLink(href?: string): boolean {
     return /^https?:\/\//i.test(href);
 }
 
-function normalizeChipVariant(value?: string): ChipVariant {
-    if (!value) return "default";
-    const normalized = value.trim().toLowerCase();
+function normalizeChipVariant(value?: string, label?: string): ChipVariant {
+    const normalizedVariant = (value || "").trim().toLowerCase();
+    
+    // Explicit variants take precedence
     if (
-        normalized === "code" ||
-        normalized === "commit" ||
-        normalized === "asis" ||
-        normalized === "tobe"
-    ) return normalized;
+        normalizedVariant === "code" ||
+        normalizedVariant === "commit" ||
+        normalizedVariant === "asis" ||
+        normalizedVariant === "tobe"
+    ) return normalizedVariant as ChipVariant;
+
+    // Fallback to label-based detection if variant is default/missing
+    if (label) {
+        const normalizedLabel = label.trim().toLowerCase().replace(/\s+/g, "").replace(/[^a-z-]/g, "");
+        if (normalizedLabel === "asis" || normalizedLabel === "as-is") return "asis";
+        if (normalizedLabel === "tobe" || normalizedLabel === "to-be") return "tobe";
+    }
+
     return "default";
 }
 
@@ -112,7 +131,7 @@ function parseChipLines(source: string): ChipItem[] {
 
         const rawHref = parts[1] ?? "";
         const href = rawHref.length > 0 && !/\s/.test(rawHref) ? rawHref : undefined;
-        const variant = normalizeChipVariant(parts[2]);
+        const variant = normalizeChipVariant(parts[2], label);
 
         chips.push({
             label,
@@ -184,6 +203,62 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         return value.trim().toLowerCase().replace(/\s+/g, "").replace(/[^a-z-]/g, "");
     };
 
+    const toCompareVariant = (value: string): CompareVariant => {
+        const normalized = normalizeCompareLabel(value);
+        if (normalized === "asis" || normalized === "as-is") return "asis";
+        if (normalized === "tobe" || normalized === "to-be") return "tobe";
+        return "default";
+    };
+
+    const isCompareChipNode = (node: React.ReactNode) => {
+        if (!React.isValidElement<Record<string, unknown>>(node)) return false;
+        return typeof node.props["data-compare-first-label"] === "string";
+    };
+
+    const getCompareChipLabel = (node: React.ReactNode): string | null => {
+        if (!React.isValidElement<Record<string, unknown>>(node)) return null;
+        const label = node.props["data-compare-first-label"];
+        return typeof label === "string" && label.trim().length > 0 ? label.trim() : null;
+    };
+
+    const getRawCode = (node: React.ReactNode): string | null => {
+        if (!React.isValidElement<Record<string, unknown>>(node)) return null;
+        const rawCode = node.props["data-raw-code"];
+        return typeof rawCode === "string" && rawCode.length > 0 ? rawCode : null;
+    };
+
+    const extractCompareSummary = (rawCode: string): string | undefined => {
+        for (const line of rawCode.split("\n")) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+
+            const singleLineComment = /^\/\/\s*(.+)$/.exec(trimmed);
+            if (singleLineComment) {
+                return singleLineComment[1].trim();
+            }
+
+            break;
+        }
+
+        return undefined;
+    };
+
+    const buildCompareCard = (nodes: React.ReactNode[], fallbackLabel: string): CompareCard => {
+        const chipNode = nodes.find((node) => isCompareChipNode(node));
+        const label = getCompareChipLabel(chipNode) ?? fallbackLabel;
+        const variant = toCompareVariant(label);
+        const bodyNodes = nodes.filter((node) => !isCompareChipNode(node));
+        const firstCodeNode = bodyNodes.find((node) => Boolean(getRawCode(node)));
+        const summary = firstCodeNode ? extractCompareSummary(getRawCode(firstCodeNode) ?? "") : undefined;
+
+        return {
+            label,
+            variant,
+            summary,
+            bodyNodes,
+        };
+    };
+
     const renderCompareLayout = (children: React.ReactNode, className: string) => {
         const nodes = React.Children.toArray(children).filter((node) => {
             const text = getTextContent(node).trim();
@@ -211,11 +286,33 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         const fallbackMidpoint = Math.ceil(nodes.length / 2);
         const col1 = leftColumn.length > 0 ? leftColumn : nodes.slice(0, fallbackMidpoint);
         const col2 = rightColumn.length > 0 ? rightColumn : nodes.slice(fallbackMidpoint);
+        const cards = [
+            buildCompareCard(col1, "As-Is"),
+            buildCompareCard(col2, "To-Be"),
+        ];
 
         return (
             <div className={className}>
-                <div className="space-y-3 min-w-0">{col1}</div>
-                <div className="space-y-3 min-w-0">{col2}</div>
+                {cards.map((card) => (
+                    <section
+                        key={card.label}
+                        className={`compare-card compare-card--${card.variant}`}
+                    >
+                        <header className="compare-card__header">
+                            <span className={`compare-card__status compare-card__status--${card.variant}`}>
+                                {card.label}
+                            </span>
+                            {card.summary ? (
+                                <p className="compare-card__summary">
+                                    {card.summary}
+                                </p>
+                            ) : null}
+                        </header>
+                        <div className="compare-card__body">
+                            {card.bodyNodes}
+                        </div>
+                    </section>
+                ))}
             </div>
         );
     };
@@ -266,7 +363,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             if (chips.length === 0) return null;
 
             return (
-                <div className="md-chip-list not-prose">
+                <div
+                    className="md-chip-list not-prose"
+                    data-compare-first-label={chips[0]?.label ?? ""}
+                >
                     {chips.map((chip, index) => {
                         const variantClassName = chip.variant !== "default" ? `md-chip--${chip.variant}` : "";
                         const className = ["md-chip", chip.href ? "md-chip--link" : "", variantClassName]
@@ -427,7 +527,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                                     if (textStr.includes("!compare")) {
                                                         return renderCompareLayout(
                                                             innerChildren,
-                                                            "grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 my-4 p-4 md:p-5 rounded-2xl border border-[var(--border)] bg-[var(--background)]/30 backdrop-blur-sm",
+                                                            "compare-grid my-4",
                                                         );
                                                     }
                                                     return (
@@ -459,7 +559,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             const highlighted = codeHtmlMap[key];
             if (highlighted) {
                 return (
-                    <div className="not-prose shiki-block">
+                    <div className="not-prose shiki-block" data-raw-code={code}>
                         <div className="shiki-header">
                             <span className="shiki-lang">{label}</span>
                             <button
@@ -479,7 +579,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             }
 
             return (
-                <div className="not-prose shiki-block">
+                <div className="not-prose shiki-block" data-raw-code={code}>
                     <div className="shiki-header">
                         <span className="shiki-lang">{label}</span>
                         <button
@@ -549,12 +649,13 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     return (
         <div className={containerClassName}>
             <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                     pre: ({ children }) => <>{children}</>,
                     h1({ children, node, ...props }) {
                         const slug = getHeadingSlug(children, node as PositionNode);
                         return (
-                            <h1 id={slug} className="scroll-mt-24 !mt-12 !mb-6" {...props}>
+                            <h1 id={slug} className="scroll-mt-24 !mt-12 !mb-6 text-[var(--foreground)]" {...props}>
                                 {children}
                             </h1>
                         );
@@ -562,7 +663,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                     h2({ children, node, ...props }) {
                         const slug = getHeadingSlug(children, node as PositionNode);
                         return (
-                            <h2 id={slug} className="scroll-mt-24 !mt-8 !mb-4" {...props}>
+                            <h2 id={slug} className="scroll-mt-24 !mt-8 !mb-4 text-[var(--foreground)]" {...props}>
                                 {children}
                             </h2>
                         );
@@ -570,7 +671,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                     h3({ children, node, ...props }) {
                         const slug = getHeadingSlug(children, node as PositionNode);
                         return (
-                            <h3 id={slug} className="scroll-mt-24 !mt-6 !mb-3" {...props}>
+                            <h3 id={slug} className="scroll-mt-24 !mt-6 !mb-3 text-[var(--foreground)]" {...props}>
                                 {children}
                             </h3>
                         );
@@ -578,31 +679,70 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                     h4({ children, node, ...props }) {
                         const slug = getHeadingSlug(children, node as PositionNode);
                         return (
-                            <h4 id={slug} className="scroll-mt-24 !mt-4 !mb-2" {...props}>
+                            <h4 id={slug} className="scroll-mt-24 !mt-4 !mb-2 text-[var(--foreground)]" {...props}>
                                 {children}
                             </h4>
                         );
                     },
                     p({ children }) {
                         const text = getTextContent(children);
-                        if (typeof text === "string" && text.trim().startsWith("|")) {
-                            const content = text.trim().substring(1).trim();
+                        // Summary-style highlight: only if explicit "| " marker is used 
+                        // and it's not a fragmented table line (GFM handles tables now)
+                        if (typeof text === "string" && text.trim().startsWith("|") && !text.includes("| --- |")) {
+                            const raw = text.trim();
+                            const content = raw.substring(1).trim();
+                            // If it still looks like a table's raw content but wasn't caught by the table renderer, 
+                            // we just render a plain p to be safe.
+                            if (raw.split("|").filter(Boolean).length > 1 && !raw.includes(" || ")) {
+                                return <p>{children}</p>;
+                            }
+
                             return (
                                 <p
-                                    className="scroll-mt-24 !mt-8 !mb-4 border-l-4 border-zinc-800 dark:border-zinc-200 pl-4 font-bold text-2xl tracking-tighter !text-black"
+                                    className="scroll-mt-24 !mt-8 !mb-4 border-l-4 border-zinc-900 dark:border-zinc-100 pl-6 font-bold text-2xl tracking-tighter !text-black dark:!text-white leading-[1.3] py-2"
                                 >
                                     {content}
                                 </p>
                             );
                         }
-                        return <p>{children}</p>;
+                        return <p className="leading-[1.85] text-[15.5px] text-[var(--foreground)]/85 tracking-[-0.01em] break-keep">{children}</p>;
                     },
+                    // GFM Tables - Elegant Content Reading Style
+                    table: ({ children }) => (
+                        <div className="my-10 w-full overflow-hidden">
+                            <div className="overflow-x-auto custom-scrollbar pb-4">
+                                <table className="w-full border-collapse text-left">
+                                    {children}
+                                </table>
+                            </div>
+                        </div>
+                    ),
+                    thead: ({ children }) => (
+                        <thead>
+                            {children}
+                        </thead>
+                    ),
+                    th: ({ children }) => (
+                        <th className="px-3 py-4 text-[15px] font-semibold text-[var(--foreground)] border-y border-[var(--border)] align-middle whitespace-nowrap bg-[var(--background)]">
+                            {children}
+                        </th>
+                    ),
+                    tr: ({ children }) => (
+                        <tr className="border-b border-[var(--border-muted)] transition-colors hover:bg-[var(--card-subtle)]/20 last:border-b-0">
+                            {children}
+                        </tr>
+                    ),
+                    td: ({ children }) => (
+                        <td className="px-3 py-[1.125rem] text-[15px] leading-[1.7] text-[var(--text-muted)] align-top first:font-medium first:text-[var(--foreground)] break-words">
+                            {children}
+                        </td>
+                    ),
                     blockquote: ({ children }) => {
                         const textStr = getTextContent(children).trim();
                         if (textStr.includes("!compare") || textStr.includes("compare")) {
                             return renderCompareLayout(
                                 children,
-                                "grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 my-6 p-4 md:p-6 rounded-3xl border border-[var(--border)] bg-[var(--card-subtle)]/40 backdrop-blur-sm shadow-sm",
+                                "compare-grid my-6",
                             );
                         }
                         return (
