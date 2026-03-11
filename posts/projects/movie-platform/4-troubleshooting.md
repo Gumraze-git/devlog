@@ -69,9 +69,6 @@
 > }
 > ```
 
-**Commit Evidence**
-- `236db2a` (boxoffice 공개 경로 반영)
-- `346f551` (JWT 검증 구조 개선)
 
 결과:
 공개 조회와 보호 경로의 책임이 분리되어, 사용자 입장에서는 조회 실패 혼선을 줄이고 팀 입장에서는 보안 정책 해석이 쉬워졌습니다.
@@ -163,9 +160,6 @@ public class ExternalServiceException extends BaseException {
 }
 ```
 
-**Commit Evidence**
-- `efc1427` (리뷰 작성 시 감정분석 연동 + 실패 처리)
-- `6c8bdef` (외부 서비스 예외 타입 추가)
 
 결과:
 외부 장애가 발생해도 오류 응답 계약이 고정되어, 클라이언트는 동일한 규칙으로 실패를 처리할 수 있게 되었습니다.
@@ -228,9 +222,7 @@ public class ExternalServiceException extends BaseException {
 > summary.updateFromDTO(avgDto);
 > ```
 
-**Commit Evidence**
-- `53aeac7` (감정 DTO 범위 0~100)
-- `ff72cbc` (대표 감정 계산 오류 개선)
+
 
 결과:
 입력 스케일과 집계 계산 기준이 맞춰져, 추천 결과 해석의 일관성과 신뢰도를 함께 확보할 수 있었습니다.

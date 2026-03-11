@@ -25,18 +25,11 @@
   인증 처리 기준을 일관화해 도메인별 접근 제어 해석 차이를 줄였습니다.
   ```chips
   SecurityConfig | https://github.com/AutoeverInsideMovie/Insidemovie-BE/blob/d605bba/src/main/java/com/insidemovie/backend/common/config/security/SecurityConfig.java#L91 | code
-  JwtProvider | https://github.com/AutoeverInsideMovie/Insidemovie-BE/blob/346f551/src/main/java/com/insidemovie/backend/api/jwt/JwtProvider.java#L89 | code
   d605bba | https://github.com/AutoeverInsideMovie/Insidemovie-BE/commit/d605bba | commit
-  346f551 | https://github.com/AutoeverInsideMovie/Insidemovie-BE/commit/346f551 | commit
   ```
 - **리뷰-감정분석 연동 (Spring ↔ FastAPI)**: 리뷰 작성 시 감정 추론 호출과 외부 예외 표준화를 구현했습니다.  
   리뷰 데이터가 추천 로직으로 이어지는 연계 파이프라인을 구성했습니다.
-  ```chips
-  ReviewService | https://github.com/AutoeverInsideMovie/Insidemovie-BE/blob/efc1427/src/main/java/com/insidemovie/backend/api/review/service/ReviewService.java#L44 | code
-  ExternalServiceException | https://github.com/AutoeverInsideMovie/Insidemovie-BE/blob/6c8bdef/src/main/java/com/insidemovie/backend/common/exception/ExternalServiceException.java#L6 | code
-  efc1427 | https://github.com/AutoeverInsideMovie/Insidemovie-BE/commit/efc1427 | commit
-  6c8bdef | https://github.com/AutoeverInsideMovie/Insidemovie-BE/commit/6c8bdef | commit
-  ```
+
 - **데이터 정합성 및 AI 추론 구성**: 감정 입력/요약 계산 정합성을 보강하고 KoBERT 추론 서버를 구성했습니다.  
   감정 데이터의 저장·집계 기준을 맞춰 추천 입력 데이터의 일관성을 강화했습니다.
   ```chips
