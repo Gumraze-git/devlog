@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import MarkdownRenderer from "../../components/MarkdownRenderer";
+import { DevlogDetailHeader } from "./DevlogDetailHeader";
 import { createArticleJsonLd } from "../../lib/articleJsonLd";
 import { buildCodeHtmlByKey } from "../../lib/codeHighlight";
-import { getPost } from "../../lib/posts";
 import { getAllDevlogs } from "../../lib/devlog";
 import { createPageMetadata } from "../../lib/metadata";
-import TagBadge from "../../components/ui/TagBadge";
+import { getPost } from "../../lib/posts";
 
 type Params = {
   slug: string;
@@ -77,35 +77,7 @@ export default async function DevlogDetailPage({ params }: { params: Promise<Par
       </Link>
 
       <article className="space-y-10">
-        <header className="space-y-6 border-b border-[var(--border)] pb-8">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 text-sm font-mono text-[var(--text-soft)] uppercase tracking-wider">
-              <time dateTime={post.date}>
-                {new Date(post.date).toLocaleDateString("ko-KR", { year: 'numeric', month: 'long', day: 'numeric' })}
-              </time>
-            </div>
-            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{post.title}</h1>
-          </div>
-
-          {post.description && (
-            <p className="text-xl text-[var(--text-muted)] leading-relaxed max-w-3xl">
-              {post.description}
-            </p>
-          )}
-
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map(tag => (
-                <TagBadge
-                  key={tag}
-                  label={tag}
-                  size="sm"
-                  href={`/devlog?tag=${encodeURIComponent(tag)}`}
-                />
-              ))}
-            </div>
-          )}
-        </header>
+        <DevlogDetailHeader post={post} />
 
         {post.thumbnail && (
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-subtle)]">
