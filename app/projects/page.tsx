@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
+import { PageIntro } from "../components/common/PageIntro";
+import { Skeleton } from "../components/ui/Skeleton";
 import { createPageMetadata } from "../lib/metadata";
 import { getAllProjects, type Project } from "../lib/projects";
 
@@ -114,9 +117,6 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
-import { Suspense } from "react";
-import { Skeleton } from "../components/ui/Skeleton";
-
 function ProjectsContent() {
   const projects = getAllProjects();
 
@@ -171,15 +171,12 @@ function ProjectsSkeleton() {
 export default function ProjectsListPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-      <header className="space-y-4 border-b border-[var(--border-muted)] pb-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)]">Projects</p>
-        <div className="space-y-3">
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">Idea to Execution</h1>
-          <p className="max-w-3xl text-base leading-relaxed text-[var(--text-muted)] sm:text-lg">
-            문제를 정의하고 구조를 설계한 뒤, 구현과 검증까지 이어간 프로젝트들을 케이스 스터디 관점에서 정리했습니다.
-          </p>
-        </div>
-      </header>
+      <PageIntro
+        eyebrow="Projects"
+        title="Idea to Execution"
+        description="문제를 정의하고 구조를 설계한 뒤, 구현과 검증까지 이어간 프로젝트들을 케이스 스터디 관점에서 정리했습니다."
+        bordered
+      />
 
       <Suspense fallback={<ProjectsSkeleton />}>
         <ProjectsContent />

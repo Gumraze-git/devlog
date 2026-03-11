@@ -61,6 +61,60 @@ export type AboutProject = {
 
 const projectsDir = path.join(process.cwd(), "posts/projects");
 
+function getSortedSubFiles(dirPath: string): string[] {
+  return fs.readdirSync(dirPath)
+    .filter((file) => file.endsWith(".md") && file !== "index.md")
+    .sort((a, b) => a.localeCompare(b));
+}
+
+function readProjectDirectoryContents(
+  dirPath: string,
+  opts?: { injectTocDirective?: boolean },
+): string | null {
+  const indexPath = path.join(dirPath, "index.md");
+  if (!fs.existsSync(indexPath)) return null;
+
+  let fileContents = fs.readFileSync(indexPath, "utf8");
+
+  for (const subFile of getSortedSubFiles(dirPath)) {
+    const subContent = fs.readFileSync(path.join(dirPath, subFile), "utf8");
+    const subParsed = matter(subContent);
+    const disableToc = opts?.injectTocDirective && subParsed.data.toc === false
+      ? "\n<!-- toc: false -->\n"
+      : "";
+    fileContents += "\n\n" + disableToc + subParsed.content;
+  }
+
+  return fileContents;
+}
+
+function readProjectEntryByName(
+  entryName: string,
+  opts?: { injectTocDirective?: boolean },
+): { slug: string; fileContents: string } | null {
+  const fullPath = path.join(projectsDir, entryName);
+  if (!fs.existsSync(fullPath)) return null;
+
+  if (fs.statSync(fullPath).isDirectory()) {
+    const fileContents = readProjectDirectoryContents(fullPath, opts);
+    return fileContents ? { slug: entryName, fileContents } : null;
+  }
+
+  if (!entryName.endsWith(".md")) return null;
+
+  return {
+    slug: entryName.replace(/\.md$/, ""),
+    fileContents: fs.readFileSync(fullPath, "utf8"),
+  };
+}
+
+function readProjectEntryBySlug(
+  slug: string,
+  opts?: { injectTocDirective?: boolean },
+): { slug: string; fileContents: string } | null {
+  return readProjectEntryByName(slug, opts) ?? readProjectEntryByName(`${slug}.md`, opts);
+}
+
 function normalizeStringArray(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
 
@@ -282,37 +336,8 @@ export function getAllProjects(): Project[] {
   });
 
   const projects = files
-    .map((file) => {
-      const fullPath = path.join(projectsDir, file);
-      const isDirectory = fs.statSync(fullPath).isDirectory();
-      
-      let slug = file;
-      let fileContents = "";
-      
-      if (isDirectory) {
-         const indexPath = path.join(fullPath, "index.md");
-         if (!fs.existsSync(indexPath)) return null;
-         
-         fileContents = fs.readFileSync(indexPath, "utf8");
-         
-         const subFiles = fs.readdirSync(fullPath)
-           .filter(f => f.endsWith(".md") && f !== "index.md")
-           .sort((a, b) => a.localeCompare(b));
-           
-         for (const subFile of subFiles) {
-           const subContent = fs.readFileSync(path.join(fullPath, subFile), "utf8");
-           const subParsed = matter(subContent);
-           const disableToc = subParsed.data.toc === false ? "\n<!-- toc: false -->\n" : "";
-           fileContents += "\n\n" + disableToc + subParsed.content;
-         }
-      } else {
-         if (!file.endsWith(".md")) return null;
-         slug = file.replace(/\.md$/, "");
-         fileContents = fs.readFileSync(fullPath, "utf8");
-      }
-      
-      return parseProjectFile(slug, fileContents);
-    })
+    .map((file) => readProjectEntryByName(file, { injectTocDirective: true }))
+    .map((entry) => entry ? parseProjectFile(entry.slug, entry.fileContents) : null)
     .filter((p) => p !== null && p.published)
     .sort((a, b) => {
       const aTime = a!.date ? new Date(a!.date).getTime() : 0;
@@ -324,33 +349,10 @@ export function getAllProjects(): Project[] {
 }
 
 export function getProject(slug: string): Project | null {
-  const dirPath = path.join(projectsDir, slug);
-  const filePath = path.join(projectsDir, `${slug}.md`);
-  
-  let fileContents = "";
-  
-  if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
-     const indexPath = path.join(dirPath, "index.md");
-     if (!fs.existsSync(indexPath)) return null;
-     
-     fileContents = fs.readFileSync(indexPath, "utf8");
-     
-     const subFiles = fs.readdirSync(dirPath)
-       .filter(f => f.endsWith(".md") && f !== "index.md")
-       .sort((a, b) => a.localeCompare(b));
-       
-     for (const subFile of subFiles) {
-       const subContent = fs.readFileSync(path.join(dirPath, subFile), "utf8");
-       const subParsed = matter(subContent);
-       fileContents += "\n\n" + subParsed.content;
-     }
-  } else if (fs.existsSync(filePath)) {
-    fileContents = fs.readFileSync(filePath, "utf8");
-  } else {
-    return null;
-  }
+  const entry = readProjectEntryBySlug(slug);
+  if (!entry) return null;
 
-  return parseProjectFile(slug, fileContents);
+  return parseProjectFile(entry.slug, entry.fileContents);
 }
 
 export function getAboutProjects(): AboutProject[] {

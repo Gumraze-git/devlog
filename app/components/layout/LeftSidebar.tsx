@@ -1,6 +1,13 @@
 import Image from "next/image";
 import { Github, Mail } from "lucide-react";
+
+import { siteProfile } from "../../data/siteProfile";
 import { ThemeToggle } from "../ui/ThemeToggle";
+
+const socialIconMap = {
+    github: Github,
+    mail: Mail,
+};
 
 export function LeftSidebar() {
     return (
@@ -9,8 +16,8 @@ export function LeftSidebar() {
             <div className="mb-8 flex flex-col gap-4">
                 <div className="relative w-48 h-48 rounded-full overflow-hidden border border-[var(--border)] bg-[var(--card)] mx-auto lg:mx-0">
                     <Image
-                        src="https://htmacgfeigx1pttr.public.blob.vercel-storage.com/image/IMG_5362.jpeg"
-                        alt="Profile"
+                        src={siteProfile.image.src}
+                        alt={siteProfile.image.alt}
                         fill
                         className="object-cover"
                         priority
@@ -18,26 +25,35 @@ export function LeftSidebar() {
                 </div>
 
                 <div>
-                    <h2 className="font-bold text-lg leading-tight">Daehwan Kim</h2>
-                    <p className="text-xs text-[var(--text-soft)] mt-1">Backend Developer</p>
+                    <h2 className="font-bold text-lg leading-tight">{siteProfile.name}</h2>
+                    <p className="text-xs text-[var(--text-soft)] mt-1">{siteProfile.role}</p>
                 </div>
 
                 <p className="text-sm text-[var(--text-muted)] font-medium leading-relaxed whitespace-pre-line">
-                    개발 참 즐겁습니다.{"\n"}
-                    공식문서 읽는 것을 즐깁니다.{"\n"}
-                    배드민턴 치는 것을 좋아합니다.
+                    {siteProfile.bio}
                 </p>
             </div>
 
             {/* Social Links */}
             <div className="flex items-center justify-between">
                 <div className="flex gap-3 text-[var(--text-muted)]">
-                    <a href="https://github.com/Gumraze-git" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--foreground)] transition-colors">
-                        <Github size={18} />
-                    </a>
-                    <a href="mailto:galaxydh4110@gmail.com" className="hover:text-[var(--foreground)] transition-colors">
-                        <Mail size={18} />
-                    </a>
+                    {siteProfile.socialLinks.map((link) => {
+                        const Icon = socialIconMap[link.kind];
+                        const isExternal = link.href.startsWith("http");
+
+                        return (
+                            <a
+                                key={link.href}
+                                href={link.href}
+                                target={isExternal ? "_blank" : undefined}
+                                rel={isExternal ? "noopener noreferrer" : undefined}
+                                className="hover:text-[var(--foreground)] transition-colors"
+                                aria-label={link.label}
+                            >
+                                <Icon size={18} />
+                            </a>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -54,7 +70,7 @@ export function LeftSidebar() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                         </span>
-                        Open to work
+                        {siteProfile.status.label}
                     </div>
                 </div>
                 <div className="pb-1">
