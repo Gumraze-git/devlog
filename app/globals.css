@@ -435,6 +435,17 @@ html {
   background: rgba(15, 23, 42, 0.68);
 }
 
+.compare-card__body .shiki-wrapper .shiki,
+.compare-card__body .shiki-fallback {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.compare-card__body .shiki-wrapper .shiki::-webkit-scrollbar,
+.compare-card__body .shiki-fallback::-webkit-scrollbar {
+  display: none;
+}
+
 .compare-card--asis {
   border-color: color-mix(in srgb, #fb7185 26%, var(--border));
   background:

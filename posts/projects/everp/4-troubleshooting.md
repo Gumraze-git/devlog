@@ -226,7 +226,7 @@
 ~~~
 
 ~~~troubleshooting
-제목: Kafka 비동기 흐름의 불확실한 결과 정합성
+제목: Kafka 비동기 흐름의 결과 추적 부재
 
 문제:
 - 서비스 간 비동기 이벤트 흐름에서 중복 수신이나 실패 시 상태 불일치가 발생해도 이를 감지하거나 복구할 장치가 부족했습니다.
@@ -237,7 +237,7 @@
 
 해결:
 - `GenericAsyncResultManager`와 `DeferredResult`를 활용하여 비동기 처리 결과를 추적하고 성공/실패 여부를 확정 짓는 구조를 도입했습니다.
-- Auth 소비자 레이어에 `Acknowledgment` 기반 수동 커밋을 적용하고, 실패 시 롤백 이벤트를 발행하는 보상 흐름을 가시화했습니다.
+- Auth 소비자 레이어에 `Acknowledgment` 기반 수동 커밋을 적용하고, 실패 시 롤백 이벤트 발행 또는 보상 트리거가 이어지도록 흐름을 가시화했습니다.
 
 > !compare
 > ```chips
@@ -261,14 +261,14 @@
 > if (event.isSuccess()) {
 >     asyncResultManager.setSuccessResult(transactionId, event, "완료", HttpStatus.CREATED);
 > } else {
->     asyncResultManager.setErrorResult(transactionId, "실패", HttpStatus.ERROR);
+>     asyncResultManager.setErrorResult(transactionId, "실패", HttpStatus.INTERNAL_SERVER_ERROR);
 >     publishRollbackEvent(event);
 > }
 > acknowledgment.acknowledge(); // 명시적 수동 커밋
 > ```
 
 결과:
-단순 발행-소비 수준을 넘어 결과 추적과 예외 복구가 가능한 신뢰성 있는 메시징 인프라를 구축했습니다.
+단순 발행-소비에서 한 단계 나아가, `transactionId` 기반 결과 확인과 수동 Ack, 보상 트리거를 갖춘 1차 안정화 구조를 만들었습니다. 다만 공통 DLQ/재시도 정책과 발행-커밋 원자성은 이후 보강 과제로 남았습니다.
 ~~~
 
 ~~~troubleshooting
@@ -317,5 +317,5 @@
 > ```
 
 결과:
-서비스 경계를 넘나드는 데이터 변경 작업에서도 일관성을 유지할 수 있는 견고한 분산 트랜잭션 구조를 확보했습니다.
+부분 실패 시 로컬 변경을 되돌릴 수 있는 보상 기반 구조를 도입했고, 분산 트랜잭션을 설계할 때 "실패를 전제로 한 흐름"을 코드로 다루는 경험을 확보했습니다. 다만 outbox처럼 발행-저장 원자성까지 보장하는 구조는 후속 보강 여지로 남았습니다.
 ~~~
