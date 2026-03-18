@@ -15,7 +15,19 @@ hero_images:
   - src: "/assets/everp_msa_stru.png"
     caption: "MSA 시스템 아키텍처"
     alt: "4EVER ERP MSA 구조 다이어그램"
-thumbnail: "/assets/projects/everp/everp-logo.svg"
+  - src: "/assets/projects/everp/dashboard.png"
+    caption: "ERP 대시보드 화면"
+    alt: "4EVER ERP 대시보드 화면"
+  - src: "/assets/projects/everp/fcm.png"
+    caption: "FCM 알림 연동 화면"
+    alt: "4EVER ERP FCM 알림 연동 화면"
+  - src: "/assets/projects/everp/mm.png"
+    caption: "MM 모듈 화면"
+    alt: "4EVER ERP MM 모듈 화면"
+  - src: "/assets/projects/everp/sd.png"
+    caption: "SD 모듈 화면"
+    alt: "4EVER ERP SD 모듈 화면"
+thumbnail: "/assets/projects/everp/Auth.png"
 stack:
   - Spring Boot
   - Spring Security
