@@ -23,9 +23,7 @@ function renderMeta(project: Project) {
 
 function ProjectCard({ project }: { project: Project }) {
   const metaItems = renderMeta(project);
-  const previewHighlights = project.results && project.results.length > 0
-    ? project.results.slice(0, 2)
-    : project.highlights.slice(0, 2);
+
   const previewStack = project.stack.slice(0, 4);
 
   return (
@@ -87,16 +85,7 @@ function ProjectCard({ project }: { project: Project }) {
           </div>
         ) : null}
 
-        {previewHighlights.length > 0 ? (
-          <ul className="space-y-2 border-t border-dashed border-[var(--border)] pt-4 text-sm text-[var(--text-muted)] leading-relaxed">
-            {previewHighlights.map((item) => (
-              <li key={item} className="flex gap-2">
-                <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--accent)]" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+
 
         {previewStack.length > 0 ? (
           <div className="flex flex-wrap gap-2 pt-1">
@@ -121,7 +110,7 @@ function ProjectsContent() {
   return (
     <section className="space-y-8">
       {projects.length > 0 ? (
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project) => (
             <ProjectCard key={project.slug} project={project} />
           ))}
