@@ -1,6 +1,6 @@
 ---
-title: "MSA 기반 ERP 시스템 개발"
-summary: "팀장과 백엔드 역할로 참여해 Auth·Gateway·Business·SCM 서비스를 연결하고, 권한 경계와 대시보드 집계 흐름을 정리한 엔터프라이즈 ERP 프로젝트. 본편 이후 2026.03에는 저장소 기준의 후속 개선도 별도로 진행했습니다."
+title: "MSA 기반 엔터프라이즈 ERP"
+summary: "마이크로서비스 아키텍처(MSA)를 적용하여 권한 인증, SCM, 대시보드 등 다양한 기업 비즈니스 도메인을 안정적으로 연동한 전사적 자원 관리 시스템입니다."
 project_title: "4EVER / everp"
 sources:
   - label: "프로젝트 통합 레포"
@@ -9,9 +9,9 @@ sources:
     url: "https://github.com/AutoEver-4Ever"
 date: "2025-11-12"
 hero_images:
-  - src: "/assets/projects/everp/everp-logo.svg"
-    caption: "4EVER 프로젝트 아이덴티티"
-    alt: "4EVER ERP 프로젝트 로고"
+  - src: "/assets/projects/everp/Auth.png"
+    caption: "Auth 인증 흐름 화면"
+    alt: "4EVER ERP Auth 인증 흐름 화면"
   - src: "/assets/everp_msa_stru.png"
     caption: "MSA 시스템 아키텍처"
     alt: "4EVER ERP MSA 구조 다이어그램"
