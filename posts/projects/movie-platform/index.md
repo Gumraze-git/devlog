@@ -1,6 +1,6 @@
 ---
-title: "영화 리뷰 및 추천 웹 서비스 개발"
-summary: "SOLID 원칙과 CRUD 기본기를 바탕으로 레이어드 백엔드를 구현하고, AI 감정분석 연동으로 추천 흐름까지 확장한 영화 리뷰·추천 프로젝트"
+title: "영화 추천 커뮤니티 플랫폼"
+summary: "사용자의 리뷰 텍스트를 AI 감정분석으로 처리하여 개인의 취향에 맞는 영화를 큐레이션해주는 맞춤형 추천 커뮤니티 서비스입니다."
 project_title: "Inside Movie / 인사이드 무비"
 github_link: "https://github.com/AutoeverInsideMovie"
 sources:

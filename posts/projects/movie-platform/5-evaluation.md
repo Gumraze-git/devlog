@@ -1,152 +1,35 @@
-## 5. 프로젝트 평가 및 개선
+## 5. 프로젝트 평가
 
-~~~troubleshooting
-제목: REST API 경로 및 오류 응답 포맷의 비표준화
+Inside Movie는 단순 CRUD 학습 프로젝트를 넘어, **리뷰 작성이 추천 신호로 이어지는 흐름을 실제 서비스 계약으로 연결해 본 프로젝트**라는 점에서 의미가 있었습니다. 포트폴리오 관점에서도 "영화 리뷰 서비스"보다 "리뷰 데이터를 어떻게 추천 입력으로 구조화했는가"를 보여주는 편이 이 프로젝트의 강점을 더 잘 드러냅니다.
 
-문제:
-- 경로/식별자 계약이 `members/memberId`와 `users/userId`로 도메인별로 혼재되어 API 해석 비용이 높았습니다.
-- 예외 응답 포맷이 공통 계약으로 고정되지 않아 클라이언트의 오류 처리 로직이 파편화되었습니다.
+### 이 프로젝트가 잘 보여준 점
 
-원인:
-- 리소스 중심 URI 규칙과 식별자 네이밍 규칙이 도메인별로 다르게 유지되면서 계약 경계가 일관되지 않았습니다.
-- 예외 처리도 공통 Problem 포맷이 아닌 도메인별 처리 방식이 섞여 계약 통일이 어려웠습니다.
+- **사용자 행동을 데이터 파이프라인으로 연결한 점**
+  - 리뷰 작성이 곧바로 감정 분석, 감정 저장, 회원/영화 요약 재계산, 추천 반영으로 이어졌습니다.
+  - 즉, 게시글 등록에서 끝나지 않고 사용자 행동을 후속 의사결정 데이터로 변환하는 흐름을 직접 구현했습니다.
 
-해결:
-- Devlog: [REST 시리즈](https://velog.io/@gumraze/series/REST)
-- 백엔드를 `/api/v1` 리소스 중심 계약과 `ProblemDetail` 기반 오류 응답으로 정리했습니다.
-- 회원 도메인 식별자를 `users/userId` 기준으로 통일하고 내부 연동 URI도 v1 계약으로 정렬했습니다.
+- **백엔드 기본기를 구조와 계약으로 보여준 점**
+  - Spring Boot 레이어드 아키텍처, JPA 관계 설계, 공개/보호 API 분리, 외부 API 예외 표준화를 한 프로젝트 안에서 함께 다뤘습니다.
+  - 기능 수보다 책임 경계와 계약 일관성을 먼저 맞추려는 접근이 분명히 드러납니다.
 
-> !compare
-> ```chips
-> As-Is | | asis
-> ```
-> ```java
-> // 문제: ApiResponse.fail 중심 처리로 ProblemDetail 공통 계약이 미적용됨
-> @ExceptionHandler(BaseException.class)
-> public ResponseEntity<ApiResponse<Void>> handleGlobalException(BaseException ex) {
->     return ResponseEntity
->             .status(ex.getStatusCode())
->             .body(ApiResponse.fail(ex.getStatusCode(), ex.getResponseMessage()));
-> }
-> ```
-> 
-> ```chips
-> To-Be | | tobe
-> ```
-> ```java
-> // 개선: ProblemDetailFactory로 공통 오류 payload를 일관 생성
-> @ExceptionHandler(BaseException.class)
-> public ResponseEntity<ProblemDetail> handleGlobalException(BaseException ex, HttpServletRequest request) {
->     HttpStatus status = HttpStatus.valueOf(ex.getStatusCode());
->     ProblemDetail pd = problemDetailFactory.create(status, code, ex.getResponseMessage(), request);
->     return ResponseEntity.status(status).body(pd);
-> }
-> ```
-> 
-> ```chips
-> As-Is | | asis
-> ```
-> ```java
-> // 문제: members/memberId 계약으로 users/userId 기준과 불일치
-> @RequestMapping("/api/v1/members")
-> public class MemberRegistrationController {
->     Long memberId = ((Number) result.get("memberId")).longValue();
-> }
-> ```
-> 
-> ```chips
-> To-Be | | tobe
-> ```
-> ```java
-> // 개선: users/userId 기준으로 URI와 식별자 키를 통일
-> @RequestMapping("/api/v1/users")
-> public class MemberRegistrationController {
->     Long userId = ((Number) result.get("userId")).longValue();
-> }
-> ```
-> 
-> ```chips
-> As-Is | | asis
-> ```
-> ```java
-> // 문제: 구버전 내부 URI(/predict/overall_avg) 사용
-> .uri("/predict/overall_avg")
-> ```
-> 
-> ```chips
-> To-Be | | tobe
-> ```
-> ```java
-> // 개선: v1 내부 계약 URI(/api/v1/emotion-predictions)로 정렬
-> .uri("/api/v1/emotion-predictions")
-> ```
+- **외부 AI 서버를 서비스 안으로 안전하게 편입한 점**
+  - FastAPI를 별도 추론 서버로 분리하고, Spring Boot에서는 실패를 도메인 예외로 수렴해 전체 API 계약을 흔들리지 않게 했습니다.
+  - 이 덕분에 AI 연동이 부가 기능이 아니라, 운영 가능한 백엔드 구성 요소로 설명됩니다.
 
-결과:
-Devlog 내용을 기반으로 URI/식별자/오류 포맷의 API 계약을 일관되게 정립하여, 협업 시 발생하던 계약 해석 오차를 획기적으로 줄였습니다.
-~~~
+### 포트폴리오 관점에서 아쉬운 점
 
-~~~troubleshooting
-제목: 컨트롤러와 Swagger 문서의 과도한 결합
+- **추천 품질 자체를 정량적으로 설명하는 근거는 아직 약합니다**
+  - 감정 분석과 추천 흐름은 구현됐지만, 추천 정확도나 사용자 만족도 같은 지표까지는 이어지지 않았습니다.
+  - 그래서 이 프로젝트는 "AI 추천 성능"보다 "AI를 서비스 플로우에 연결한 구조적 경험"으로 설명하는 편이 더 정직하고 강합니다.
 
-문제:
-- 컨트롤러 구현부와 Swagger 어노테이션이 강하게 결합되어 코드 가독성이 저해되고 문서 최신화 관리가 어려웠습니다.
-- 공통 에러 응답 및 보안 요구사항 등의 문서화 코드가 도메인별로 중복되어 일관성이 결여되었습니다.
+- **외부 의존성이 많아 운영 복잡도가 빠르게 커질 수 있습니다**
+  - KOBIS, KMDb, Kakao OAuth, FastAPI 등 외부 연동 포인트가 많아질수록 장애 전파 범위도 함께 커집니다.
+  - 현재 문서에서는 예외 표준화와 계약 정리는 잘 보이지만, 재시도 정책이나 관측성 전략까지는 아직 드러나지 않습니다.
 
-원인:
-- 문서화에 대한 책임이 컨트롤러 구현 내부에 혼재되어 있어, 비즈니스 로직과 문서 메타데이터가 뒤섞인 구조였습니다.
-- 공통 Swagger 규칙을 자동화하여 보정하는 레이어가 없어 문서 품질이 수동 관리에 의존했습니다.
+- **후속 하드닝이 본편 설명과 다소 분리돼 있습니다**
+  - 프로젝트 종료 후 REST 경로, 식별자 규칙, ProblemDetail, Swagger 분리 같은 개선이 있었는데, 이 강점이 본편과 자연스럽게 이어져 보이진 않습니다.
+  - 다만 이를 통해 "처음 구현한 뒤 계약을 다시 정리할 줄 아는 사람"이라는 점은 분명히 보여줄 수 있습니다.
 
-해결:
-- Devlog: [Swagger를 분리해보자](https://velog.io/@gumraze/Swagger%EB%A5%BC-%EB%B6%84%EB%A6%AC%ED%95%B4%EB%B3%B4%EC%9E%90)
-- `*Api` 인터페이스 패턴을 도입하여 문서 책임을 컨트롤러 구현부에서 명확히 분리했습니다.
-- `OpenApiContractCustomiser`와 공통 어노테이션을 구현하여 전역적인 문서화 표준을 자동 적용했습니다.
+### 종합 평가
 
-> !compare
-> ```chips
-> As-Is | | asis
-> ```
-> ```java
-> // 문제: 구현과 문서 책임이 컨트롤러에 결합되어 비즈니스 로직 파악이 어려움
-> @RestController
-> @RequestMapping("/api/v1/members")
-> public class MeController { 
->     @Operation(summary = "내 정보 조회", ...)
->     @ApiResponses(...)
->     public ResponseEntity<MemberResponse> getMe() { ... }
-> }
-> ```
-> 
-> ```chips
-> To-Be | | tobe
-> ```
-> ```java
-> // 개선: 문서 계약을 MeApi 인터페이스로 격리하고 컨트롤러는 구현에만 집중
-> @RestController
-> @RequestMapping("/api/v1/users")
-> public class MeController implements MeApi { 
->     @Override
->     public ResponseEntity<MemberResponse> getMe() { ... }
-> }
-> ```
-> 
-> ```chips
-> As-Is | | asis
-> ```
-> ```java
-> // 문제: ProblemDetail 예시 경로가 members 기준으로 남아 최신 규약과 불일치
-> @Schema(description = "Request URI", example = "/api/v1/members/me")
-> private String instance;
-> ```
-> 
-> ```chips
-> To-Be | | tobe
-> ```
-> ```java
-> // 개선: users 기준 전역 예시 경로로 일괄 대응하여 문서 신뢰도 확보
-> @Schema(description = "Request URI", example = "/api/v1/users/me")
-> private String instance;
-> ```
-
-결과:
-문서와 구현의 책임을 물리적으로 분리하고 공통 커스터마이저를 통해 전역 표준을 강제함으로써, API 문서의 정확성과 코드 유지보수성을 동시에 확보했습니다.
-~~~
+Inside Movie는 대규모 시스템이나 복잡한 분산 구조를 보여주는 프로젝트는 아니지만, 그 대신 **도메인 모델링, API 계약, 외부 연동, 예외 처리, AI 파이프라인 연결**을 한 흐름 안에서 경험한 프로젝트로서 가치가 큽니다. 특히 포트폴리오에서는 "처음부터 완성된 추천 엔진"처럼 포장하기보다, 리뷰 데이터를 추천 가능한 형태로 구조화하고 이후 계약과 문서를 다시 정비해 나간 과정을 함께 보여줄 때 가장 설득력이 높습니다.
