@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Code2, GitCommitHorizontal } from "lucide-react";
+import { Code2, GitCommitHorizontal, AlertCircle, Search, CheckCircle2, Flag } from "lucide-react";
 import {
     buildTroubleSummary,
     createCodeKey,
@@ -422,11 +422,47 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                             <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[var(--background)] border border-[var(--border)] text-[var(--accent)] flex items-center justify-center font-bold text-sm shadow-inner group-hover:bg-[var(--accent)] group-hover:text-white transition-colors duration-300">
                                 {i + 1}
                             </div>
-                            <div className="text-[var(--text-muted)] text-[15px] font-bold leading-relaxed group-hover:text-[var(--foreground)] transition-all duration-300">
+                            <div className="text-[var(--text-muted)] text-[16px] md:text-[17.5px] font-bold leading-relaxed group-hover:text-[var(--foreground)] transition-all duration-300">
                                 {step}
                             </div>
                         </div>
                     ))}
+                </div>
+            );
+        }
+
+        if (isBlockCodeNode && (lang === "features" || lang === "feature")) {
+            const items = code
+                .split(/(?:^|\n)-\s+/)
+                .map((item) => item.trim())
+                .filter(Boolean);
+
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 my-8 not-prose">
+                    {items.map((item, i) => {
+                        const match = item.match(/^(?:\*\*)?(.*?)(?:\*\*)?:\s+([\s\S]*)$/);
+                        const title = match ? match[1].replace(/\*\*/g, "").trim() : "";
+                        const desc = match ? match[2].trim() : item;
+                        return (
+                            <div
+                                key={i}
+                                className="group relative flex flex-col gap-3 p-6 md:p-7 text-left rounded-[1.5rem] bg-[var(--card)] border border-[var(--border)] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_30px_-8px_rgba(0,0,0,0.1)] hover:-translate-y-1 hover:border-[var(--accent)]/50 transition-all duration-500 overflow-hidden"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                {title && (
+                                    <div className="flex items-center gap-3 relative z-10">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-[var(--accent)] opacity-70 group-hover:scale-125 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_8px_var(--accent)]" />
+                                        <h4 className="text-[16.5px] md:text-[18px] font-bold text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors duration-300 tracking-tight m-0">
+                                            {title}
+                                        </h4>
+                                    </div>
+                                )}
+                                <p className="text-[15px] md:text-[16px] leading-[1.75] text-[var(--text-muted)] group-hover:text-[var(--foreground)]/90 transition-colors duration-300 m-0 relative z-10">
+                                    {desc}
+                                </p>
+                            </div>
+                        );
+                    })}
                 </div>
             );
         }
@@ -479,40 +515,55 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
             const summary = buildTroubleSummary(sections);
             const activeRows = TROUBLE_ROWS.filter((row) => Boolean(sections[row.key]));
 
+            const getIconAndColor = (key: string) => {
+                switch(key) {
+                    case "problem": return { Icon: AlertCircle, colorClass: "text-[#ef4444] dark:text-[#f87171]", bgClass: "bg-[#ef4444]/10 dark:bg-[#f87171]/10", borderClass: "border-[#ef4444]/20", leftBorder: "border-l-[#ef4444]" };
+                    case "cause": return { Icon: Search, colorClass: "text-[#f59e0b] dark:text-[#fbbf24]", bgClass: "bg-[#f59e0b]/10 dark:bg-[#fbbf24]/10", borderClass: "border-[#f59e0b]/20", leftBorder: "border-l-[#f59e0b]" };
+                    case "solution": return { Icon: CheckCircle2, colorClass: "text-[#0ea5e9] dark:text-[#38bdf8]", bgClass: "bg-[#0ea5e9]/10 dark:bg-[#38bdf8]/10", borderClass: "border-[#0ea5e9]/20", leftBorder: "border-l-[#0ea5e9]" };
+                    case "result": return { Icon: Flag, colorClass: "text-[#22c55e] dark:text-[#4ade80]", bgClass: "bg-[#22c55e]/10 dark:bg-[#4ade80]/10", borderClass: "border-[#22c55e]/20", leftBorder: "border-l-[#22c55e]" };
+                    default: return { Icon: AlertCircle, colorClass: "text-[var(--text-soft)]", bgClass: "bg-[var(--card)]", borderClass: "border-[var(--border)]", leftBorder: "border-l-[var(--border)]" };
+                }
+            };
+
             return (
-                <div className="trouble-card my-8 not-prose rounded-3xl border border-[var(--border)] bg-[var(--card-subtle)]/50 p-5 md:p-6 shadow-sm">
-                    <div className="trouble-summary mb-5 flex items-center gap-3">
-                        <span className="inline-flex h-8 items-center rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-[11px] font-semibold uppercase tracking-widest text-[var(--accent)]">
+                <div className="trouble-card my-10 not-prose rounded-[2rem] border border-[var(--border)] bg-[var(--card-subtle)]/30 p-5 md:p-8 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)] relative overflow-hidden backdrop-blur-xl">
+                    <div className="relative z-10 flex flex-col gap-4 mb-8 md:flex-row md:items-center trouble-summary">
+                        <span className="inline-flex h-8 items-center justify-center rounded-lg border border-[var(--border)] bg-gradient-to-br from-[var(--card)] to-[var(--card-subtle)] px-3.5 text-[11.5px] font-black uppercase tracking-[0.2em] text-[var(--accent)] shadow-sm">
                             Case Study
                         </span>
-                        <h4 className="trouble-summary-title min-w-0 flex-1 text-[16px] md:text-lg font-bold leading-relaxed text-[var(--foreground)]">{summary}</h4>
-                        <div className="h-px flex-1 bg-[var(--border)] hidden sm:block" />
+                        <h4 className="flex-1 min-w-0 font-bold tracking-tight leading-relaxed trouble-summary-title text-[17px] md:text-[20px] text-[var(--foreground)]">{summary}</h4>
+                        <div className="hidden flex-1 h-px opacity-50 bg-gradient-to-r md:block from-[var(--border)] to-transparent" />
                     </div>
 
-                    <div className="trouble-content mt-4 space-y-4">
+                    <div className="relative z-10 mt-4 space-y-5 trouble-content md:space-y-6">
                         {activeRows.length > 0 ? (
-                            activeRows.map((row) => (
+                            activeRows.map((row) => {
+                                const { Icon, colorClass, bgClass, borderClass, leftBorder } = getIconAndColor(row.key);
+                                return (
                                 <article
                                     key={row.key}
-                                    className={`trouble-section trouble-section--${row.key} rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-4 md:px-5`}
+                                    className={`trouble-section group relative trouble-section--${row.key} rounded-2xl border ${borderClass} bg-[var(--card)] px-5 py-5 md:px-6 shadow-sm hover:shadow-md border-l-[5px] ${leftBorder} transition-all duration-300`}
                                 >
-                                    <div className="trouble-section-header mb-3 flex items-center gap-3">
-                                        <p className="trouble-section-label text-[13px] font-bold uppercase tracking-[0.15em] text-[var(--text-soft)]">
+                                    <div className="flex items-center gap-3 mb-4 trouble-section-header">
+                                        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${bgClass} ${colorClass} group-hover:scale-110 transition-transform duration-300`}>
+                                            <Icon size={16} strokeWidth={2.5} />
+                                        </div>
+                                        <p className={`trouble-section-label text-[13px] md:text-[14px] font-extrabold uppercase tracking-[0.15em] ${colorClass}`}>
                                             {row.label}
                                         </p>
                                     </div>
-                                    <div className="trouble-section-body space-y-3">
+                                    <div className="space-y-3 trouble-section-body md:pl-11">
                                         <ReactMarkdown
                                             components={{
                                                 pre: ({ children: innerChildren }) => <>{innerChildren}</>,
                                                 code: renderCode,
                                                 p: ({ children: innerChildren }) => (
-                                                    <p className="trouble-section-text text-[14px] leading-relaxed text-[var(--text-muted)]">
+                                                    <p className="trouble-section-text text-[15px] md:text-[16px] leading-relaxed text-[var(--text-muted)]">
                                                         {innerChildren}
                                                     </p>
                                                 ),
                                                 li: ({ children: innerChildren }) => (
-                                                    <li className="trouble-section-text text-[14px] leading-relaxed text-[var(--text-muted)]">
+                                                    <li className="trouble-section-text text-[15px] md:text-[16px] leading-relaxed text-[var(--text-muted)]">
                                                         {innerChildren}
                                                     </li>
                                                 ),
@@ -543,7 +594,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                         </ReactMarkdown>
                                     </div>
                                 </article>
-                            ))
+                                );
+                            })
                         ) : (
                             <p className="text-[14px] leading-relaxed text-[var(--text-muted)]">
                                 작성된 내용이 없습니다.
@@ -705,7 +757,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                 </p>
                             );
                         }
-                        return <p className="leading-[1.85] text-[15.5px] text-[var(--foreground)]/85 tracking-[-0.01em] break-keep">{children}</p>;
+                        return <p className="leading-[1.85] text-[16px] md:text-[18px] text-[var(--foreground)]/85 tracking-[-0.01em] break-keep">{children}</p>;
                     },
                     // GFM Tables - Elegant Content Reading Style
                     table: ({ children }) => (
@@ -723,7 +775,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         </thead>
                     ),
                     th: ({ children }) => (
-                        <th className="px-3 py-4 text-[15px] font-semibold text-[var(--foreground)] border-y border-[var(--border)] align-middle whitespace-nowrap bg-[var(--background)]">
+                        <th className="px-3 py-4 text-[15px] md:text-[17px] font-semibold text-[var(--foreground)] border-y border-[var(--border)] align-middle whitespace-nowrap bg-[var(--background)]">
                             {children}
                         </th>
                     ),
@@ -733,7 +785,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         </tr>
                     ),
                     td: ({ children }) => (
-                        <td className="px-3 py-[1.125rem] text-[15px] leading-[1.7] text-[var(--text-muted)] align-top first:font-medium first:text-[var(--foreground)] break-words">
+                        <td className="px-3 py-[1.125rem] text-[15px] md:text-[17px] leading-[1.7] text-[var(--text-muted)] align-top first:font-medium first:text-[var(--foreground)] break-words">
                             {children}
                         </td>
                     ),
