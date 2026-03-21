@@ -46,6 +46,7 @@ export const skills: SkillItem[] = [
   { label: "MySQL", categoryId: "database", image: vercelBlob("logo-mysql-170x115.png"), size: 0.8 },
   { label: "MongoDB", categoryId: "database", image: vercelBlob("MongoDB.svg"), size: .8 },
   { label: "PostgreSQL", categoryId: "database", image: vercelBlob("elephant.png"), size: .8 },
+  { label: "Flyway", categoryId: "database", image: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/Flyway_logo.svg.png", size: .8 },
 
   // 환경 및 배포
   { label: "AWS", categoryId: "env", image: vercelBlob("AWS-Cloud-logo_32_Dark.svg"), size: .8 },
@@ -115,6 +116,7 @@ const extraTechIconMap: Record<string, TechIconMeta> = {
   "github actions": { key: "github actions", label: "Github Actions", icon: vercelBlob("GitHub_Invertocat_Black.svg") },
   docker: { key: "docker", label: "Docker", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/docker.svg" },
   "docker compose": { key: "docker compose", label: "Docker Compose", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/docker.svg" },
+  flyway: { key: "flyway", label: "Flyway", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/Flyway_logo.svg.png" },
   "spring cloud": { key: "spring cloud", label: "Spring Cloud", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/spring-cloud.svg" },
   "spring cloud gateway": { key: "spring cloud gateway", label: "Spring Cloud Gateway", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/icon/spring-cloud.svg" },
   kafka: { key: "kafka", label: "Kafka", icon: "https://htmacgfeigx1pttr.public.blob.vercel-storage.com/apache_kafka_logo_icon_167866.svg" },

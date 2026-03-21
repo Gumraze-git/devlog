@@ -1,6 +1,6 @@
 ---
-title: "배드민턴 운영 서비스 플랫폼 개발"
-summary: "자유게임 생성·운영을 코어로 시작해 인증, 프로필, 공유 기능을 먼저 구현하고, 이후 대회 운영과 콘텐츠 영역까지 확장해갈 배드민턴 서비스 플랫폼입니다. 백엔드 도메인 규칙과 로컬 HTTPS 기반 협업 환경을 함께 정리하고 있습니다."
+title: "배드민턴 운영 서비스 플랫폼"
+summary: "배드민턴 동호회와 지인 모임의 자유게임 및 대회 운영을 돕고, 플레이어 간의 소통을 연결하는 종합 배드민턴 서비스 플랫폼입니다."
 project_title: "RallyOn / 랠리온"
 sources:
   - label: "Backend Repository"
@@ -11,10 +11,13 @@ sources:
     url: "https://github.com/RallyOnPrj/infra"
 date: "2026-03-18"
 hero_images:
+  - src: "/assets/projects/rally-on/rallyon_main.png"
+    caption: "RallyOn 메인 화면"
+    alt: "RallyOn 메인 화면"
   - src: "/assets/projects/rally-on/rallyon-cover.svg"
-    caption: "RallyOn 임시 프로젝트 커버"
-    alt: "RallyOn 프로젝트 로고 커버"
-thumbnail: "/assets/projects/rally-on/rallyon-cover.svg"
+    caption: "RallyOn 프로젝트 커버"
+    alt: "RallyOn 프로젝트 커버 이미지"
+thumbnail: "/assets/projects/rally-on/rallyon_main.png"
 stack:
   - Spring Boot
   - Spring Security
