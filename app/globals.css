@@ -615,74 +615,99 @@ body {
 }
 
 .shiki-block {
-  margin: 1.5rem 0;
-  border: 1px solid var(--code-border);
-  border-radius: 1rem;
+  margin: 1.25rem 0;
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+  border-radius: 12px;
   overflow: hidden;
   background: var(--code-bg);
-  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5),
+    0 10px 24px -10px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .shiki-header {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.65rem;
-  padding: 0.62rem 0.92rem;
-  border-bottom: 1px solid var(--code-border);
-  background: var(--code-surface) !important;
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  justify-content: center; /* Center the language label */
+  height: 2.75rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1e1e1e; /* Stark contrast header */
+  font-size: 13px;
   color: var(--code-fg-soft);
+}
+
+/* macOS Traffic Lights */
+.shiki-header::before {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f56;
+  box-shadow:
+    20px 0 0 #ffbd2e,
+    40px 0 0 #27c93f;
 }
 
 .shiki-lang {
   display: inline-flex;
   align-items: center;
-  padding: 0.22rem 0.62rem;
-  border: 1px solid color-mix(in srgb, var(--code-border) 78%, #ffffff 22%);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--code-bg) 80%, #0f172a 20%);
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.03em;
-  color: var(--code-fg-soft);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: #8b9eb0;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .shiki-copy {
-  border: 1px solid var(--code-copy-border);
-  border-radius: 999px;
-  padding: 0.28rem 0.72rem;
+  position: absolute;
+  right: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #dbe7f6;
-  background: var(--code-copy-bg) !important;
-  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+  letter-spacing: 0.05em;
+  color: #a3b8cc;
+  background: rgba(255, 255, 255, 0.03) !important;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
 }
 
 .shiki-copy:hover {
-  border-color: color-mix(in srgb, var(--accent) 72%, #ffffff 28%);
-  background: color-mix(in srgb, var(--code-copy-bg) 72%, var(--accent) 28%);
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.25);
   color: #ffffff;
 }
 
 .shiki-copy:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent) 78%, #ffffff 22%);
-  outline-offset: 2px;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .shiki-wrapper .shiki {
   margin: 0;
-  padding: 1.28rem 1.32rem;
+  padding: 1.25rem 1.35rem;
   overflow-x: auto;
-  font-size: 0.97rem;
-  line-height: 1.85;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  font-size: 0.92rem;
+  line-height: 1.7;
   tab-size: 2;
   font-family: var(--font-mono);
   background: var(--code-bg) !important;
   color: var(--code-fg) !important;
+}
+
+.shiki-wrapper .shiki::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge */
 }
 
 .shiki-wrapper .shiki code {
