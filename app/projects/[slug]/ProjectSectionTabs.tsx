@@ -5,7 +5,6 @@ import { useState } from "react";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import { extractHeadings } from "../../lib/markdown";
 import type { ProjectContentSection } from "../../lib/markdown";
-import ProjectTroubleshootingTab from "./ProjectTroubleshootingTab";
 
 type ProjectSectionTabsProps = {
   sections: ProjectContentSection[];
@@ -19,11 +18,8 @@ export default function ProjectSectionTabs({
   const [activeSlug, setActiveSlug] = useState<string>(() => sections[0]?.slug ?? "");
   const activeSection = sections.find((section) => section.slug === activeSlug) ?? sections[0];
   const currentActiveSlug = activeSection?.slug ?? "";
-  const isTroubleshootingTab = activeSection?.title.includes("트러블") ?? false;
-  const isEvaluationTab = activeSection?.title.includes("평가") ?? false;
   
-  const shouldHideToc = isTroubleshootingTab || isEvaluationTab;
-  const headings = shouldHideToc ? [] : extractHeadings(activeSection?.content ?? "");
+  const headings = extractHeadings(activeSection?.content ?? "");
 
   const getSectionEmoji = (title: string) => {
     if (title.includes("개요")) return "📝";
@@ -88,13 +84,6 @@ export default function ProjectSectionTabs({
         className="pt-6 pb-12 w-full mx-auto max-w-6xl animate-in fade-in zoom-in-95 duration-300"
       >
         {activeSection.content.trim().length > 0 ? (
-          isTroubleshootingTab || isEvaluationTab ? (
-            <ProjectTroubleshootingTab
-              title={activeSection.title}
-              content={activeSection.content}
-              codeHtmlByKey={codeHtmlByKey}
-            />
-          ) : (
             <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch">
               <div className="flex-1 min-w-0 space-y-6">
                 <h2 className="text-2xl font-extrabold tracking-tight text-[var(--foreground)] md:text-3xl">
@@ -132,7 +121,6 @@ export default function ProjectSectionTabs({
                 </aside>
               )}
             </div>
-          )
         ) : (
           <p className="text-base text-[var(--text-muted)]">표시할 내용이 없습니다.</p>
         )}

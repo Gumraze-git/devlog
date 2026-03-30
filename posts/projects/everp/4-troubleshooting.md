@@ -16,9 +16,6 @@
 - Gateway 계층에서 각 도메인(생산/구매/재고 등) 엔드포인트에 역할별 `@PreAuthorize` 기준을 일관되게 적용했습니다.
 
 > !compare
-> ```chips
-> As-Is | | asis
-> ```
 > ```java
 > // 문제: 인증 여부만 확인하고 클라이언트별 접근 제어가 부재함
 > public void onLoginSuccess(...) {
@@ -31,9 +28,6 @@
 > public ResponseEntity<Object> simulate(...) { ... }
 > ```
 > 
-> ```chips
-> To-Be | | tobe
-> ```
 > ```java
 > // Auth: 클라이언트 유형별 로그인 대상 제한
 > private static final Set<String> RESTRICTED_CLIENTS = Set.of("everp-ios", "everp-aos");
@@ -51,7 +45,7 @@
 > ```
 
 결과:
-인증과 인가(접근 제어)의 책임을 명확히 분리하여, 사용자 유형 및 클라이언트 환경에 따른 강력한 보안 경계를 확보했습니다.
+- 인증과 인가(접근 제어)의 책임을 명확히 분리하여, 사용자 유형 및 클라이언트 환경에 따른 강력한 보안 경계를 확보했습니다.
 ~~~
 
 ~~~troubleshooting
@@ -70,9 +64,6 @@
 - 공급사 정보 등 외부 연계는 Kafka 기반 비동기 Resolver 패턴(`SupplierCompanyResolverImpl`)으로 전환하여 서비스 간 결합도를 낮췄습니다.
 
 > !compare
-> ```chips
-> As-Is | | asis
-> ```
 > ```java
 > // 문제: 프런트엔드에서 각 도메인을 순차 조회하거나 동기식으로 무겁게 결합
 > Order order = orderRepo.findById(id);
@@ -80,9 +71,6 @@
 > return new DashboardDto(order, product);
 > ```
 > 
-> ```chips
-> To-Be | | tobe
-> ```
 > ```java
 > // 집계 서비스: 주문 아이템과 제품 정보를 Workflow 모델로 가공
 > Map<String, List<OrderItem>> itemsByOrder = mapOrderItems(orders);
@@ -96,7 +84,7 @@
 > ```
 
 결과:
-파편화된 CRUD API를 운영 목적에 맞춘 전용 집계 API로 재구성하여, 대시보드 로딩 성능을 개선하고 프런트엔드 협업 효율을 극대화했습니다.
+- 파편화된 CRUD API를 운영 목적에 맞춘 전용 집계 API로 재구성하여, 대시보드 로딩 성능을 개선하고 프런트엔드 협업 효율을 극대화했습니다.
 ~~~
 
 ~~~troubleshooting
@@ -114,18 +102,12 @@
 - 제품 시드(`ProductInitializer`)에 고유 `productId` 필드와 소재 기반 구조를 적용하여 식별 정합성을 확보했습니다.
 
 > !compare
-> ```chips
-> As-Is | | asis
-> ```
 > ```java
 > // 문제: 각 개발자가 필요에 따라 임의의 ID로 데이터를 산발적으로 생성
 > userRepository.save(new User("test1", "ROLE_USER"));
 > productRepository.save(new Product("p1", "sample"));
 > ```
 > 
-> ```chips
-> To-Be | | tobe
-> ```
 > ```java
 > // 시드 설정: 모듈별 권한 및 인원 기반 초기화 규칙 고정
 > private static final List<ModuleSeedConfig> MODULE_SEED_CONFIGS = List.of(
@@ -136,7 +118,7 @@
 > ```
 
 결과:
-시드 데이터가 단순 샘플링을 넘어 "재현 가능한 개발 인프라"로 구축되었으며, 팀 전체가 동일한 테스트 데이터 세트 위에서 안정적으로 개발할 수 있게 되었습니다.
+- 시드 데이터가 단순 샘플링을 넘어 "재현 가능한 개발 인프라"로 구축되었으며, 팀 전체가 동일한 테스트 데이터 세트 위에서 안정적으로 개발할 수 있게 되었습니다.
 ~~~
 
 ~~~troubleshooting
@@ -154,9 +136,6 @@
 - `DashboardOrderServiceImpl`에서 수집한 ID 목록을 맵 형태로 결합하여 메모리 내에서 데이터 매핑을 처리하도록 개선했습니다.
 
 > !compare
-> ```chips
-> As-Is | | asis
-> ```
 > ```java
 > // 문제: 목록 루프 내에서 건별로 상세 정보를 조회 (N+1 발생)
 > for (Order order : orders) {
@@ -165,9 +144,6 @@
 > }
 > ```
 > 
-> ```chips
-> To-Be | | tobe
-> ```
 > ```java
 > // 레파지토리: 다중 ID 기반 일괄 조회 인터페이스 도입
 > List<OrderItem> findByOrder_IdIn(List<String> orderIds);
@@ -179,7 +155,7 @@
 > ```
 
 결과:
-반복 조회 비용을 근본적으로 제거하여 목록 조회 성능을 대폭 향상시켰으며, 대량 데이터 환경에서도 안정적인 응답을 보장하게 되었습니다.
+- 반복 조회 비용을 근본적으로 제거하여 목록 조회 성능을 대폭 향상시켰으며, 대량 데이터 환경에서도 안정적인 응답을 보장하게 되었습니다.
 ~~~
 
 ~~~troubleshooting
@@ -197,9 +173,6 @@
 - 정렬 기준(`sortBy`)을 동적으로 수용할 수 있도록 컨트롤러 레이어를 고도화했습니다.
 
 > !compare
-> ```chips
-> As-Is | | asis
-> ```
 > ```java
 > // 문제: 파라미터 제어 없이 전체 결과를 리스트로 반환
 > @GetMapping("/quotations")
@@ -208,9 +181,6 @@
 > }
 > ```
 > 
-> ```chips
-> To-Be | | tobe
-> ```
 > ```java
 > // 컨트롤러: 페이징 및 검색 필터 파라미터 표준화
 > @GetMapping("/quotations")
@@ -222,7 +192,7 @@
 > ```
 
 결과:
-필요한 범위만 전송하는 효율적인 API 계약을 정립하여 네트워크 부하를 줄이고 관리 화면의 반응 속도를 개선했습니다.
+- 필요한 범위만 전송하는 효율적인 API 계약을 정립하여 네트워크 부하를 줄이고 관리 화면의 반응 속도를 개선했습니다.
 ~~~
 
 ~~~troubleshooting
@@ -240,9 +210,6 @@
 - Auth 소비자 레이어에 `Acknowledgment` 기반 수동 커밋을 적용하고, 실패 시 롤백 이벤트 발행 또는 보상 트리거가 이어지도록 흐름을 가시화했습니다.
 
 > !compare
-> ```chips
-> As-Is | | asis
-> ```
 > ```java
 > // 문제: 결과 확인 없이 발행만 하거나, 자동 커밋으로 인해 실패 조치가 누락됨
 > kafkaTemplate.send(topic, event); // 발행 후 추적 불가
@@ -253,9 +220,6 @@
 > }
 > ```
 > 
-> ```chips
-> To-Be | | tobe
-> ```
 > ```java
 > // 결과 관리: 대기 중인 비동기 요청 상태 확인 및 결과 설정
 > if (event.isSuccess()) {
@@ -268,7 +232,7 @@
 > ```
 
 결과:
-단순 발행-소비에서 한 단계 나아가, `transactionId` 기반 결과 확인과 수동 Ack, 보상 트리거를 갖춘 1차 안정화 구조를 만들었습니다. 다만 공통 DLQ/재시도 정책과 발행-커밋 원자성은 이후 보강 과제로 남았습니다.
+- 단순 발행-소비에서 한 단계 나아가, `transactionId` 기반 결과 확인과 수동 Ack, 보상 트리거를 갖춘 1차 안정화 구조를 만들었습니다. 다만 공통 DLQ/재시도 정책과 발행-커밋 원자성은 이후 보강 과제로 남았습니다.
 ~~~
 
 ~~~troubleshooting
@@ -286,9 +250,6 @@
 - 비동기 흐름에서도 전체 작업의 완료를 `DeferredResult`로 관리하며, `SagaCompensationService`를 통해 물리적 롤백을 수행하도록 설계했습니다.
 
 > !compare
-> ```chips
-> As-Is | | asis
-> ```
 > ```java
 > // 문제: 로컬 트랜잭션만 사용해 외부 서비스 실패 시 롤백이 불가함
 > @Transactional
@@ -298,9 +259,6 @@
 > }
 > ```
 > 
-> ```chips
-> To-Be | | tobe
-> ```
 > ```java
 > // Saga 관리: 변경 내역 수집 및 예외 발생 시 전역 보상 처리
 > public <T> T executeSagaWithId(String tid, Supplier<T> action) {
@@ -317,5 +275,5 @@
 > ```
 
 결과:
-부분 실패 시 로컬 변경을 되돌릴 수 있는 보상 기반 구조를 도입했고, 분산 트랜잭션을 설계할 때 "실패를 전제로 한 흐름"을 코드로 다루는 경험을 확보했습니다. 다만 outbox처럼 발행-저장 원자성까지 보장하는 구조는 후속 보강 여지로 남았습니다.
+- 부분 실패 시 로컬 변경을 되돌릴 수 있는 보상 기반 구조를 도입했고, 분산 트랜잭션을 설계할 때 "실패를 전제로 한 흐름"을 코드로 다루는 경험을 확보했습니다. 다만 outbox처럼 발행-저장 원자성까지 보장하는 구조는 후속 보강 여지로 남았습니다.
 ~~~

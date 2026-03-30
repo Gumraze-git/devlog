@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Code2, GitCommitHorizontal, AlertCircle, Search, CheckCircle2, Flag } from "lucide-react";
+import { Code2, GitCommitHorizontal } from "lucide-react";
 import {
     buildTroubleSummary,
     createCodeKey,
@@ -11,7 +11,6 @@ import {
     parseTroubleshootingContent,
     slugify,
     stripInlineMarkdown,
-    TROUBLE_ROWS,
 } from "../lib/markdown";
 import MermaidDiagram from "./MermaidDiagram";
 import remarkGfm from "remark-gfm";
@@ -259,7 +258,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         };
     };
 
-    const renderCompareLayout = (children: React.ReactNode, className: string) => {
+    const renderCompareLayout = (children: React.ReactNode) => {
         const nodes = React.Children.toArray(children).filter((node) => {
             const text = getTextContent(node).trim();
             if (text.length === 0) return false;
@@ -292,23 +291,18 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         ];
 
         return (
-            <div className={className}>
+            <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 {cards.map((card) => (
-                    <section
-                        key={card.label}
-                        className={`compare-card compare-card--${card.variant}`}
-                    >
-                        <header className="compare-card__header">
-                            <span className={`compare-card__status compare-card__status--${card.variant}`}>
-                                {card.label}
-                            </span>
-                            {card.summary ? (
-                                <p className="compare-card__summary">
-                                    {card.summary}
-                                </p>
-                            ) : null}
-                        </header>
-                        <div className="compare-card__body">
+                    <section key={card.label} className="space-y-3">
+                        <h4 className="text-[16px] md:text-[18px] font-bold text-[var(--foreground)] m-0 flex items-center gap-2">
+                            {card.label}
+                            {card.summary && (
+                                <span className="text-[var(--text-muted)] font-normal text-[14px]">
+                                    - {card.summary}
+                                </span>
+                            )}
+                        </h4>
+                        <div className="prose-p:mt-0 prose-pre:mt-2 w-full">
                             {card.bodyNodes}
                         </div>
                     </section>
@@ -513,95 +507,174 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
         if (isBlockCodeNode && (lang === "troubleshooting" || lang === "trouble" || lang === "troubleshoot")) {
             const sections = parseTroubleshootingContent(code);
             const summary = buildTroubleSummary(sections);
-            const activeRows = TROUBLE_ROWS.filter((row) => Boolean(sections[row.key]));
 
-            const getIconAndColor = (key: string) => {
-                switch(key) {
-                    case "problem": return { Icon: AlertCircle, colorClass: "text-[#ef4444] dark:text-[#f87171]", bgClass: "bg-[#ef4444]/10 dark:bg-[#f87171]/10", borderClass: "border-[#ef4444]/20", leftBorder: "border-l-[#ef4444]" };
-                    case "cause": return { Icon: Search, colorClass: "text-[#f59e0b] dark:text-[#fbbf24]", bgClass: "bg-[#f59e0b]/10 dark:bg-[#fbbf24]/10", borderClass: "border-[#f59e0b]/20", leftBorder: "border-l-[#f59e0b]" };
-                    case "solution": return { Icon: CheckCircle2, colorClass: "text-[#0ea5e9] dark:text-[#38bdf8]", bgClass: "bg-[#0ea5e9]/10 dark:bg-[#38bdf8]/10", borderClass: "border-[#0ea5e9]/20", leftBorder: "border-l-[#0ea5e9]" };
-                    case "result": return { Icon: Flag, colorClass: "text-[#22c55e] dark:text-[#4ade80]", bgClass: "bg-[#22c55e]/10 dark:bg-[#4ade80]/10", borderClass: "border-[#22c55e]/20", leftBorder: "border-l-[#22c55e]" };
-                    default: return { Icon: AlertCircle, colorClass: "text-[var(--text-soft)]", bgClass: "bg-[var(--card)]", borderClass: "border-[var(--border)]", leftBorder: "border-l-[var(--border)]" };
+            const solutionDataRaw = sections["solution"] || "";
+            let solutionIntro = solutionDataRaw;
+            let compareValue = "";
+            let asIsText = "";
+            let toBeText = "";
+
+            const compareMarker = "> !compare";
+            const altCompareMarker = "!compare";
+            const cIndex = solutionDataRaw.indexOf(compareMarker);
+            const altIndex = solutionDataRaw.indexOf(altCompareMarker);
+
+            if (cIndex !== -1) {
+                solutionIntro = solutionDataRaw.substring(0, cIndex).trim();
+                compareValue = solutionDataRaw.substring(cIndex + compareMarker.length).trim();
+            } else if (altIndex !== -1) {
+                solutionIntro = solutionDataRaw.substring(0, altIndex).trim();
+                compareValue = solutionDataRaw.substring(altIndex + altCompareMarker.length).trim();
+            }
+
+            if (compareValue) {
+                const cleanCompare = compareValue
+                  .split("\n")
+                  .filter((l: string) => !l.trim().endsWith("!compare"))
+                  .map((l: string) => l.startsWith("> ") ? l.substring(2) : l.startsWith(">") ? l.substring(1) : l)
+                  .join("\n");
+                
+                if (cleanCompare.includes("```chips")) {
+                    const rawChunks = cleanCompare.split(/(?=```chips)/).filter((c: string) => c.trim().length > 0);
+                    rawChunks.forEach((chunk: string) => {
+                        const normalizedChunk = chunk.toLowerCase().replace(/\s+/g, "").replace(/[^a-z-]/g, "");
+                        if (normalizedChunk.includes("asis") || normalizedChunk.includes("as-is")) {
+                            asIsText += "\n" + chunk;
+                        } else if (normalizedChunk.includes("tobe") || normalizedChunk.includes("to-be")) {
+                            toBeText += "\n" + chunk;
+                        } else {
+                            if (!asIsText) asIsText += "\n" + chunk;
+                            else if (toBeText) toBeText += "\n" + chunk;
+                            else asIsText += "\n" + chunk;
+                        }
+                    });
+                } else {
+                    const blocks: string[] = [];
+                    const regex = /```[a-z]*\s*[\s\S]*?```/gi;
+                    let match;
+                    while ((match = regex.exec(cleanCompare)) !== null) {
+                        blocks.push(match[0]);
+                    }
+                    if (blocks.length >= 2) {
+                        asIsText = blocks[0];
+                        toBeText = blocks[1];
+                    } else if (blocks.length === 1) {
+                        asIsText = blocks[0];
+                    }
                 }
+            }
+
+            const SharedComponents: import("react-markdown").Components = {
+                pre: ({ children: innerChildren }) => <>{innerChildren}</>,
+                code: renderCode,
+                a: renderMarkdownAnchor,
+                p: ({ children: innerChildren }) => <p className="m-0 leading-snug">{innerChildren}</p>,
+                ul: ({ children: innerChildren }) => (
+                    <ul className="list-disc leading-snug pl-4 !m-0 !my-1.5 marker:text-[var(--text-muted)]">
+                        {innerChildren}
+                    </ul>
+                ),
+                ol: ({ children: innerChildren }) => (
+                    <ol className="list-decimal leading-snug pl-4 !m-0 !my-1.5 marker:text-[var(--text-muted)]">
+                        {innerChildren}
+                    </ol>
+                ),
+                li: ({ children: innerChildren }) => <li className="first:!mt-0 !mt-0.5 !mb-0 leading-snug">{innerChildren}</li>,
+                blockquote: ({ children: innerChildren }) => {
+                    const textStr = getTextContent(innerChildren).trim();
+                    if (textStr.includes("!compare") || textStr.includes("compare")) {
+                        return renderCompareLayout(innerChildren);
+                    }
+                    return (
+                        <blockquote className="border-l-2 border-[var(--border)] pl-3 text-[var(--text-soft)] italic my-1.5 py-0.5">
+                            {innerChildren}
+                        </blockquote>
+                    );
+                },
             };
 
             return (
-                <div className="trouble-card my-10 not-prose rounded-[2rem] border border-[var(--border)] bg-[var(--card-subtle)]/30 p-5 md:p-8 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.1)] relative overflow-hidden backdrop-blur-xl">
-                    <div className="relative z-10 flex flex-col gap-4 mb-8 md:flex-row md:items-center trouble-summary">
-                        <span className="inline-flex h-8 items-center justify-center rounded-lg border border-[var(--border)] bg-gradient-to-br from-[var(--card)] to-[var(--card-subtle)] px-3.5 text-[11.5px] font-black uppercase tracking-[0.2em] text-[var(--accent)] shadow-sm">
-                            Case Study
-                        </span>
-                        <h4 className="flex-1 min-w-0 font-bold tracking-tight leading-relaxed trouble-summary-title text-[17px] md:text-[20px] text-[var(--foreground)]">{summary}</h4>
-                        <div className="hidden flex-1 h-px opacity-50 bg-gradient-to-r md:block from-[var(--border)] to-transparent" />
-                    </div>
+                <div className="!mt-2 !mb-4">
+                    <h3 className="text-[20px] md:text-[22px] font-bold tracking-tight text-[var(--foreground)] !mt-0 !mb-2">
+                        {summary}
+                    </h3>
+                    
+                    <div className="space-y-2">
+                        {sections["problem"] && (
+                            <div className="space-y-1.5 bg-[var(--card-subtle)]/30 border border-[var(--border)] rounded-lg px-2.5 pb-2.5 pt-2.5 lg:px-3.5 lg:pb-3.5 lg:pt-3">
+                                <h4 className="flex items-center gap-2 text-[15px] md:text-[16px] font-bold tracking-[0.1em] text-[var(--text-soft)] uppercase !m-0 !mb-2 leading-none">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-muted)] outline outline-2 outline-[var(--text-muted)]/20" />
+                                    문제
+                                </h4>
+                                <div className="text-[14px] md:text-[15px] text-[var(--text-muted)] w-full">
+                                    <ReactMarkdown components={SharedComponents}>{normalizeArrowNotation(sections["problem"])}</ReactMarkdown>
+                                </div>
+                            </div>
+                        )}
 
-                    <div className="relative z-10 mt-4 space-y-5 trouble-content md:space-y-6">
-                        {activeRows.length > 0 ? (
-                            activeRows.map((row) => {
-                                const { Icon, colorClass, bgClass, borderClass, leftBorder } = getIconAndColor(row.key);
-                                return (
-                                <article
-                                    key={row.key}
-                                    className={`trouble-section group relative trouble-section--${row.key} rounded-2xl border ${borderClass} bg-[var(--card)] px-5 py-5 md:px-6 shadow-sm hover:shadow-md border-l-[5px] ${leftBorder} transition-all duration-300`}
-                                >
-                                    <div className="flex items-center gap-3 mb-4 trouble-section-header">
-                                        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${bgClass} ${colorClass} group-hover:scale-110 transition-transform duration-300`}>
-                                            <Icon size={16} strokeWidth={2.5} />
+                        {(sections["cause"] || solutionIntro || asIsText || toBeText) && (
+                            <div className="flex flex-col lg:grid lg:grid-cols-2 relative my-1.5 bg-[var(--card-subtle)]/30 border border-[var(--border)] rounded-lg px-2.5 pb-2.5 pt-2.5 lg:px-3.5 lg:pb-3.5 lg:pt-3 gap-y-3 lg:gap-y-0 lg:gap-x-4">
+                                {/* 1. CAUSE TEXT (Row 1, Col 1) */}
+                                <div className="order-1 lg:order-none lg:pb-2">
+                                    <h4 className="flex items-center gap-2 text-[15px] md:text-[16px] font-bold tracking-[0.1em] text-rose-500/90 dark:text-rose-400/90 uppercase !m-0 !mb-2 leading-none">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500/80 outline outline-2 outline-rose-500/20" />
+                                        AS IS
+                                    </h4>
+                                    {sections["cause"] && (
+                                        <div className="text-[14px] md:text-[15px] text-[var(--text-muted)]">
+                                            <ReactMarkdown components={SharedComponents}>{normalizeArrowNotation(sections["cause"])}</ReactMarkdown>
                                         </div>
-                                        <p className={`trouble-section-label text-[13px] md:text-[14px] font-extrabold uppercase tracking-[0.15em] ${colorClass}`}>
-                                            {row.label}
-                                        </p>
-                                    </div>
-                                    <div className="space-y-3 trouble-section-body md:pl-11">
-                                        <ReactMarkdown
-                                            components={{
-                                                pre: ({ children: innerChildren }) => <>{innerChildren}</>,
-                                                code: renderCode,
-                                                p: ({ children: innerChildren }) => (
-                                                    <p className="trouble-section-text text-[15px] md:text-[16px] leading-relaxed text-[var(--text-muted)]">
-                                                        {innerChildren}
-                                                    </p>
-                                                ),
-                                                li: ({ children: innerChildren }) => (
-                                                    <li className="trouble-section-text text-[15px] md:text-[16px] leading-relaxed text-[var(--text-muted)]">
-                                                        {innerChildren}
-                                                    </li>
-                                                ),
-                                                ul: ({ children: innerChildren }) => (
-                                                    <ul className="list-disc pl-5 space-y-1 mt-1 font-medium">{innerChildren}</ul>
-                                                ),
-                                                ol: ({ children: innerChildren }) => (
-                                                    <ol className="list-decimal pl-5 space-y-1 mt-1 font-medium">{innerChildren}</ol>
-                                                ),
-                                                blockquote: ({ children: innerChildren }) => {
-                                                    const textStr = getTextContent(innerChildren).trim();
-                                                    if (textStr.includes("!compare")) {
-                                                        return renderCompareLayout(
-                                                            innerChildren,
-                                                            "compare-grid my-4",
-                                                        );
-                                                    }
-                                                    return (
-                                                        <blockquote className="border-l-2 border-[var(--border)] pl-3 text-[var(--text-soft)] italic mt-2">
-                                                            {innerChildren}
-                                                        </blockquote>
-                                                    );
-                                                },
-                                                a: renderMarkdownAnchor,
-                                            }}
-                                        >
-                                            {normalizeArrowNotation(sections[row.key] || "")}
-                                        </ReactMarkdown>
-                                    </div>
-                                </article>
-                                );
-                            })
-                        ) : (
-                            <p className="text-[14px] leading-relaxed text-[var(--text-muted)]">
-                                작성된 내용이 없습니다.
-                            </p>
+                                    )}
+                                </div>
+
+                                {/* 2. SOLUTION TEXT (Row 1, Col 2) */}
+                                <div className="order-3 lg:order-none lg:pb-2 lg:border-l lg:border-[var(--border-muted)] lg:pl-4">
+                                    <div className="lg:hidden w-full h-[1px] bg-[var(--border-muted)]/30 mb-2 mt-0" />
+                                    <h4 className="flex items-center gap-2 text-[15px] md:text-[16px] font-bold tracking-[0.1em] text-emerald-500/90 dark:text-emerald-400/90 uppercase !m-0 !mb-2 leading-none">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 outline outline-2 outline-emerald-500/20" />
+                                        TO BE
+                                    </h4>
+                                    {solutionIntro && (
+                                        <div className="text-[14px] md:text-[15px] text-[var(--text-muted)]">
+                                            <ReactMarkdown components={SharedComponents}>{normalizeArrowNotation(solutionIntro)}</ReactMarkdown>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 3. AS-IS CODE (Row 2, Col 1) */}
+                                <div className="order-2 lg:order-none h-full">
+                                    {asIsText && (
+                                        <div className="text-[14px] md:text-[15px] text-[var(--text-muted)] w-full hover:z-10 relative [&_.shiki-block]:!mt-1 [&_.shiki-block]:!mb-0">
+                                            <ReactMarkdown components={SharedComponents}>{normalizeArrowNotation(asIsText.replace(/```chips[\s\S]*?```/g, "").trim())}</ReactMarkdown>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 4. TO-BE CODE (Row 2, Col 2) */}
+                                <div className="order-4 lg:order-none lg:border-l lg:border-[var(--border-muted)] lg:pl-4 h-full">
+                                    {toBeText && (
+                                        <div className="text-[14px] md:text-[15px] text-[var(--text-muted)] w-full hover:z-10 relative [&_.shiki-block]:!mt-1 [&_.shiki-block]:!mb-0">
+                                            <ReactMarkdown components={SharedComponents}>{normalizeArrowNotation(toBeText.replace(/```chips[\s\S]*?```/g, "").trim())}</ReactMarkdown>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {sections["result"] && (
+                            <div className="space-y-1.5 bg-[var(--card-subtle)]/30 border border-[var(--border)] rounded-lg px-2.5 pb-2.5 pt-2.5 lg:px-3.5 lg:pb-3.5 lg:pt-3 w-full">
+                                <h4 className="flex items-center gap-2 text-[15px] md:text-[16px] font-bold tracking-[0.1em] text-[var(--text-soft)] uppercase !m-0 !mb-2 leading-none">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-muted)] outline outline-2 outline-[var(--text-muted)]/20" />
+                                    결과
+                                </h4>
+                                <div className="text-[14px] md:text-[15px] text-[var(--text-muted)]">
+                                    <ReactMarkdown components={SharedComponents}>{normalizeArrowNotation(sections["result"])}</ReactMarkdown>
+                                </div>
+                            </div>
                         )}
                     </div>
+
+                    <hr className="my-8 border-t-[1.5px] border-dashed border-[var(--border-muted)] w-full" />
                 </div>
             );
         }
@@ -793,8 +866,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         const textStr = getTextContent(children).trim();
                         if (textStr.includes("!compare") || textStr.includes("compare")) {
                             return renderCompareLayout(
-                                children,
-                                "compare-grid my-6",
+                                children
                             );
                         }
                         return (
