@@ -765,7 +765,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
     };
 
     const containerClassName = [
-        "markdown-prose prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[var(--text-muted)] prose-p:leading-[1.6] prose-li:text-[var(--text-muted)] prose-li:leading-[1.4]",
+        "markdown-prose prose prose-base md:prose-lg prose-zinc dark:prose-invert max-w-4xl mx-auto prose-headings:tracking-tighter prose-headings:font-bold prose-headings:text-[var(--foreground)] prose-strong:text-[var(--foreground)] prose-strong:font-bold prose-p:text-[color:color-mix(in_srgb,var(--foreground)_95%,transparent)] prose-p:leading-[1.6] prose-li:text-[color:color-mix(in_srgb,var(--foreground)_95%,transparent)] prose-li:leading-[1.4]",
         className,
     ]
         .filter(Boolean)
@@ -830,7 +830,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                                 </p>
                             );
                         }
-                        return <p className="leading-[1.85] text-[16px] md:text-[18px] text-[var(--foreground)]/85 tracking-[-0.01em] break-keep">{children}</p>;
+                        return <p className="leading-[1.85] text-[16px] md:text-[18px] text-[color:color-mix(in_srgb,var(--foreground)_95%,transparent)] tracking-[-0.01em] break-keep">{children}</p>;
                     },
                     // GFM Tables - Elegant Content Reading Style
                     table: ({ children }) => (
@@ -858,7 +858,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, codeHtmlBy
                         </tr>
                     ),
                     td: ({ children }) => (
-                        <td className="px-3 py-[1.125rem] text-[15px] md:text-[17px] leading-[1.7] text-[var(--text-muted)] align-top first:font-medium first:text-[var(--foreground)] break-words">
+                        <td className="px-3 py-[1.125rem] text-[15px] md:text-[17px] leading-[1.7] text-[color:color-mix(in_srgb,var(--foreground)_95%,transparent)] align-top first:font-medium first:text-[var(--foreground)] break-words">
                             {children}
                         </td>
                     ),
