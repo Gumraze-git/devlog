@@ -130,7 +130,7 @@ export default function ProjectsListPage() {
       <PageIntro
         eyebrow="Projects"
         title="Idea to Execution"
-        description="문제를 정의하고 구조를 설계한 뒤, 구현과 검증까지 이어간 프로젝트들을 케이스 스터디 관점에서 정리했습니다."
+        description="문제를 정의하고 구조를 설계한 뒤, 구현과 검증까지 이어간 프로젝트들을 정리했습니다."
         bordered
       />
 

@@ -1,4 +1,4 @@
-## 4. 핵심 트러블슈팅 및 성능 개선
+## 4. 핵심 트러블슈팅
 
 ~~~troubleshooting
 제목: Auth와 Gateway의 권한 경계 모호성
@@ -49,231 +49,99 @@
 ~~~
 
 ~~~troubleshooting
-제목: 대시보드 다중 도메인 데이터 결합 병목
+제목: Problem Detail 기반 응답 계약 부재
 
 문제:
-- ERP 대시보드는 여러 도메인(주문, 견적, 제품 등) 정보를 통합 제공해야 하지만, 각 도메인 API가 파편화되어 있었습니다.
-- 프런트엔드에서 조합 로직을 부담하면서 화면 로딩 속도가 저하되고 개발 복잡도가 증가했습니다.
+- 서비스마다 성공/실패 응답 형태가 제각각이라 프런트와 다른 팀원이 예외를 같은 기준으로 해석하기 어려웠습니다.
+- 특히 Gateway를 거쳐 여러 도메인 API를 다루는 화면에서는 어떤 실패가 인증 문제인지, 입력 문제인지, 업무 규칙 문제인지 구분이 잘 되지 않았습니다.
 
 원인:
-- 도메인별 원시 CRUD API와 운영 화면용 집계 API의 목적이 혼재되어 있었습니다.
-- 특히 외부 서비스 연동이 필요한 데이터(공급사 회사명 등)의 동기 조회 방식이 전체 응답 시간을 지연시켰습니다.
+- 초기에는 예외 응답을 서비스별 DTO나 문자열 메시지 수준에서 처리해, 공통 오류 계약이 먼저 정해져 있지 않았습니다.
+- 결과적으로 프런트는 화면마다 예외 케이스를 따로 해석해야 했고, 팀 내에서도 실패 기준을 같은 언어로 설명하기 어려웠습니다.
 
 해결:
-- `DashboardOrderServiceImpl`을 도입하여 필요한 원천 데이터를 사전 가공하는 workflow item 모델로 구조화했습니다.
-- 공급사 정보 등 외부 연계는 Kafka 기반 비동기 Resolver 패턴(`SupplierCompanyResolverImpl`)으로 전환하여 서비스 간 결합도를 낮췄습니다.
+- Spring Problem Detail을 기준으로 공통 오류 응답 형식을 정리하고, Gateway와 하위 서비스가 같은 실패 해석 기준을 따르도록 맞췄습니다.
+- 인증/인가 오류, 입력 오류, 도메인 규칙 오류를 상태 코드와 응답 본문 기준으로 일관되게 구분하도록 정리했습니다.
 
 > !compare
 > ```java
-> // 문제: 프런트엔드에서 각 도메인을 순차 조회하거나 동기식으로 무겁게 결합
-> Order order = orderRepo.findById(id);
-> Product product = restTemplate.getForObject("/products/" + order.getPid()); // 동기 호출 병목
-> return new DashboardDto(order, product);
+> // 문제: 서비스마다 제각각인 오류 응답 형식
+> return ResponseEntity.badRequest().body(Map.of("message", "invalid state"));
 > ```
 > 
 > ```java
-> // 집계 서비스: 주문 아이템과 제품 정보를 Workflow 모델로 가공
-> Map<String, List<OrderItem>> itemsByOrder = mapOrderItems(orders);
-> Map<String, ProductInfoResponseDto.ProductDto> productMap = buildProductMap(itemsByOrder);
-> 
-> // 비동기 연계: Kafka를 통한 공급사 정보 확인 요청
-> SupplierCompanyResolveRequestEvent event = SupplierCompanyResolveRequestEvent.builder()
->         .transactionId(transactionId)
->         .supplierUserId(supplierUserId)
->         .build();
-> ```
-
-결과:
-- 파편화된 CRUD API를 운영 목적에 맞춘 전용 집계 API로 재구성하여, 대시보드 로딩 성능을 개선하고 프런트엔드 협업 효율을 극대화했습니다.
-~~~
-
-~~~troubleshooting
-제목: 개발 환경별 초기 데이터 정합성 불일치
-
-문제:
-- 모듈별 테스트 계정과 목업 데이터가 개발자마다 다르게 관리되어 재현 불가능한 버그가 자주 발생했습니다.
-- 특히 권한 및 대시보드 시나리오를 전체 팀이 동일하게 테스트할 수 있는 기준 데이터가 부족했습니다.
-
-원인:
-- 사용자 계정, 제품 식별자, 조직 정보 등이 하나의 초기화 규칙으로 묶여 있지 않고 각 서비스에 산재되어 있었습니다.
-
-해결:
-- `InternalUserInitializer`를 도입하여 Auth 계정 ID와 도메인 데이터를 매핑하는 전역 시드 규칙을 설정했습니다.
-- 제품 시드(`ProductInitializer`)에 고유 `productId` 필드와 소재 기반 구조를 적용하여 식별 정합성을 확보했습니다.
-
-> !compare
-> ```java
-> // 문제: 각 개발자가 필요에 따라 임의의 ID로 데이터를 산발적으로 생성
-> userRepository.save(new User("test1", "ROLE_USER"));
-> productRepository.save(new Product("p1", "sample"));
-> ```
-> 
-> ```java
-> // 시드 설정: 모듈별 권한 및 인원 기반 초기화 규칙 고정
-> private static final List<ModuleSeedConfig> MODULE_SEED_CONFIGS = List.of(
->     new ModuleSeedConfig("MM", "DEPT-001", "mm-user", 10, "mm-admin", 2),
->     new ModuleSeedConfig("SD", "DEPT-002", "sd-user", 10, "sd-admin", 2),
->     new ModuleSeedConfig("IM", "DEPT-003", "im-user", 10, "im-admin", 2)
+> // 공통 기준: Problem Detail 기반 오류 응답
+> return ResponseEntity.badRequest().body(
+>     ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "invalid state")
 > );
 > ```
 
 결과:
-- 시드 데이터가 단순 샘플링을 넘어 "재현 가능한 개발 인프라"로 구축되었으며, 팀 전체가 동일한 테스트 데이터 세트 위에서 안정적으로 개발할 수 있게 되었습니다.
+- 서비스와 프런트가 같은 기준으로 실패를 해석할 수 있게 되면서, 인증 경계와 응답 계약을 팀 전체가 더 일관되게 설명하고 사용할 수 있게 됐습니다.
 ~~~
 
 ~~~troubleshooting
-제목: 대량 목록 조회 시 N+1 반복 요청 병목
+제목: 대시보드와 목록용 조회 계약 부재
 
 문제:
-- 주문/견적 목록에서 각 항목의 상세 데이터를 건별로 반복 조회하는 구조로 인해, 데이터 증가에 따라 응답 속도가 기하급수적으로 느려졌습니다.
-- 대화형 대시보드 환경에서 목록 확장 시 발생하는 반복 조회 패턴이 주요 병목 지점이 되었습니다.
+- ERP 화면은 주문, 견적, 제품, 공급사처럼 여러 도메인 데이터를 함께 보여줘야 했지만, 초기 API는 원시 CRUD 중심이라 프런트가 화면 조합 로직을 많이 떠안고 있었습니다.
+- 목록 API도 페이징·필터·정렬 계약이 충분히 정리되지 않아 운영 화면 요구사항과 API 형태가 계속 어긋났습니다.
 
 원인:
-- 레파지토리 수준에서 개별 ID 기반 조회 메서드만 존재하여, 다건의 하위 항목을 일괄 조회할 수 있는 인터페이스가 부재했습니다.
+- 도메인별 원시 데이터와 운영 화면용 조회 계약을 같은 수준에서 다뤘고, 화면이 실제로 필요한 조합형 응답을 먼저 정의하지 못했습니다.
+- 특히 외부 연계 데이터와 목록 제어 파라미터가 조회 계약에 포함되지 않아, 화면마다 별도 조합 로직이 생기기 쉬웠습니다.
 
 해결:
-- `In` 연산자를 활용한 다중 ID 기반 조회(`findByOrder_IdIn` 등)를 도입하여 목록 단위 데이터를 일괄 배치 조회하도록 전환했습니다.
-- `DashboardOrderServiceImpl`에서 수집한 ID 목록을 맵 형태로 결합하여 메모리 내에서 데이터 매핑을 처리하도록 개선했습니다.
+- `DashboardOrderServiceImpl` 같은 집계용 조회 모델을 두고, 운영 화면이 바로 사용할 수 있는 응답 형태로 가공했습니다.
+- 견적 및 통계 API에 날짜 범위, 상태 필터, 검색어, 페이지네이션, 정렬 같은 목록 계약을 추가해 화면 요구사항과 API 기준을 맞췄습니다.
+- 외부 연계가 필요한 데이터는 Resolver 패턴으로 분리해 조회 계약을 더 예측 가능하게 만들었습니다.
 
 > !compare
 > ```java
-> // 문제: 목록 루프 내에서 건별로 상세 정보를 조회 (N+1 발생)
-> for (Order order : orders) {
->     List<OrderItem> items = orderItemRepo.findByOrderId(order.getId()); // 반복 쿼리
->     order.setItems(items);
-> }
+> // 문제: 원시 CRUD 응답을 화면에서 직접 조합
+> return quotationRepo.findAll();
 > ```
 > 
 > ```java
-> // 레파지토리: 다중 ID 기반 일괄 조회 인터페이스 도입
-> List<OrderItem> findByOrder_IdIn(List<String> orderIds);
-> 
-> // 서비스: 스트림을 활용한 효율적인 맵 매핑 처리
-> List<String> orderIds = orders.stream().map(Order::getId).toList();
-> return orderItemRepository.findByOrder_IdIn(orderIds).stream()
->         .collect(Collectors.groupingBy(item -> item.getOrder().getId()));
-> ```
-
-결과:
-- 반복 조회 비용을 근본적으로 제거하여 목록 조회 성능을 대폭 향상시켰으며, 대량 데이터 환경에서도 안정적인 응답을 보장하게 되었습니다.
-~~~
-
-~~~troubleshooting
-제목: 비표준화된 목록 조회 응답 제어
-
-문제:
-- ERP 목록 API가 페이징이나 필터 없이 전체 데이터를 반환하여, 시스템 부하와 응답 크기가 지속적으로 증가하는 문제가 있었습니다.
-- UI 요구사항(검색, 정렬)이 API 계약에 포함되지 않아 불필요한 데이터 통신이 과다하게 발생했습니다.
-
-원인:
-- 초기 API 설계가 고정된 전체 조회 방식에 머물러 있어, 대용량 데이터를 처리하기 위한 제어 파라미터가 누락되었습니다.
-
-해결:
-- 견적 및 통계 API에 날짜 범위, 상태 필터 검색어, 0-base 기준 페이지네이션을 표준 계약으로 추가했습니다.
-- 정렬 기준(`sortBy`)을 동적으로 수용할 수 있도록 컨트롤러 레이어를 고도화했습니다.
-
-> !compare
-> ```java
-> // 문제: 파라미터 제어 없이 전체 결과를 리스트로 반환
-> @GetMapping("/quotations")
-> public List<Quotation> getAll() {
->     return quotationRepo.findAll();
-> }
-> ```
-> 
-> ```java
-> // 컨트롤러: 페이징 및 검색 필터 파라미터 표준화
-> @GetMapping("/quotations")
+> // 운영 화면 기준 조회 계약과 목록 제어 파라미터
 > public ResponseEntity<Object> getQuotationList(
->         @RequestParam(defaultValue = "0") int page,
->         @RequestParam(defaultValue = "10") int size,
->         @RequestParam(required = false) String sortBy,
->         @RequestParam(required = false) String status) { ... }
+>     @RequestParam int page,
+>     @RequestParam int size,
+>     @RequestParam(required = false) String sortBy
+> ) { ... }
 > ```
 
 결과:
-- 필요한 범위만 전송하는 효율적인 API 계약을 정립하여 네트워크 부하를 줄이고 관리 화면의 반응 속도를 개선했습니다.
+- 화면 요구사항을 API 계약으로 다시 정리하면서, 프런트와 백엔드가 같은 조회 기준으로 개발할 수 있게 됐고 운영 화면 연동도 더 단순해졌습니다.
 ~~~
 
 ~~~troubleshooting
-제목: Kafka 비동기 흐름의 결과 추적 부재
+제목: 초기 데이터 정합성 불일치
 
 문제:
-- 서비스 간 비동기 이벤트 흐름에서 중복 수신이나 실패 시 상태 불일치가 발생해도 이를 감지하거나 복구할 장치가 부족했습니다.
-- 특히 이벤트 소비 후 자동 커밋 시점 문제로 인해 유실되거나 재처리가 반복되는 현상이 있었습니다.
+- 모듈별 테스트 계정과 목업 데이터가 개발자마다 다르게 관리되어 재현 불가능한 버그가 자주 발생했습니다.
+- 특히 권한과 대시보드 시나리오를 전체 팀이 동일하게 테스트할 수 있는 기준 데이터가 부족했습니다.
 
 원인:
-- 이벤트 발행 이후의 결과 대기, 수동 승인(ack), 보상 트랜잭션 등 비동기 라이프사이클 관리가 연동되지 않았습니다.
+- 사용자 계정, 제품 식별자, 조직 정보가 하나의 초기화 규칙으로 묶여 있지 않고 각 서비스에 흩어져 있었습니다.
+- 결과적으로 어떤 계정과 어떤 데이터 조합으로 화면을 검증해야 하는지 팀마다 다르게 이해하기 쉬웠습니다.
 
 해결:
-- `GenericAsyncResultManager`와 `DeferredResult`를 활용하여 비동기 처리 결과를 추적하고 성공/실패 여부를 확정 짓는 구조를 도입했습니다.
-- Auth 소비자 레이어에 `Acknowledgment` 기반 수동 커밋을 적용하고, 실패 시 롤백 이벤트 발행 또는 보상 트리거가 이어지도록 흐름을 가시화했습니다.
+- `InternalUserInitializer`를 도입해 Auth 계정 ID와 도메인 데이터를 매핑하는 전역 시드 규칙을 설정했습니다.
+- `ProductInitializer`에 고유 `productId`와 소재 기반 구조를 적용해 식별 정합성을 확보했습니다.
+- 모듈별 테스트 계정과 권한 시나리오를 같은 규칙으로 반복 실행할 수 있게 정리했습니다.
 
 > !compare
 > ```java
-> // 문제: 결과 확인 없이 발행만 하거나, 자동 커밋으로 인해 실패 조치가 누락됨
-> kafkaTemplate.send(topic, event); // 발행 후 추적 불가
-> 
-> @KafkaListener(...)
-> public void handle(Event event) {
->     process(event); // 수동 Ack 부재로 실패 시 유실 가능
-> }
+> // 문제: 개발자마다 다른 샘플 데이터와 계정 규칙
+> userRepository.save(new User("test1", "ROLE_USER"));
 > ```
 > 
 > ```java
-> // 결과 관리: 대기 중인 비동기 요청 상태 확인 및 결과 설정
-> if (event.isSuccess()) {
->     asyncResultManager.setSuccessResult(transactionId, event, "완료", HttpStatus.CREATED);
-> } else {
->     asyncResultManager.setErrorResult(transactionId, "실패", HttpStatus.INTERNAL_SERVER_ERROR);
->     publishRollbackEvent(event);
-> }
-> acknowledgment.acknowledge(); // 명시적 수동 커밋
+> // 시드 규칙: 모듈별 권한과 인원 기준 초기화
+> private static final List<ModuleSeedConfig> MODULE_SEED_CONFIGS = List.of(...);
 > ```
 
 결과:
-- 단순 발행-소비에서 한 단계 나아가, `transactionId` 기반 결과 확인과 수동 Ack, 보상 트리거를 갖춘 1차 안정화 구조를 만들었습니다. 다만 공통 DLQ/재시도 정책과 발행-커밋 원자성은 이후 보강 과제로 남았습니다.
-~~~
-
-~~~troubleshooting
-제목: 서비스 간 분산 트랜잭션의 부분적 실패 위험
-
-문제:
-- 공급사 또는 사용자 생성 시 여러 서비스의 DB에 데이터가 저장되어야 하지만, 중간 단계 실패 시 데이터가 반만 생성되는 "파편화" 현상이 있었습니다.
-- 로컬 `@Transactional`만으로는 네트워크 너머의 서비스 상태까지 원자성을 보장할 수 없었습니다.
-
-원인:
-- 분산 환경에서의 "All or Nothing"을 보장하기 위한 분산 트랜잭션 정책(Saga 패턴 등)이 부재했습니다.
-
-해결:
-- `SagaTransactionManager`를 구현하여 트랜잭션 ID 단위로 변경 사항을 수집하고 실패 시 실행할 보상 로직을 등록했습니다.
-- 비동기 흐름에서도 전체 작업의 완료를 `DeferredResult`로 관리하며, `SagaCompensationService`를 통해 물리적 롤백을 수행하도록 설계했습니다.
-
-> !compare
-> ```java
-> // 문제: 로컬 트랜잭션만 사용해 외부 서비스 실패 시 롤백이 불가함
-> @Transactional
-> public void createSupplier(Dto dto) {
->     repo.save(entity);
->     remoteCall.createAccount(dto.getId()); // 실패해도 위 save는 커밋됨
-> }
-> ```
-> 
-> ```java
-> // Saga 관리: 변경 내역 수집 및 예외 발생 시 전역 보상 처리
-> public <T> T executeSagaWithId(String tid, Supplier<T> action) {
->     try {
->         SagaTransactionContext.setCurrentTransactionId(tid);
->         T result = action.get();
->         changeCollector.persistChanges(tid); // 변경 내역 기록
->         return result;
->     } catch (Exception e) {
->         compensationService.compensate(tid); // 분산 롤백 실행
->         throw e;
->     }
-> }
-> ```
-
-결과:
-- 부분 실패 시 로컬 변경을 되돌릴 수 있는 보상 기반 구조를 도입했고, 분산 트랜잭션을 설계할 때 "실패를 전제로 한 흐름"을 코드로 다루는 경험을 확보했습니다. 다만 outbox처럼 발행-저장 원자성까지 보장하는 구조는 후속 보강 여지로 남았습니다.
+- 시드 데이터가 단순 샘플이 아니라 재현 가능한 개발 기준이 되면서, 팀 전체가 같은 계정과 같은 업무 시나리오 위에서 개발하고 검증할 수 있게 됐습니다.
 ~~~
