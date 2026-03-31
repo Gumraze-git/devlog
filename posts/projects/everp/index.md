@@ -1,6 +1,6 @@
 ---
 title: "Everp"
-summary: "공통 인증 서버, Gateway 권한 처리, Problem Detail 기반 응답 계약, 조회 계약과 초기화 데이터 기준을 정리한 ERP 팀 프로젝트입니다."
+summary: "현대오토에버 모빌리티 코딩 스쿨에서 현대오토에버 ERP 시스템 개발을 목표로 진행한 대규모 팀 프로젝트에서, DDD 기반 MSA 서버 경계를 설계하고 ERP 도메인과 유비쿼터스 언어를 정리한 뒤 Auth와 Gateway 권한 처리 구조를 구현한 프로젝트입니다."
 sources:
   - label: "프로젝트 통합 레포"
     url: "https://github.com/Gumraze-git/everp"
@@ -40,32 +40,34 @@ stack:
   - OAuth 2.1
 period: "2025.09 - 2025.11"
 members: "총 6명 (프론트엔드 3, 백엔드 3)"
-role: "팀장, 공통 인증 서버·Gateway 권한 처리·응답 계약 중심 백엔드"
+role: "팀장, 백엔드"
 roles:
-  - Shared Auth
-  - Gateway Authorization
-  - API Contract
-  - Query / Seed Data
+  - DDD / Bounded Context
+  - MSA Server Split
+  - Auth / Gateway Authorization
 category: "ERP Workflow Service"
-project_type: "교육 기반 팀 프로젝트"
+project_type: "현대오토에버 ERP 개발 프로젝트"
 status: "Completed"
 feature_cards:
-  - title: "공통 인증과 클라이언트 경계"
-    description: "Spring Authorization Server 기반 OAuth2.1/OIDC 인증 서버를 구축하고 클라이언트 유형별 로그인 흐름을 정리했습니다."
-  - title: "Gateway 권한 해석"
-    description: "JWT Claims를 역할과 사용자 유형으로 해석해 화면/API 권한 기준을 일관되게 연결했습니다."
-  - title: "응답 계약과 팀 기준 정렬"
-    description: "Problem Detail 기반 오류 응답, 조회 계약, 초기화 데이터를 정리해 프론트 연동과 팀 개발 기준을 맞췄습니다."
+  - title: "Bounded Context와 공통 언어 정리"
+    description: "Business와 SCM을 두 개의 큰 bounded context로 두고, 팀이 같은 업무 언어로 경계를 설명할 수 있게 기준을 맞췄습니다."
+  - title: "Auth와 Gateway 권한 경계"
+    description: "Spring Authorization Server와 Gateway Resource Server를 기준으로 인증과 접근 제어 책임을 나눴습니다."
+  - title: "Problem Detail 기반 API 계약"
+    description: "성공 응답은 화면용 DTO, 실패 응답은 Problem Detail이라는 기준으로 API 계약을 다시 정리했습니다."
+  - title: "조회 계약과 초기화 데이터 기준"
+    description: "운영 화면용 조회 모델과 시드 규칙을 정리해 팀이 같은 시나리오로 개발할 수 있게 만들었습니다."
 results:
-  - Auth와 Gateway 경계를 먼저 고정해 모바일·웹·백엔드 접근 정책을 같은 기준으로 맞춤
-  - Problem Detail 기반 공통 오류 응답으로 프런트 연동 규칙과 서비스 간 디버깅 기준을 통일
+  - Business와 SCM를 설명 가능한 bounded context로 정리해 구현 범위와 업무 언어를 같은 기준으로 맞춤
+  - Auth와 Gateway 경계를 먼저 고정해 모바일·웹·백엔드 접근 정책을 같은 기준으로 통일
+  - Problem Detail 기반 공통 오류 응답으로 프런트 연동 규칙과 서비스 간 실패 해석 기준을 정리
   - 조회 계약과 초기화 데이터를 정리해 팀이 같은 시나리오와 같은 언어로 개발할 수 있는 기준을 마련
 published: true
 education: "현대오토에버 모빌리티 SW 스쿨 2기"
 about_organization: "현대오토에버 모빌리티 SW 스쿨 2기"
-about_description: "Everp는 견적, 주문, 발주, 재고, 생산, 정산, 인사 흐름을 하나의 업무 체계로 다뤄본 ERP 성격의 팀 프로젝트였습니다. 저는 팀장과 백엔드 역할을 함께 맡아 공통 인증 서버, Gateway 권한 처리, Problem Detail 기반 응답 계약, 조회 계약과 초기화 데이터를 먼저 고정해 팀이 같은 기준으로 개발할 수 있도록 만드는 데 집중했습니다."
+about_description: "Everp는 견적, 주문, 발주, 재고, 생산, 정산, 인사 흐름을 하나의 업무 체계로 다뤄본 ERP 성격의 팀 프로젝트였습니다. 저는 팀장과 백엔드 역할을 함께 맡아 Bounded Context와 공통 언어, Auth와 Gateway 권한 경계, Problem Detail 기반 응답 계약, 조회 계약과 초기화 데이터를 먼저 고정하고 팀이 같은 기준으로 구현할 수 있도록 만드는 데 집중했습니다."
 about_tasks:
-  - 팀 단위 일정과 범위를 조율하며 공통 인증, Gateway, 조회 계약 중심의 기준을 정리
+  - 팀 단위 일정과 범위를 조율하며 bounded context, 공통 인증, 조회 계약, 초기화 데이터 기준을 정리
   - OAuth2.1/OIDC 인증 서버와 Gateway 권한 검사 정책 구현
   - Problem Detail 기반 오류 응답과 대시보드용 조회 계약 구현
   - 초기화 데이터와 모듈별 테스트 시나리오 기준 정리
